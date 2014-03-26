@@ -1,8 +1,24 @@
+function icRun() {
+  var target = document.querySelector('.calendar-graph');
+
+  var observer = new MutationObserver(function(mutations) {
+    mutations.forEach(function(mutation) {
+      if (mutation.type === 'childList') {
+        var days = $('#calendar-graph  rect');
+        d3.selectAll(days).attr("data-contrib-count", function(d, i) { return d[1]; });
+      }
+    });
+  });
+
+  observer.observe(target, { attributes: true, childList: true, characterData: true});
+}
+var script = document.createElement('script');
+script.appendChild(document.createTextNode('('+ icRun +')();'));
+document.documentElement.appendChild(script);
+
 $(function() {
 
   $('<canvas id="isometric-contributions" width="721" height="500"></canvas>').insertBefore('#contributions-calendar');
-
-  console.log($('#calendar-graph g').length);
 
   var SIZE      = 10;
   var GH_OFFSET = 13;
@@ -20,10 +36,21 @@ $(function() {
   var color3 = new obelisk.CubeColor().getByHorizontalColor(0x44a340);
   var color4 = new obelisk.CubeColor().getByHorizontalColor(0x1e6823);
 
-  $('#calendar-graph g').each(function(g) {
+  var contribCount;
+
+  $('#calendar-graph g > g').each(function(g) {
     $(this).find('rect').each(function(r) {
-      console.log($(this).attr('style'));
+      var r = $(this).get(0);
       var y = $(this).attr('y') / GH_OFFSET;
+      var style = $(this).attr('style');
+
+      $(this).mouseover();
+      // var html = $('.svg-tip').html();
+      // debugger;
+      // contribCount = d3.select(r).data()[0][1];
+      // console.log(contribCount);
+      // var matches = $('.svg-tip').html().match(/(\d+) contributions/);
+      // id = matches !== null ? matches[1] : '';
 
       var contribCount;
       var weightedCount = Math.random();
@@ -36,11 +63,11 @@ $(function() {
       if (contribCount <= 3) contribCount = 3;
       var dimension = new obelisk.CubeDimension(SIZE, SIZE, contribCount);
 
-      if (contribCount == 3)  color = color0;
-      if (contribCount > 10)  color = color1;
-      if (contribCount > 20)  color = color2;
-      if (contribCount > 30)  color = color3;
-      if (contribCount > 50)  color = color4;
+      if      (style == 'fill: rgb(238, 238, 238);') color = color0;
+      else if (style == 'fill: rgb(214, 230, 133);') color = color1;
+      else if (style == 'fill: rgb(140, 198, 101);') color = color2;
+      else if (style == 'fill: rgb(68, 163, 64);')   color = color3;
+      else if (style == 'fill: rgb(30, 104, 35);')   color = color4;
 
       var cube = new obelisk.Cube(dimension, color, false);
       var p3d = new obelisk.Point3D(SIZE * g, SIZE * y, 0);
@@ -49,3 +76,4 @@ $(function() {
   });
 
 });
+
