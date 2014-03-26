@@ -1,4 +1,3 @@
-isometric-contributions
-=======================
+This is a WIP Chrome extension (maybe Safari too?) that will let you toggle between your regular GitHub contribution chart and an isometric pixel art version.
 
-Render an isometric pixel art version of your contribution chart.
+![](http://cl.ly/image/2m1r422t161J/content)
