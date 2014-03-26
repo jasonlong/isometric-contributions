@@ -51,7 +51,7 @@ $(function() {
 });
 
 function renderIsometricChart() {
-  $('<canvas id="isometric-contributions" width="721" height="500"></canvas>').insertBefore('#contributions-calendar');
+  $('<canvas id="isometric-contributions" width="721" height="450"></canvas>').insertBefore('#contributions-calendar');
 
   var SIZE       = 10;
   var GH_OFFSET  = 13;
@@ -60,7 +60,7 @@ function renderIsometricChart() {
   var canvas = document.getElementById('isometric-contributions');
 
   // create pixel view container in point
-  var point = new obelisk.Point(125, 100);
+  var point = new obelisk.Point(128, 120);
   var pixelView = new obelisk.PixelView(canvas, point);
 
   var color;
@@ -80,7 +80,7 @@ function renderIsometricChart() {
       var style        = $(this).attr('style');
       var contribCount = parseInt($(this).data("contrib-count"));
 
-      var dimension = new obelisk.CubeDimension(SIZE, SIZE, MAX_HEIGHT/maxContributions * contribCount + 3);
+      var dimension = new obelisk.CubeDimension(SIZE, SIZE, parseInt(MAX_HEIGHT/maxContributions * contribCount) + 3);
 
       if      (style == 'fill: rgb(238, 238, 238);') color = color0;
       else if (style == 'fill: rgb(214, 230, 133);') color = color1;
