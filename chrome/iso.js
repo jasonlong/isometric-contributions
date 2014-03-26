@@ -74,9 +74,10 @@ function renderIsometricChart() {
   var contribCount;
 
   $('#calendar-graph g > g').each(function(g) {
+    var x = parseInt($(this).attr('transform').match(/(\d+)/)[0] / GH_OFFSET);
     $(this).find('rect').each(function(r) {
       var r            = $(this).get(0);
-      var y            = $(this).attr('y') / GH_OFFSET;
+      var y            = parseInt($(this).attr('y') / GH_OFFSET);
       var style        = $(this).attr('style');
       var contribCount = parseInt($(this).data("contrib-count"));
 
@@ -89,7 +90,7 @@ function renderIsometricChart() {
       else if (style == 'fill: rgb(30, 104, 35);')   color = color4;
 
       var cube = new obelisk.Cube(dimension, color, false);
-      var p3d = new obelisk.Point3D(SIZE * g, SIZE * y, 0);
+      var p3d = new obelisk.Point3D(SIZE * x, SIZE * y, 0);
       pixelView.renderObject(cube, p3d);
     });
   });
