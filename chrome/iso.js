@@ -13,6 +13,7 @@ function icRun() {
           if (d[1] > maxCount) maxCount = d[1];
           return d[1];
         });
+        observer.disconnect();
         target.setAttribute("data-max-contributions", maxCount);
       }
     });
@@ -27,20 +28,26 @@ document.documentElement.appendChild(script);
 //
 // The actual extension
 //
-$(function() {
 
+$(function() {
   var target = document.querySelector('.js-calendar-graph');
 
   var observer = new MutationObserver(function(mutations) {
     mutations.forEach(function(mutation) {
       if (mutation.attributeName === 'data-max-contributions') {
         // We're loaded and ready!
+        observer.disconnect();
         renderIsometricChart();
       }
     });
   });
 
-  observer.observe(target, { attributes: true, childList: true, characterData: true});
+  if ($('.js-calendar-graph').data("max-contributions")) {
+    renderIsometricChart();
+  }
+  else {
+    observer.observe(target, { attributes: true, childList: true, characterData: true});
+  }
 });
 
 function renderIsometricChart() {
@@ -53,7 +60,7 @@ function renderIsometricChart() {
   var canvas = document.getElementById('isometric-contributions');
 
   // create pixel view container in point
-  var point = new obelisk.Point(100, 50);
+  var point = new obelisk.Point(125, 100);
   var pixelView = new obelisk.PixelView(canvas, point);
 
   var color;
