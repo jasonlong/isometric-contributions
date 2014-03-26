@@ -43,24 +43,8 @@ $(function() {
       var r = $(this).get(0);
       var y = $(this).attr('y') / GH_OFFSET;
       var style = $(this).attr('style');
+      var contribCount = parseInt($(this).data("contrib-count")) + 3;
 
-      $(this).mouseover();
-      // var html = $('.svg-tip').html();
-      // debugger;
-      // contribCount = d3.select(r).data()[0][1];
-      // console.log(contribCount);
-      // var matches = $('.svg-tip').html().match(/(\d+) contributions/);
-      // id = matches !== null ? matches[1] : '';
-
-      var contribCount;
-      var weightedCount = Math.random();
-
-      if      (weightedCount < 0.4) contribCount = Math.floor(weightedCount * 12);
-      else if (weightedCount < 0.5) contribCount = Math.floor(weightedCount * 15);
-      else if (weightedCount < 0.6) contribCount = Math.floor(weightedCount * 20);
-      else if (weightedCount < 0.7) contribCount = Math.floor(weightedCount * 25);
-
-      if (contribCount <= 3) contribCount = 3;
       var dimension = new obelisk.CubeDimension(SIZE, SIZE, contribCount);
 
       if      (style == 'fill: rgb(238, 238, 238);') color = color0;
