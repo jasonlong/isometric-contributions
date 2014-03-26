@@ -51,16 +51,16 @@ $(function() {
 });
 
 function renderIsometricChart() {
-  $('<canvas id="isometric-contributions" width="721" height="450"></canvas>').insertBefore('#contributions-calendar');
+  $('<canvas id="isometric-contributions" width="728" height="470"></canvas>').insertBefore('#contributions-calendar');
 
-  var SIZE       = 10;
+  var SIZE       = 12;
   var GH_OFFSET  = 13;
   var MAX_HEIGHT = 100;
 
   var canvas = document.getElementById('isometric-contributions');
 
   // create pixel view container in point
-  var point = new obelisk.Point(128, 120);
+  var point = new obelisk.Point(87, 100);
   var pixelView = new obelisk.PixelView(canvas, point);
 
   var color;
