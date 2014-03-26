@@ -27,9 +27,23 @@ document.documentElement.appendChild(script);
 //
 // The actual extension
 //
-
 $(function() {
 
+  var target = document.querySelector('.js-calendar-graph');
+
+  var observer = new MutationObserver(function(mutations) {
+    mutations.forEach(function(mutation) {
+      if (mutation.attributeName === 'data-max-contributions') {
+        // We're loaded and ready!
+        renderIsometricChart();
+      }
+    });
+  });
+
+  observer.observe(target, { attributes: true, childList: true, characterData: true});
+});
+
+function renderIsometricChart() {
   $('<canvas id="isometric-contributions" width="721" height="500"></canvas>').insertBefore('#contributions-calendar');
 
   var SIZE       = 10;
@@ -37,8 +51,6 @@ $(function() {
   var MAX_HEIGHT = 100;
 
   var canvas = document.getElementById('isometric-contributions');
-
-  console.log($('#calendar-graph').length);
 
   // create pixel view container in point
   var point = new obelisk.Point(100, 50);
@@ -74,6 +86,4 @@ $(function() {
       pixelView.renderObject(cube, p3d);
     });
   });
-
-});
-
+}
