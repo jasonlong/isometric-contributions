@@ -104,7 +104,6 @@ function initUI() {
   $('<span class="ic-toggle"><a href="#" class="ic-toggle-option squares" data-ic-option="squares">sq</a><a href="#" class="ic-toggle-option cubes" data-ic-option="cubes">cu</a></span>').insertBefore(insertLocation);
 
   chrome.storage.local.get('toggleSetting', function (result) {
-    console.log(result.toggleSetting);
     if (result.toggleSetting !== undefined) {
       $('.ic-toggle-option.'+result.toggleSetting).addClass('active');
       contributionsBox.addClass('ic-'+result.toggleSetting);
