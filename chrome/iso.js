@@ -101,7 +101,7 @@ function renderIsometricChart() {
 function initUI() {
   var contributionsBox = $('#contributions-calendar').closest('.box').find('.box-body');
   var insertLocation = $('#contributions-calendar').closest('.box').find('.box-header .box-title');
-  $('<span class="ic-toggle"><a href="#" class="ic-toggle-option squares" data-ic-option="squares"></a><a href="#" class="ic-toggle-option cubes" data-ic-option="cubes"></a></span>').insertBefore(insertLocation);
+  $('<span class="ic-toggle"><span class="tooltipped tooltipped-nw" aria-label="Regular chart view"><a href="#" class="ic-toggle-option squares" data-ic-option="squares"></a></span><span class="tooltipped tooltipped-nw" aria-label="Isometric chart view"><a href="#" class="ic-toggle-option cubes" data-ic-option="cubes"></a></span></span>').insertBefore(insertLocation);
 
   chrome.storage.local.get('toggleSetting', function (result) {
     if (result.toggleSetting !== undefined) {

@@ -5,6 +5,12 @@
   top: 10px;
 }
 
+.ic-toggle .tooltipped {
+  float: none ! important;
+  top: 0 ! important;
+  right: 0 ! important;
+}
+
 .ic-toggle-option {
   font-size: 10px;
   height: 32px;
@@ -19,14 +25,14 @@
   background-color: #eee;
 }
 
-.ic-toggle-option:first-child {
+.ic-toggle .tooltipped:first-child .ic-toggle-option {
   border-top-left-radius: 3px;
   border-bottom-left-radius: 3px;
   border-right: 0;
   padding: 2px 13px 2px 10px;
 }
 
-.ic-toggle-option:last-child {
+.ic-toggle .tooltipped:last-child .ic-toggle-option {
   border-top-right-radius: 3px;
   border-bottom-right-radius: 3px;
   border-left: 0;
