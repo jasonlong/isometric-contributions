@@ -7,6 +7,9 @@
     "js": [ "jquery.min.js", "obelisk.min.js", "iso.js" ],
     "matches": [ "https://github.com/*" ]
   }],
+  "permissions": [
+    "storage"
+  ],
   "icons" : {
     "48" : "icon-48.png",
     "128" : "icon-128.png"

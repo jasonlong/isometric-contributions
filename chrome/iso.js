@@ -48,6 +48,8 @@ $(function() {
   else {
     observer.observe(target, { attributes: true, childList: true, characterData: true});
   }
+
+  initUI();
 });
 
 function renderIsometricChart() {
@@ -94,4 +96,38 @@ function renderIsometricChart() {
       pixelView.renderObject(cube, p3d);
     });
   });
+}
+
+function initUI() {
+  var contributionsBox = $('#contributions-calendar').closest('.box').find('.box-body');
+  var insertLocation = $('#contributions-calendar').closest('.box').find('.box-header .box-title');
+  $('<span class="ic-toggle"><a href="#" class="ic-toggle-option squares" data-ic-option="squares">sq</a><a href="#" class="ic-toggle-option cubes" data-ic-option="cubes">cu</a></span>').insertBefore(insertLocation);
+
+  chrome.storage.local.get('toggleSetting', function (result) {
+    console.log(result.toggleSetting);
+    if (result.toggleSetting !== undefined) {
+      $('.ic-toggle-option.'+result.toggleSetting).addClass('active');
+      contributionsBox.addClass('ic-'+result.toggleSetting);
+    }
+    else {
+      $('.ic-toggle-option.cubes').addClass('active');
+      contributionsBox.removeClass('ic-squares').addClass('ic-cubes');
+    }
+  });
+
+  $('.ic-toggle-option').click(function(e) {
+    e.preventDefault();
+    if ($(this).data("ic-option") === "squares") {
+      contributionsBox.removeClass('ic-cubes').addClass('ic-squares');
+    }
+    else {
+      contributionsBox.removeClass('ic-squares').addClass('ic-cubes');
+    }
+    $('.ic-toggle-option').removeClass('active');
+    $(this).addClass('active');
+
+    // chrome.storage.sync.set({'value': theValue}, function() {
+    //   message('Settings saved');
+    // });
+  })
 }

@@ -1,0 +1,49 @@
+.ic-toggle {
+  float: right;
+  position: relative;
+  right: 24px;
+  top: 10px;
+}
+
+.ic-toggle-option {
+  font-size: 10px;
+  height: 32px;
+  background-color: transparent;
+  border: solid 1px #d5d5d5;
+  padding: 2px 5px;
+}
+
+.ic-toggle-option:hover {
+  background-color: #eee;
+}
+
+.ic-toggle-option:first-child {
+  border-top-left-radius: 3px;
+  border-bottom-left-radius: 3px;
+}
+
+.ic-toggle-option:last-child {
+  border-top-right-radius: 3px;
+  border-bottom-right-radius: 3px;
+}
+
+.ic-toggle-option.active {
+  background-color: #4183c4;
+  border-color: #4183c4;
+  color: #fff;
+}
+
+/*
+ * Normal chart display
+ */
+.ic-squares #isometric-contributions {
+  display: none;
+}
+
+/*
+ * Isometric cube display
+ */
+.ic-cubes .calendar-graph,
+.ic-cubes .contrib-footer {
+  display: none;
+}
