@@ -44,6 +44,7 @@
  * Isometric cube display
  */
 .ic-cubes .calendar-graph,
+.ic-cubes .contrib-details,
 .ic-cubes .contrib-footer {
   display: none;
 }

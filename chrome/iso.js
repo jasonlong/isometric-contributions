@@ -117,7 +117,8 @@ function initUI() {
 
   $('.ic-toggle-option').click(function(e) {
     e.preventDefault();
-    if ($(this).data("ic-option") === "squares") {
+    var option = $(this).data("ic-option");
+    if (option === "squares") {
       contributionsBox.removeClass('ic-cubes').addClass('ic-squares');
     }
     else {
@@ -126,8 +127,6 @@ function initUI() {
     $('.ic-toggle-option').removeClass('active');
     $(this).addClass('active');
 
-    // chrome.storage.sync.set({'value': theValue}, function() {
-    //   message('Settings saved');
-    // });
+    chrome.storage.local.set({'toggleSetting': option});
   })
 }
