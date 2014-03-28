@@ -74,3 +74,20 @@
 .ic-cubes .contrib-footer {
   display: none;
 }
+
+.ic-contributions-wrapper {
+  position: relative;
+}
+
+.ic-obelisk {
+  font-size: 11px;
+  text-align: right;
+  color: #bbb;
+  position: absolute;
+  top: 441px;
+  right: 138px;
+}
+
+.ic-obelisk a {
+  color: #999;
+}

@@ -53,7 +53,8 @@ $(function() {
 });
 
 function renderIsometricChart() {
-  $('<canvas id="isometric-contributions" width="728" height="470"></canvas>').insertBefore('#contributions-calendar');
+  $('<div class="ic-contributions-wrapper"></div>').insertBefore('#contributions-calendar');
+  $('<canvas id="isometric-contributions" width="728" height="470"></canvas>').appendTo('#contributions-calendar');
 
   var SIZE       = 12;
   var GH_OFFSET  = 13;
@@ -101,8 +102,14 @@ function renderIsometricChart() {
 function initUI() {
   var contributionsBox = $('#contributions-calendar').closest('.box').find('.box-body');
   var insertLocation = $('#contributions-calendar').closest('.box').find('.box-header .box-title');
+
+  // Inject toggle
   $('<span class="ic-toggle"><span class="tooltipped tooltipped-nw" aria-label="Regular chart view"><a href="#" class="ic-toggle-option squares" data-ic-option="squares"></a></span><span class="tooltipped tooltipped-nw" aria-label="Isometric chart view"><a href="#" class="ic-toggle-option cubes" data-ic-option="cubes"></a></span></span>').insertBefore(insertLocation);
 
+  // Inject obelisk.js credit
+  $('<span class="ic-obelisk">Graphics powered by <a href="https://github.com/nosir/obelisk.js">obelisk.js</a>').appendTo($('.ic-contributions-wrapper'));
+
+  // Check for user preference
   chrome.storage.local.get('toggleSetting', function (result) {
     if (result.toggleSetting !== undefined) {
       $('.ic-toggle-option.'+result.toggleSetting).addClass('active');
@@ -114,6 +121,7 @@ function initUI() {
     }
   });
 
+  // Observe toggle
   $('.ic-toggle-option').click(function(e) {
     e.preventDefault();
     var option = $(this).data("ic-option");
