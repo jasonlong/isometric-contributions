@@ -104,22 +104,7 @@ function initUI() {
   var insertLocation = $('#contributions-calendar').closest('.box').find('.box-header .box-title');
 
   // Inject toggle
-  $('<span class="ic-toggle"><span class="tooltipped tooltipped-nw" aria-label="Regular chart view"><a href="#" class="ic-toggle-option squares" data-ic-option="squares"></a></span><span class="tooltipped tooltipped-nw" aria-label="Isometric chart view"><a href="#" class="ic-toggle-option cubes" data-ic-option="cubes"></a></span></span>').insertBefore(insertLocation);
-
-  // Inject obelisk.js credit
-  $('<span class="ic-obelisk">Graphics powered by <a href="https://github.com/nosir/obelisk.js">obelisk.js</a>').appendTo($('.ic-contributions-wrapper'));
-
-  // Check for user preference
-  chrome.storage.local.get('toggleSetting', function (result) {
-    if (result.toggleSetting !== undefined) {
-      $('.ic-toggle-option.'+result.toggleSetting).addClass('active');
-      contributionsBox.addClass('ic-'+result.toggleSetting);
-    }
-    else {
-      $('.ic-toggle-option.cubes').addClass('active');
-      contributionsBox.removeClass('ic-squares').addClass('ic-cubes');
-    }
-  });
+  $('<span class="ic-toggle"><span class="tooltipped tooltipped-nw" aria-label="Normal chart view"><a href="#" class="ic-toggle-option squares" data-ic-option="squares"></a></span><span class="tooltipped tooltipped-nw" aria-label="Isometric chart view"><a href="#" class="ic-toggle-option cubes" data-ic-option="cubes"></a></span></span>').insertBefore(insertLocation);
 
   // Observe toggle
   $('.ic-toggle-option').click(function(e) {
@@ -135,5 +120,43 @@ function initUI() {
     $(this).addClass('active');
 
     chrome.storage.local.set({'toggleSetting': option});
-  })
+  });
+
+  // Check for user preference
+  chrome.storage.local.get('toggleSetting', function (result) {
+    if (result.toggleSetting !== undefined) {
+      $('.ic-toggle-option.'+result.toggleSetting).addClass('active');
+      contributionsBox.addClass('ic-'+result.toggleSetting);
+    }
+    else {
+      $('.ic-toggle-option.cubes').addClass('active');
+      contributionsBox.removeClass('ic-squares').addClass('ic-cubes');
+    }
+  });
+
+  loadStats();
+}
+
+function loadStats() {
+  // Year total
+  var str  = $('.contrib-day').html();
+  var html = $.parseHTML(str);
+  var count = html[1].innerText.match(/(((\d{1,3})(,\d{3})*)|(\d+))(.\d+)?/)[0];
+  var dates = $.trim(html[2].nodeValue);
+
+  // Longest streak
+  var str  = $('.contrib-streak').html();
+  var html = $.parseHTML(str);
+  var count = html[1].innerText.match(/(((\d{1,3})(,\d{3})*)|(\d+))(.\d+)?/)[0];
+  var dates = $.trim(html[2].nodeValue);
+
+  // Current streak
+  var str  = $('.contrib-streak-current').html();
+  var html = $.parseHTML(str);
+  var count = html[1].innerText.match(/(((\d{1,3})(,\d{3})*)|(\d+))(.\d+)?/)[0];
+  var dates = $.trim(html[2].nodeValue);
+
+  // Inject obelisk.js credit
+  $('<span class="ic-obelisk">Graphics powered by <a href="https://github.com/nosir/obelisk.js">obelisk.js</a>').appendTo($('.ic-contributions-wrapper'));
+
 }
