@@ -10,11 +10,15 @@ function icRun() {
         var maxCount = 0;
         var days = $('#calendar-graph rect');
         d3.selectAll(days).attr("data-contrib-count", function(d, i) {
-          if (d[1] > maxCount) maxCount = d[1];
+          if (d[1] > maxCount) {
+            bestDay  = d[0];
+            maxCount = d[1];
+          }
           return d[1];
         });
         observer.disconnect();
         target.setAttribute("data-max-contributions", maxCount);
+        target.setAttribute("data-best-day", bestDay);
       }
     });
   });
@@ -139,22 +143,27 @@ function initUI() {
 
 function loadStats() {
   // Year total
-  var str  = $('.contrib-day').html();
-  var html = $.parseHTML(str);
+  var str   = $('.contrib-day').html();
+  var html  = $.parseHTML(str);
   var count = html[1].innerText.match(/(((\d{1,3})(,\d{3})*)|(\d+))(.\d+)?/)[0];
   var dates = $.trim(html[2].nodeValue);
 
   // Longest streak
-  var str  = $('.contrib-streak').html();
-  var html = $.parseHTML(str);
+  var str   = $('.contrib-streak').html();
+  var html  = $.parseHTML(str);
   var count = html[1].innerText.match(/(((\d{1,3})(,\d{3})*)|(\d+))(.\d+)?/)[0];
   var dates = $.trim(html[2].nodeValue);
 
   // Current streak
-  var str  = $('.contrib-streak-current').html();
-  var html = $.parseHTML(str);
+  var str   = $('.contrib-streak-current').html();
+  var html  = $.parseHTML(str);
   var count = html[1].innerText.match(/(((\d{1,3})(,\d{3})*)|(\d+))(.\d+)?/)[0];
   var dates = $.trim(html[2].nodeValue);
+
+  // Best day
+  var count     = $('.js-calendar-graph').data('max-contributions');
+  var dateParts = $('.js-calendar-graph').data('best-day').split(" ");
+  var date      = dateParts[1] + " " + dateParts[2] + " " + dateParts[3];
 
   // Inject obelisk.js credit
   $('<span class="ic-obelisk">Graphics powered by <a href="https://github.com/nosir/obelisk.js">obelisk.js</a>').appendTo($('.ic-contributions-wrapper'));
