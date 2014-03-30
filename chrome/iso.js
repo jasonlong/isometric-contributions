@@ -143,29 +143,33 @@ function initUI() {
 
 function loadStats() {
   // Year total
-  var str   = $('.contrib-day').html();
-  var html  = $.parseHTML(str);
-  var count = html[1].innerText.match(/(((\d{1,3})(,\d{3})*)|(\d+))(.\d+)?/)[0];
-  var dates = $.trim(html[2].nodeValue);
-
-  // Longest streak
-  var str   = $('.contrib-streak').html();
-  var html  = $.parseHTML(str);
-  var count = html[1].innerText.match(/(((\d{1,3})(,\d{3})*)|(\d+))(.\d+)?/)[0];
-  var dates = $.trim(html[2].nodeValue);
-
-  // Current streak
-  var str   = $('.contrib-streak-current').html();
-  var html  = $.parseHTML(str);
-  var count = html[1].innerText.match(/(((\d{1,3})(,\d{3})*)|(\d+))(.\d+)?/)[0];
-  var dates = $.trim(html[2].nodeValue);
+  var str        = $('.contrib-day').html();
+  var html       = $.parseHTML(str);
+  var countTotal = html[1].innerText.match(/(((\d{1,3})(,\d{3})*)|(\d+))(.\d+)?/)[0];
+  var datesTotal = $.trim(html[2].nodeValue);
 
   // Best day
-  var count     = $('.js-calendar-graph').data('max-contributions');
+  var countBest     = $('.js-calendar-graph').data('max-contributions');
   var dateParts = $('.js-calendar-graph').data('best-day').split(" ");
-  var date      = dateParts[1] + " " + dateParts[2] + " " + dateParts[3];
+  var dateBest      = dateParts[1] + " " + dateParts[2] + " " + dateParts[3];
+
+  $('<div class="ic-stats-block ic-stats-top"><span class="ic-stats-table"><span class="ic-stats-row"><span class="ic-stats-label">1 year total<span class="ic-stats-count">' + countTotal + '</span></span><span class="ic-stats-meta"><span class="ic-stats-unit">contributions</span><span class="ic-stats-date">' + datesTotal + '</span></span></span><span class="ic-stats-row"><span class="ic-stats-label">Busiest day<span class="ic-stats-count">' + countBest + '</span></span><span class="ic-stats-meta"><span class="ic-stats-unit">contributions</span><span class="ic-stats-date">' + dateBest + '</span></span></span></div>').appendTo($('.ic-contributions-wrapper'));
+
+  // Longest streak
+  var str          = $('.contrib-streak').html();
+  var html         = $.parseHTML(str);
+  var countLongest = html[1].innerText.match(/(((\d{1,3})(,\d{3})*)|(\d+))(.\d+)?/)[0];
+  var datesLongest = $.trim(html[2].nodeValue);
+
+  // Current streak
+  var str          = $('.contrib-streak-current').html();
+  var html         = $.parseHTML(str);
+  var countCurrent = html[1].innerText.match(/(((\d{1,3})(,\d{3})*)|(\d+))(.\d+)?/)[0];
+  var datesCurrent = $.trim(html[2].nodeValue);
+
+  $('<div class="ic-stats-block ic-stats-bottom"><span class="ic-stats-table"><span class="ic-stats-row"><span class="ic-stats-label">Longest streak<span class="ic-stats-count">' + countLongest + '</span></span><span class="ic-stats-meta"><span class="ic-stats-unit">days</span><span class="ic-stats-date">' + datesLongest + '</span></span></span><span class="ic-stats-row"><span class="ic-stats-label">Current streak<span class="ic-stats-count">' + countCurrent + '</span></span><span class="ic-stats-meta"><span class="ic-stats-unit">days</span><span class="ic-stats-date">' + datesCurrent + '</span></span></span></div>').appendTo($('.ic-contributions-wrapper'));
 
   // Inject obelisk.js credit
-  $('<span class="ic-obelisk">Graphics powered by <a href="https://github.com/nosir/obelisk.js">obelisk.js</a>').appendTo($('.ic-contributions-wrapper'));
+  $('<span class="ic-obelisk">Graphics powered by <a href="https://github.com/nosir/obelisk.js">obelisk.js</a></span>').appendTo($('.ic-contributions-wrapper'));
 
 }

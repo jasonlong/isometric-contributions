@@ -79,6 +79,66 @@
   position: relative;
 }
 
+/*
+ * Stats display
+ */
+.ic-stats-block {
+  position: absolute;
+}
+
+.ic-stats-top {
+  top: 30px;
+  left: 440px;
+}
+
+.ic-stats-bottom {
+  top: 265px;
+  left: 20px;
+}
+
+.ic-stats-table {
+  display: table;
+}
+
+.ic-stats-row {
+  display: table-row;
+}
+
+.ic-stats-label {
+  color: #777;
+  font-size: 14px;
+  display: table-cell;
+  text-align: right;
+  vertical-align: bottom;
+  padding-bottom: 20px;
+}
+
+.ic-stats-count {
+  display: block;
+  font-size: 40px;
+  line-height: 1;
+  font-weight: bold;
+  color: #1e6823;
+}
+
+.ic-stats-meta {
+  display: table-cell;
+  vertical-align: bottom;
+  padding-left: 8px;
+  text-align: left;
+  padding-bottom: 20px;
+}
+
+.ic-stats-unit {
+  display: block;
+  font-size: 15px;
+}
+
+.ic-stats-date {
+  display: block;
+  color: #999;
+}
+
 .ic-obelisk {
   font-size: 11px;
   text-align: right;
