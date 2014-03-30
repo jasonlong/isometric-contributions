@@ -62,7 +62,8 @@
 /*
  * Normal chart display
  */
-.ic-squares #isometric-contributions {
+.ic-squares #isometric-contributions,
+.ic-squares .ic-contributions-wrapper {
   display: none;
 }
 
