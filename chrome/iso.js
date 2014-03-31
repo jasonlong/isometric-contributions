@@ -71,13 +71,6 @@ function renderIsometricChart() {
   var point = new obelisk.Point(87, 100);
   var pixelView = new obelisk.PixelView(canvas, point);
 
-  var color;
-  var color0 = new obelisk.CubeColor().getByHorizontalColor(0xeeeeee);
-  var color1 = new obelisk.CubeColor().getByHorizontalColor(0xd6e685);
-  var color2 = new obelisk.CubeColor().getByHorizontalColor(0x8cc665);
-  var color3 = new obelisk.CubeColor().getByHorizontalColor(0x44a340);
-  var color4 = new obelisk.CubeColor().getByHorizontalColor(0x1e6823);
-
   var maxContributions = $('.js-calendar-graph').data("max-contributions");
   var contribCount;
 
@@ -91,14 +84,9 @@ function renderIsometricChart() {
 
       var dimension = new obelisk.CubeDimension(SIZE, SIZE, parseInt(MAX_HEIGHT/maxContributions * contribCount) + 3);
 
-      if      (style == 'fill: rgb(238, 238, 238);') color = color0;
-      else if (style == 'fill: rgb(214, 230, 133);') color = color1;
-      else if (style == 'fill: rgb(140, 198, 101);') color = color2;
-      else if (style == 'fill: rgb(68, 163, 64);')   color = color3;
-      else if (style == 'fill: rgb(30, 104, 35);')   color = color4;
-
-      var cube = new obelisk.Cube(dimension, color, false);
-      var p3d = new obelisk.Point3D(SIZE * x, SIZE * y, 0);
+      var color = getSquareColor(style);
+      var cube  = new obelisk.Cube(dimension, color, false);
+      var p3d   = new obelisk.Point3D(SIZE * x, SIZE * y, 0);
       pixelView.renderObject(cube, p3d);
     });
   });
@@ -185,3 +173,21 @@ function loadStats() {
 
   $('<div class="ic-stats-block ic-stats-bottom"><span class="ic-stats-table"><span class="ic-stats-row"><span class="ic-stats-label">Longest streak<span class="ic-stats-count">' + countLongest + '</span></span><span class="ic-stats-meta"><span class="ic-stats-unit">days</span><span class="ic-stats-date">' + datesLongest + '</span></span></span><span class="ic-stats-row"><span class="ic-stats-label">Current streak<span class="ic-stats-count">' + countCurrent + '</span></span><span class="ic-stats-meta"><span class="ic-stats-unit">days</span><span class="ic-stats-date">' + datesCurrent + '</span></span></span></div>').appendTo($('.ic-contributions-wrapper'));
 }
+
+function getSquareColor(style) {
+  var color;
+  var color0 = new obelisk.CubeColor().getByHorizontalColor(0xeeeeee);
+  var color1 = new obelisk.CubeColor().getByHorizontalColor(0xd6e685);
+  var color2 = new obelisk.CubeColor().getByHorizontalColor(0x8cc665);
+  var color3 = new obelisk.CubeColor().getByHorizontalColor(0x44a340);
+  var color4 = new obelisk.CubeColor().getByHorizontalColor(0x1e6823);
+
+  if      (style == 'fill: rgb(238, 238, 238);' || style == 'fill: #eeeeee;') color = color0;
+  else if (style == 'fill: rgb(214, 230, 133);' || style == 'fill: #d6e685;')  color = color1;
+  else if (style == 'fill: rgb(140, 198, 101);' || style == 'fill: #8cc665;')  color = color2;
+  else if (style == 'fill: rgb(68, 163, 64);'   || style == 'fill: #44a340;')  color = color3;
+  else if (style == 'fill: rgb(30, 104, 35);'   || style == 'fill: #1e6823;')  color = color4;
+
+  return color;
+}
+
