@@ -1,3 +1,24 @@
-This is a WIP Chrome extension (maybe Safari too?) that will let you toggle between your regular GitHub contribution chart and an isometric pixel art version.
+This is a Chrome extension lets you toggle between your regular GitHub contribution chart and an isometric pixel art version. It uses [obelisk.js](https://github.com/nosir/obelisk.js) for the isometric graphics.
 
-![](http://cl.ly/image/2m1r422t161J/content)
+![](http://cl.ly/image/231h2I132S1P)
+
+## Installation
+
+### Chrome Web Store
+
+The easiest way to install the extension is through the Chrome Web Store:
+https://chrome.google.com/webstore/detail/isometric-contributions/mjoedlfflcchnleknnceiplgaeoegien?hl=en&gl=US
+
+## Developer mode
+
+If you want to hack on the extension, you'll need to install it manually. First clone or fork this repo. Then, on your Extensions page, make sure "Developer mode" is checked. You can then click the "Load unpacked extension..." button and browse to the `chrome` directory of this repo.
+
+![](http://cl.ly/image/0J0p1H2u0F0E/content)
+
+## Hacking
+
+To hack on the extension, you'll first need to make sure you've installed it in Developer mode (see above). Once you've made changes to the extension, go back to the Extensions page and click the Reload link under the extension entry.
+
+![](http://cl.ly/image/10370H2B2Q1G/content)
+
+Feel free to send a pull request if you've made an improvement.
