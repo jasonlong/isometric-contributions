@@ -76,6 +76,11 @@
   display: none;
 }
 
+.ic-cubes.show-2d .calendar-graph,
+.ic-cubes.show-2d .contrib-footer {
+  display: block;
+}
+
 .ic-contributions-wrapper {
   position: relative;
 }
@@ -140,15 +145,14 @@
   color: #999;
 }
 
-.ic-obelisk {
+.ic-footer {
   font-size: 11px;
-  text-align: right;
-  color: #bbb;
+  color: #999;
   position: absolute;
-  top: 441px;
-  right: 138px;
+  top: 450px;
+  left: 20px;
 }
 
-.ic-obelisk a {
-  color: #999;
+.ic-footer a {
+  color: #777;
 }

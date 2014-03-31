@@ -58,7 +58,7 @@ $(function() {
 
 function renderIsometricChart() {
   $('<div class="ic-contributions-wrapper"></div>').insertBefore('#contributions-calendar');
-  $('<canvas id="isometric-contributions" width="728" height="470"></canvas>').appendTo('#contributions-calendar');
+  $('<canvas id="isometric-contributions" width="728" height="470"></canvas>').appendTo('.ic-contributions-wrapper');
 
   var SIZE       = 12;
   var GH_OFFSET  = 13;
@@ -105,7 +105,7 @@ function renderIsometricChart() {
 
 function initUI() {
   var contributionsBox = $('#contributions-calendar').closest('.box').find('.box-body');
-  var insertLocation = $('#contributions-calendar').closest('.box').find('.box-header .box-title');
+  var insertLocation   = $('#contributions-calendar').closest('.box').find('.box-header .box-title');
 
   // Inject toggle
   $('<span class="ic-toggle"><span class="tooltipped tooltipped-nw" aria-label="Normal chart view"><a href="#" class="ic-toggle-option squares" data-ic-option="squares"></a></span><span class="tooltipped tooltipped-nw" aria-label="Isometric chart view"><a href="#" class="ic-toggle-option cubes" data-ic-option="cubes"></a></span></span>').insertBefore(insertLocation);
@@ -138,6 +138,21 @@ function initUI() {
     }
   });
 
+  // Inject footer w/ toggle for showing 2D chart
+  $('<span class="ic-footer"><a href="#" class="ic-2d-toggle">Show normal chart below ▾</a></span>').appendTo($('.ic-contributions-wrapper'));
+
+  $('.ic-2d-toggle').click(function(e) {
+    e.preventDefault();
+    if (contributionsBox.hasClass('show-2d')) {
+      $(this).text('Show normal chart below ▾');
+      contributionsBox.removeClass('show-2d');
+    }
+    else {
+      $(this).text('Hide normal chart below ▴');
+      contributionsBox.addClass('show-2d');
+    }
+  });
+
   loadStats();
 }
 
@@ -149,9 +164,9 @@ function loadStats() {
   var datesTotal = $.trim(html[2].nodeValue);
 
   // Best day
-  var countBest     = $('.js-calendar-graph').data('max-contributions');
+  var countBest = $('.js-calendar-graph').data('max-contributions');
   var dateParts = $('.js-calendar-graph').data('best-day').split(" ");
-  var dateBest      = dateParts[1] + " " + dateParts[2] + " " + dateParts[3];
+  var dateBest  = dateParts[1] + " " + dateParts[2] + " " + dateParts[3];
 
   $('<div class="ic-stats-block ic-stats-top"><span class="ic-stats-table"><span class="ic-stats-row"><span class="ic-stats-label">1 year total<span class="ic-stats-count">' + countTotal + '</span></span><span class="ic-stats-meta"><span class="ic-stats-unit">contributions</span><span class="ic-stats-date">' + datesTotal + '</span></span></span><span class="ic-stats-row"><span class="ic-stats-label">Busiest day<span class="ic-stats-count">' + countBest + '</span></span><span class="ic-stats-meta"><span class="ic-stats-unit">contributions</span><span class="ic-stats-date">' + dateBest + '</span></span></span></div>').appendTo($('.ic-contributions-wrapper'));
 
@@ -168,8 +183,4 @@ function loadStats() {
   var datesCurrent = $.trim(html[2].nodeValue);
 
   $('<div class="ic-stats-block ic-stats-bottom"><span class="ic-stats-table"><span class="ic-stats-row"><span class="ic-stats-label">Longest streak<span class="ic-stats-count">' + countLongest + '</span></span><span class="ic-stats-meta"><span class="ic-stats-unit">days</span><span class="ic-stats-date">' + datesLongest + '</span></span></span><span class="ic-stats-row"><span class="ic-stats-label">Current streak<span class="ic-stats-count">' + countCurrent + '</span></span><span class="ic-stats-meta"><span class="ic-stats-unit">days</span><span class="ic-stats-date">' + datesCurrent + '</span></span></span></div>').appendTo($('.ic-contributions-wrapper'));
-
-  // Inject obelisk.js credit
-  $('<span class="ic-obelisk">Graphics powered by <a href="https://github.com/nosir/obelisk.js">obelisk.js</a></span>').appendTo($('.ic-contributions-wrapper'));
-
 }
