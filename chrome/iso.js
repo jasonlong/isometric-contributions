@@ -42,18 +42,19 @@ $(function() {
         // We're loaded and ready!
         observer.disconnect();
         renderIsometricChart();
+        initUI();
       }
     });
   });
 
   if ($('.js-calendar-graph').data("max-contributions")) {
     renderIsometricChart();
+    initUI();
   }
   else {
     observer.observe(target, { attributes: true, childList: true, characterData: true});
   }
 
-  initUI();
 });
 
 function renderIsometricChart() {
