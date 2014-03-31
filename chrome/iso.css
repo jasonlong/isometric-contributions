@@ -122,7 +122,7 @@
 .ic-stats-count {
   display: block;
   font-size: 40px;
-  line-height: 1;
+  line-height: 38px;
   font-weight: bold;
   color: #1e6823;
 }
