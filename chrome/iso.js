@@ -48,7 +48,6 @@ $(function() {
     });
   });
 
-  debugger;
   if ($('.js-calendar-graph').data("max-contributions") !== undefined) {
     renderIsometricChart();
     initUI();
@@ -157,7 +156,10 @@ function loadStats() {
   // Best day
   var countBest = $('.js-calendar-graph').data('max-contributions');
   var dateParts = $('.js-calendar-graph').data('best-day').split(" ");
-  var dateBest  = dateParts[1] + " " + dateParts[2] + " " + dateParts[3];
+  var dateBest  = "Not so busy after all.";
+  if (dateParts[1] !== undefined) {
+    dateBest  = dateParts[1] + " " + dateParts[2] + " " + dateParts[3];
+  }
 
   $('<div class="ic-stats-block ic-stats-top"><span class="ic-stats-table"><span class="ic-stats-row"><span class="ic-stats-label">1 year total<span class="ic-stats-count">' + countTotal + '</span></span><span class="ic-stats-meta"><span class="ic-stats-unit">contributions</span><span class="ic-stats-date">' + datesTotal + '</span></span></span><span class="ic-stats-row"><span class="ic-stats-label">Busiest day<span class="ic-stats-count">' + countBest + '</span></span><span class="ic-stats-meta"><span class="ic-stats-unit">contributions</span><span class="ic-stats-date">' + dateBest + '</span></span></span></div>').appendTo($('.ic-contributions-wrapper'));
 
