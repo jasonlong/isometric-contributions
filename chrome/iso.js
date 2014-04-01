@@ -7,8 +7,9 @@ function icRun() {
   var observer = new MutationObserver(function(mutations) {
     mutations.forEach(function(mutation) {
       if (mutation.type === 'childList') {
+        var days     = $('#calendar-graph rect');
+        var bestDay  = "";
         var maxCount = 0;
-        var days = $('#calendar-graph rect');
         d3.selectAll(days).attr("data-contrib-count", function(d, i) {
           if (d[1] > maxCount) {
             bestDay  = d[0];
@@ -47,7 +48,8 @@ $(function() {
     });
   });
 
-  if ($('.js-calendar-graph').data("max-contributions")) {
+  debugger;
+  if ($('.js-calendar-graph').data("max-contributions") !== undefined) {
     renderIsometricChart();
     initUI();
   }
