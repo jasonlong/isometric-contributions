@@ -82,12 +82,16 @@ function renderIsometricChart() {
       var y            = parseInt($(this).attr('y') / GH_OFFSET);
       var style        = $(this).attr('style');
       var contribCount = parseInt($(this).data("contrib-count"));
+      var cubeHeight   = 3;
 
-      var dimension = new obelisk.CubeDimension(SIZE, SIZE, parseInt(MAX_HEIGHT/maxContributions * contribCount) + 3);
+      if (maxContributions > 0) {
+        cubeHeight += parseInt(MAX_HEIGHT/maxContributions * contribCount);
+      }
 
-      var color = getSquareColor(style);
-      var cube  = new obelisk.Cube(dimension, color, false);
-      var p3d   = new obelisk.Point3D(SIZE * x, SIZE * y, 0);
+      var dimension = new obelisk.CubeDimension(SIZE, SIZE, cubeHeight);
+      var color     = getSquareColor(style);
+      var cube      = new obelisk.Cube(dimension, color, false);
+      var p3d       = new obelisk.Point3D(SIZE * x, SIZE * y, 0);
       pixelView.renderObject(cube, p3d);
     });
   });
