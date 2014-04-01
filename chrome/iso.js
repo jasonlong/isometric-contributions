@@ -101,8 +101,14 @@ function initUI() {
   var contributionsBox = $('#contributions-calendar').closest('.box').find('.box-body');
   var insertLocation   = $('#contributions-calendar').closest('.box').find('.box-header .box-title');
 
+  var toggleClass = "";
+  // Check for lock octicon
+  if (contributionsBox.closest('.box').find('.box-header .octicon-lock').length) {
+    toggleClass = "ic-with-lock";
+  }
+
   // Inject toggle
-  $('<span class="ic-toggle"><span class="tooltipped tooltipped-nw" aria-label="Normal chart view"><a href="#" class="ic-toggle-option squares" data-ic-option="squares"></a></span><span class="tooltipped tooltipped-nw" aria-label="Isometric chart view"><a href="#" class="ic-toggle-option cubes" data-ic-option="cubes"></a></span></span>').insertBefore(insertLocation);
+  $('<span class="ic-toggle ' + toggleClass + '"><span class="tooltipped tooltipped-nw" aria-label="Normal chart view"><a href="#" class="ic-toggle-option squares" data-ic-option="squares"></a></span><span class="tooltipped tooltipped-nw" aria-label="Isometric chart view"><a href="#" class="ic-toggle-option cubes" data-ic-option="cubes"></a></span></span>').insertBefore(insertLocation);
 
   // Observe toggle
   $('.ic-toggle-option').click(function(e) {

@@ -1,8 +1,12 @@
 .ic-toggle {
   float: right;
   position: relative;
-  right: 24px;
+  right: 10px;
   top: 10px;
+}
+
+.ic-toggle.ic-with-lock {
+  right: 24px;
 }
 
 .ic-toggle .tooltipped {
