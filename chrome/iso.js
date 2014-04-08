@@ -4,27 +4,29 @@
 function icRun() {
   var target = document.querySelector('.js-calendar-graph');
 
-  var observer = new MutationObserver(function(mutations) {
-    mutations.forEach(function(mutation) {
-      if (mutation.type === 'childList') {
-        var days     = $('#calendar-graph rect');
-        var bestDay  = "";
-        var maxCount = 0;
-        d3.selectAll(days).attr("data-contrib-count", function(d, i) {
-          if (d[1] > maxCount) {
-            bestDay  = d[0];
-            maxCount = d[1];
-          }
-          return d[1];
-        });
-        observer.disconnect();
-        target.setAttribute("data-max-contributions", maxCount);
-        target.setAttribute("data-best-day", bestDay);
-      }
+  if (target) {
+    var observer = new MutationObserver(function(mutations) {
+      mutations.forEach(function(mutation) {
+        if (mutation.type === 'childList') {
+          var days     = $('#calendar-graph rect');
+          var bestDay  = "";
+          var maxCount = 0;
+          d3.selectAll(days).attr("data-contrib-count", function(d, i) {
+            if (d[1] > maxCount) {
+              bestDay  = d[0];
+              maxCount = d[1];
+            }
+            return d[1];
+          });
+          observer.disconnect();
+          target.setAttribute("data-max-contributions", maxCount);
+          target.setAttribute("data-best-day", bestDay);
+        }
+      });
     });
-  });
 
-  observer.observe(target, { attributes: true, childList: true, characterData: true});
+    observer.observe(target, { attributes: true, childList: true, characterData: true});
+  }
 }
 var script = document.createElement('script');
 script.appendChild(document.createTextNode('('+ icRun +')();'));
@@ -37,23 +39,25 @@ document.documentElement.appendChild(script);
 $(function() {
   var target = document.querySelector('.js-calendar-graph');
 
-  var observer = new MutationObserver(function(mutations) {
-    mutations.forEach(function(mutation) {
-      if (mutation.attributeName === 'data-max-contributions') {
-        // We're loaded and ready!
-        observer.disconnect();
-        renderIsometricChart();
-        initUI();
-      }
+  if (target) {
+    var observer = new MutationObserver(function(mutations) {
+      mutations.forEach(function(mutation) {
+        if (mutation.attributeName === 'data-max-contributions') {
+          // We're loaded and ready!
+          observer.disconnect();
+          renderIsometricChart();
+          initUI();
+        }
+      });
     });
-  });
 
-  if ($('.js-calendar-graph').data("max-contributions") !== undefined) {
-    renderIsometricChart();
-    initUI();
-  }
-  else {
-    observer.observe(target, { attributes: true, childList: true, characterData: true});
+    if ($('.js-calendar-graph').data("max-contributions") !== undefined) {
+      renderIsometricChart();
+      initUI();
+    }
+    else {
+      observer.observe(target, { attributes: true, childList: true, characterData: true});
+    }
   }
 
 });
@@ -204,4 +208,3 @@ function getSquareColor(style) {
 
   return color;
 }
-
