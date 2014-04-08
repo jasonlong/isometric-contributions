@@ -52,12 +52,13 @@ Iso = (function() {
             }
           });
         });
-        return observer.observe(target, {
+        observer.observe(target, {
           attributes: true,
           childList: true,
           characterData: true
         });
       }
+      return ($(document)).on('pjax:complete', function() {});
     };
     script = document.createElement('script');
     script.appendChild(document.createTextNode("(" + icRun + ")();"));

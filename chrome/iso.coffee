@@ -41,6 +41,10 @@ class Iso
           attributes: true
           childList: true
           characterData: true
+
+      # Listen on pjax events and inject again!
+      ($ document).on 'pjax:complete', ->
+        # How do we geht the Iso object?
     script = document.createElement 'script'
     script.appendChild document.createTextNode "(#{icRun})();"
     document.documentElement.appendChild script
