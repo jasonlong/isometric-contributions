@@ -193,10 +193,10 @@ Iso = (function() {
         case 'fill: rgb(140, 198, 101);':
         case 'fill: #8cc665;':
           return color2;
-        case 'fill: rgb(68,  163, 64 );':
+        case 'fill: rgb(68, 163, 64);':
         case 'fill: #44a340;':
           return color3;
-        case 'fill: rgb(30,  104, 35 );':
+        case 'fill: rgb(30, 104, 35);':
         case 'fill: #1e6823;':
           return color4;
       }

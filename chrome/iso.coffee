@@ -241,8 +241,8 @@ class Iso
       when 'fill: rgb(238, 238, 238);', 'fill: #eeeeee;' then color0
       when 'fill: rgb(214, 230, 133);', 'fill: #d6e685;' then color1
       when 'fill: rgb(140, 198, 101);', 'fill: #8cc665;' then color2
-      when 'fill: rgb(68,  163, 64 );', 'fill: #44a340;' then color3
-      when 'fill: rgb(30,  104, 35 );', 'fill: #1e6823;' then color4
+      when 'fill: rgb(68, 163, 64);',   'fill: #44a340;' then color3
+      when 'fill: rgb(30, 104, 35);',   'fill: #1e6823;' then color4
 
 # Inject code
 Iso.inject()
