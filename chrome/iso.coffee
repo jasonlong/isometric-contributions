@@ -151,9 +151,10 @@ class Iso
   loadStats: ->
       # Year total
       str        = ($ '.contrib-day').html()
+      strCount   = ($ '.contrib-day .num').html()
       html       = $.parseHTML str
-      countTotal = (html[1].innerText.match /(((\d{1,3})(,\d{3})*)|(\d+))(.\d+)?/)[0]
-      datesTotal = $.trim html[2].nodeValue
+      countTotal = (str.match /(((\d{1,3})(,\d{3})*)|(\d+))(.\d+)?/)[0]
+      datesTotal = $.trim html[4].nodeValue
 
       # Best day
       countBest = ($ '.js-calendar-graph').data 'max-contributions'
@@ -191,15 +192,17 @@ class Iso
 
       # Longest streak
       str          = ($ '.contrib-streak').html()
+      strCount     = ($ '.contrib-streak .num').html()
       html         = $.parseHTML str
-      countLongest = (html[1].innerText.match /(((\d{1,3})(,\d{3})*)|(\d+))(.\d+)?/)[0]
-      datesLongest = $.trim html[2].nodeValue
+      countLongest = (str.match /(((\d{1,3})(,\d{3})*)|(\d+))(.\d+)?/)[0]
+      datesLongest = $.trim html[4].nodeValue
 
       # Current streak
       str          = ($ '.contrib-streak-current').html()
+      strCount     = ($ '.contrib-streak-current .num').html()
       html         = $.parseHTML str
-      countCurrent = (html[1].innerText.match /(((\d{1,3})(,\d{3})*)|(\d+))(.\d+)?/)[0]
-      datesCurrent = $.trim html[2].nodeValue
+      countCurrent = (str.match /(((\d{1,3})(,\d{3})*)|(\d+))(.\d+)?/)[0]
+      datesCurrent = $.trim html[4].nodeValue
 
       html = """
         <div class="ic-stats-block ic-stats-bottom">
