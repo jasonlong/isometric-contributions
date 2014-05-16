@@ -151,9 +151,10 @@ class Iso
   loadStats: ->
       # Year total
       str        = ($ '.contrib-day').html()
+      strCount   = ($ '.contrib-day .num').html()
       html       = $.parseHTML str
-      countTotal = (html[1].innerText.match /(((\d{1,3})(,\d{3})*)|(\d+))(.\d+)?/)[0]
-      datesTotal = $.trim html[2].nodeValue
+      countTotal = (str.match /(((\d{1,3})(,\d{3})*)|(\d+))(.\d+)?/)[0]
+      datesTotal = $.trim html[4].nodeValue
 
       # Best day
       countBest = ($ '.js-calendar-graph').data 'max-contributions'
