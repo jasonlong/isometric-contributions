@@ -1,8 +1,8 @@
 class Iso
   constructor: (target) ->
     if target
-      observer = new MutationObserver (mutations) ->
-        mutations.forEach (mutation) ->
+      observer = new MutationObserver (mutations) =>
+        mutations.forEach (mutation) =>
           if mutation.attributeName is 'data-max-contributions'
             # We're loaded and ready!
             observer.disconnect()
@@ -23,7 +23,7 @@ class Iso
       target = document.querySelector '.js-calendar-graph'
 
       if target?
-        observer = new MutationObserver (mutations) ->
+        observer = new MutationObserver (mutations) =>
           mutations.forEach (mutation) ->
             if mutation.type is 'childList'
               days     = $('#calendar-graph rect')

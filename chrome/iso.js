@@ -5,15 +5,17 @@ Iso = (function() {
   function Iso(target) {
     var observer;
     if (target) {
-      observer = new MutationObserver(function(mutations) {
-        return mutations.forEach(function(mutation) {
-          if (mutation.attributeName === 'data-max-contributions') {
-            observer.disconnect();
-            this.renderIsometricChart();
-            return this.initUI();
-          }
-        });
-      });
+      observer = new MutationObserver((function(_this) {
+        return function(mutations) {
+          return mutations.forEach(function(mutation) {
+            if (mutation.attributeName === 'data-max-contributions') {
+              observer.disconnect();
+              _this.renderIsometricChart();
+              return _this.initUI();
+            }
+          });
+        };
+      })(this));
       if ((($('.js-calendar-graph')).data('max-contributions')) != null) {
         this.renderIsometricChart();
         this.initUI();
@@ -33,25 +35,27 @@ Iso = (function() {
       var observer, target;
       target = document.querySelector('.js-calendar-graph');
       if (target != null) {
-        observer = new MutationObserver(function(mutations) {
-          return mutations.forEach(function(mutation) {
-            var bestDay, days, maxCount;
-            if (mutation.type === 'childList') {
-              days = $('#calendar-graph rect');
-              bestDay = null;
-              maxCount = null;
-              (d3.selectAll(days)).attr('data-contrib-count', function(d, i) {
-                if (d[1] > maxCount) {
-                  bestDay = d[0], maxCount = d[1];
-                }
-                return d[1];
-              });
-              observer.disconnect();
-              target.setAttribute('data-max-contributions', maxCount);
-              return target.setAttribute('data-best-day', bestDay);
-            }
-          });
-        });
+        observer = new MutationObserver((function(_this) {
+          return function(mutations) {
+            return mutations.forEach(function(mutation) {
+              var bestDay, days, maxCount;
+              if (mutation.type === 'childList') {
+                days = $('#calendar-graph rect');
+                bestDay = null;
+                maxCount = null;
+                (d3.selectAll(days)).attr('data-contrib-count', function(d, i) {
+                  if (d[1] > maxCount) {
+                    bestDay = d[0], maxCount = d[1];
+                  }
+                  return d[1];
+                });
+                observer.disconnect();
+                target.setAttribute('data-max-contributions', maxCount);
+                return target.setAttribute('data-best-day', bestDay);
+              }
+            });
+          };
+        })(this));
         return observer.observe(target, {
           attributes: true,
           childList: true,
