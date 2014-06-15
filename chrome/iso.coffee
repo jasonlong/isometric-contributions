@@ -96,12 +96,8 @@ class Iso
     # Inject toggle
     html = """
       <span class="ic-toggle #{toggleClass}">
-        <span class="tooltipped tooltipped-nw" aria-label="Normal chart view">
-          <a href="#" class="ic-toggle-option squares" data-ic-option="squares"></a>
-        </span>
-        <span class="tooltipped tooltipped-nw" aria-label="Isometric chart view">
-          <a href="#" class="ic-toggle-option cubes" data-ic-option="cubes"></a>
-        </span>
+        <a href="#" class="ic-toggle-option tooltipped tooltipped-nw squares" data-ic-option="squares" aria-label="Normal chart view"></a>
+        <a href="#" class="ic-toggle-option tooltipped tooltipped-nw cubes" data-ic-option="cubes" aria-label="Isometric chart view"></a>
       </span>
     """
     ($ html).insertBefore insertLocation
