@@ -111,7 +111,7 @@ Iso = (function() {
     if (((contributionsBox.closest('.box')).find('.box-header .octicon-lock')).length) {
       toggleClass = 'ic-with-lock';
     }
-    html = "<span class=\"ic-toggle " + toggleClass + "\">\n  <span class=\"tooltipped tooltipped-nw\" aria-label=\"Normal chart view\">\n    <a href=\"#\" class=\"ic-toggle-option squares\" data-ic-option=\"squares\"></a>\n  </span>\n  <span class=\"tooltipped tooltipped-nw\" aria-label=\"Isometric chart view\">\n    <a href=\"#\" class=\"ic-toggle-option cubes\" data-ic-option=\"cubes\"></a>\n  </span>\n</span>";
+    html = "<span class=\"ic-toggle " + toggleClass + "\">\n  <a href=\"#\" class=\"ic-toggle-option tooltipped tooltipped-nw squares\" data-ic-option=\"squares\" aria-label=\"Normal chart view\"></a>\n  <a href=\"#\" class=\"ic-toggle-option tooltipped tooltipped-nw cubes\" data-ic-option=\"cubes\" aria-label=\"Isometric chart view\"></a>\n</span>";
     ($(html)).insertBefore(insertLocation);
     ($('.ic-toggle-option')).click(function(e) {
       var option;
