@@ -105,14 +105,14 @@ Iso = (function() {
 
   Iso.prototype.initUI = function() {
     var contributionsBox, html, insertLocation, toggleClass;
-    contributionsBox = (($('#contributions-calendar')).closest('.box')).find('.box-body');
-    insertLocation = (($('#contributions-calendar')).closest('.box')).find('.box-header .box-title');
+    contributionsBox = ($('#contributions-calendar')).closest('.boxed-group');
+    insertLocation = (($('#contributions-calendar')).closest('.boxed-group')).find('.boxed-group-action');
     toggleClass = '';
     if (((contributionsBox.closest('.box')).find('.box-header .octicon-lock')).length) {
       toggleClass = 'ic-with-lock';
     }
     html = "<span class=\"ic-toggle " + toggleClass + "\">\n  <a href=\"#\" class=\"ic-toggle-option tooltipped tooltipped-nw squares\" data-ic-option=\"squares\" aria-label=\"Normal chart view\"></a>\n  <a href=\"#\" class=\"ic-toggle-option tooltipped tooltipped-nw cubes\" data-ic-option=\"cubes\" aria-label=\"Isometric chart view\"></a>\n</span>";
-    ($(html)).insertBefore(insertLocation);
+    ($(html)).insertAfter(insertLocation);
     ($('.ic-toggle-option')).click(function(e) {
       var option;
       e.preventDefault();
