@@ -85,9 +85,16 @@
   display: block;
 }
 
+.ic-cubes #contributions-calendar {
+  border-top: 0;
+  min-height: 3px;
+}
+
 .ic-contributions-wrapper {
   position: relative;
-  border: solid px #d8d8d8;
+  border-top: solid 1px #d8d8d8;
+  border-right: solid 1px #d8d8d8;
+  border-left: solid 1px #d8d8d8;
 }
 
 /*
