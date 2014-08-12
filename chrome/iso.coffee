@@ -85,8 +85,8 @@ class Iso
         pixelView.renderObject cube, p3d
 
   initUI: ->
-    contributionsBox = (($ '#contributions-calendar').closest '.box').find '.box-body'
-    insertLocation   = (($ '#contributions-calendar').closest '.box').find '.box-header .box-title'
+    contributionsBox = (($ '#contributions-calendar').closest '.boxed-group')
+    insertLocation   = (($ '#contributions-calendar').closest '.boxed-group').find '.boxed-group-action'
 
     toggleClass = ''
     # Check for lock octicon
@@ -100,7 +100,7 @@ class Iso
         <a href="#" class="ic-toggle-option tooltipped tooltipped-nw cubes" data-ic-option="cubes" aria-label="Isometric chart view"></a>
       </span>
     """
-    ($ html).insertBefore insertLocation
+    ($ html).insertAfter insertLocation
 
     # Observe toggle
     ($ '.ic-toggle-option').click (e) ->
