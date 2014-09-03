@@ -26,7 +26,7 @@ class Iso
         observer = new MutationObserver (mutations) =>
           mutations.forEach (mutation) ->
             if mutation.type is 'childList'
-              days     = $('#calendar-graph rect')
+              days     = $('.js-calendar-graph-svg rect')
               bestDay  = null
               maxCount = null
               (d3.selectAll days).attr 'data-contrib-count', (d, i) ->
@@ -66,7 +66,7 @@ class Iso
     contribCount = null
 
     self = this
-    ($ '#calendar-graph g > g').each (g) ->
+    ($ '.js-calendar-graph g > g').each (g) ->
       x = parseInt (((($ this).attr 'transform').match /(\d+)/)[0]) / GH_OFFSET
       (($ this).find 'rect').each (r) ->
         r            = ($ this).get 0
