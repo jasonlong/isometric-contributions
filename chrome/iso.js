@@ -153,17 +153,22 @@ Iso = (function() {
   };
 
   Iso.prototype.loadStats = function() {
-    var countBest, countCurrent, countLongest, countTotal, dateBest, dateParts, datesCurrent, datesLongest, datesTotal, html, str, strCount;
+    var countBest, countCurrent, countLongest, countTotal, date, dateBest, dateParts, datesCurrent, datesLongest, datesTotal, html, options, str, strCount;
     str = ($('.contrib-day')).html();
     strCount = ($('.contrib-day .num')).html();
     html = $.parseHTML(str);
     countTotal = (str.match(/(((\d{1,3})(,\d{3})*)|(\d+))(.\d+)?/))[0];
     datesTotal = $.trim(html[4].nodeValue);
     countBest = ($('.js-calendar-graph')).data('max-contributions');
-    dateParts = (($('.js-calendar-graph')).data('best-day')).split(' ');
+    dateParts = (($('.js-calendar-graph')).data('best-day')).split('-');
     dateBest = 'Not so busy after all.';
-    if (dateParts[1] != null) {
-      dateBest = "" + dateParts[1] + " " + dateParts[2] + " " + dateParts[3];
+    if (dateParts[0] != null) {
+      options = {
+        month: "long",
+        day: "numeric"
+      };
+      date = new Date(dateParts[0], dateParts[1] - 1, dateParts[2], 0, 0, 0);
+      dateBest = date.toLocaleDateString('en-US', options);
     }
     html = "<div class=\"ic-stats-block ic-stats-top\">\n  <span class=\"ic-stats-table\">\n    <span class=\"ic-stats-row\">\n      <span class=\"ic-stats-label\">1 year total\n        <span class=\"ic-stats-count\">" + countTotal + "</span>\n      </span>\n      <span class=\"ic-stats-meta\">\n        <span class=\"ic-stats-unit\">contributions</span>\n        <span class=\"ic-stats-date\">" + datesTotal + "</span>\n      </span>\n    </span>\n    <span class=\"ic-stats-row\">\n      <span class=\"ic-stats-label\">Busiest day\n        <span class=\"ic-stats-count\">" + countBest + "</span>\n      </span>\n      <span class=\"ic-stats-meta\">\n        <span class=\"ic-stats-unit\">contributions</span>\n          <span class=\"ic-stats-date\">" + dateBest + "</span>\n        </span>\n      </span>\n    </span>\n  </span>\n</div>";
     ($(html)).appendTo($('.ic-contributions-wrapper'));

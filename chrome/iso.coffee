@@ -154,10 +154,12 @@ class Iso
 
       # Best day
       countBest = ($ '.js-calendar-graph').data 'max-contributions'
-      dateParts = (($ '.js-calendar-graph').data 'best-day').split ' '
+      dateParts = (($ '.js-calendar-graph').data 'best-day').split '-'
       dateBest  = 'Not so busy after all.'
-      if dateParts[1]?
-        dateBest  = "#{dateParts[1]} #{dateParts[2]} #{dateParts[3]}"
+      if dateParts[0]?
+        options = {month: "long", day: "numeric"}
+        date = new Date(dateParts[0], dateParts[1] - 1, dateParts[2], 0, 0, 0)
+        dateBest = date.toLocaleDateString('en-US', options)
 
       html = """
         <div class="ic-stats-block ic-stats-top">
