@@ -2,6 +2,10 @@
 var Iso;
 
 Iso = (function() {
+  var COLORS;
+
+  COLORS = [new obelisk.CubeColor().getByHorizontalColor(0xeeeeee), new obelisk.CubeColor().getByHorizontalColor(0xd6e685), new obelisk.CubeColor().getByHorizontalColor(0x8cc665), new obelisk.CubeColor().getByHorizontalColor(0x44a340), new obelisk.CubeColor().getByHorizontalColor(0x1e6823)];
+
   function Iso(target) {
     var observer;
     if (target) {
@@ -43,11 +47,11 @@ Iso = (function() {
                 days = $('.js-calendar-graph-svg rect');
                 bestDay = null;
                 maxCount = null;
-                (d3.selectAll(days)).attr('data-contrib-count', function(d, i) {
-                  if (d[1] > maxCount) {
-                    bestDay = d[0], maxCount = d[1];
+                (d3.selectAll(days)).each(function() {
+                  if ($(this).data('count') > maxCount) {
+                    bestDay = ($(this)).data('date');
+                    return maxCount = ($(this)).data('count');
                   }
-                  return d[1];
                 });
                 observer.disconnect();
                 target.setAttribute('data-max-contributions', maxCount);
@@ -85,17 +89,17 @@ Iso = (function() {
       var x;
       x = parseInt(((($(this)).attr('transform')).match(/(\d+)/))[0] / GH_OFFSET);
       return (($(this)).find('rect')).each(function(r) {
-        var color, cube, cubeHeight, dimension, p3d, style, y;
+        var color, cube, cubeHeight, dimension, fill, p3d, y;
         r = ($(this)).get(0);
         y = parseInt((($(this)).attr('y')) / GH_OFFSET);
-        style = ($(this)).attr('style');
-        contribCount = parseInt(($(this)).data('contrib-count'));
+        fill = ($(this)).attr('fill');
+        contribCount = parseInt(($(this)).data('count'));
         cubeHeight = 3;
         if (maxContributions > 0) {
           cubeHeight += parseInt(MAX_HEIGHT / maxContributions * contribCount);
         }
         dimension = new obelisk.CubeDimension(SIZE, SIZE, cubeHeight);
-        color = self.getSquareColor(style);
+        color = self.getSquareColor(fill);
         cube = new obelisk.Cube(dimension, color, false);
         p3d = new obelisk.Point3D(SIZE * x, SIZE * y, 0);
         return pixelView.renderObject(cube, p3d);
@@ -153,17 +157,22 @@ Iso = (function() {
   };
 
   Iso.prototype.loadStats = function() {
-    var countBest, countCurrent, countLongest, countTotal, dateBest, dateParts, datesCurrent, datesLongest, datesTotal, html, str, strCount;
+    var countBest, countCurrent, countLongest, countTotal, date, dateBest, dateParts, datesCurrent, datesLongest, datesTotal, html, options, str, strCount;
     str = ($('.contrib-day')).html();
     strCount = ($('.contrib-day .num')).html();
     html = $.parseHTML(str);
     countTotal = (str.match(/(((\d{1,3})(,\d{3})*)|(\d+))(.\d+)?/))[0];
     datesTotal = $.trim(html[4].nodeValue);
     countBest = ($('.js-calendar-graph')).data('max-contributions');
-    dateParts = (($('.js-calendar-graph')).data('best-day')).split(' ');
+    dateParts = (($('.js-calendar-graph')).data('best-day')).split('-');
     dateBest = 'Not so busy after all.';
-    if (dateParts[1] != null) {
-      dateBest = "" + dateParts[1] + " " + dateParts[2] + " " + dateParts[3];
+    if (dateParts[0] != null) {
+      options = {
+        month: "long",
+        day: "numeric"
+      };
+      date = new Date(dateParts[0], dateParts[1] - 1, dateParts[2], 0, 0, 0);
+      dateBest = date.toLocaleDateString('en-US', options);
     }
     html = "<div class=\"ic-stats-block ic-stats-top\">\n  <span class=\"ic-stats-table\">\n    <span class=\"ic-stats-row\">\n      <span class=\"ic-stats-label\">1 year total\n        <span class=\"ic-stats-count\">" + countTotal + "</span>\n      </span>\n      <span class=\"ic-stats-meta\">\n        <span class=\"ic-stats-unit\">contributions</span>\n        <span class=\"ic-stats-date\">" + datesTotal + "</span>\n      </span>\n    </span>\n    <span class=\"ic-stats-row\">\n      <span class=\"ic-stats-label\">Busiest day\n        <span class=\"ic-stats-count\">" + countBest + "</span>\n      </span>\n      <span class=\"ic-stats-meta\">\n        <span class=\"ic-stats-unit\">contributions</span>\n          <span class=\"ic-stats-date\">" + dateBest + "</span>\n        </span>\n      </span>\n    </span>\n  </span>\n</div>";
     ($(html)).appendTo($('.ic-contributions-wrapper'));
@@ -181,30 +190,25 @@ Iso = (function() {
     return ($(html)).appendTo($('.ic-contributions-wrapper'));
   };
 
-  Iso.prototype.getSquareColor = function(style) {
-    var color, color0, color1, color2, color3, color4;
-    color0 = new obelisk.CubeColor().getByHorizontalColor(0xeeeeee);
-    color1 = new obelisk.CubeColor().getByHorizontalColor(0xd6e685);
-    color2 = new obelisk.CubeColor().getByHorizontalColor(0x8cc665);
-    color3 = new obelisk.CubeColor().getByHorizontalColor(0x44a340);
-    color4 = new obelisk.CubeColor().getByHorizontalColor(0x1e6823);
+  Iso.prototype.getSquareColor = function(fill) {
+    var color;
     return color = (function() {
-      switch (style) {
-        case 'fill: rgb(238, 238, 238);':
-        case 'fill: #eeeeee;':
-          return color0;
-        case 'fill: rgb(214, 230, 133);':
-        case 'fill: #d6e685;':
-          return color1;
-        case 'fill: rgb(140, 198, 101);':
-        case 'fill: #8cc665;':
-          return color2;
-        case 'fill: rgb(68, 163, 64);':
-        case 'fill: #44a340;':
-          return color3;
-        case 'fill: rgb(30, 104, 35);':
-        case 'fill: #1e6823;':
-          return color4;
+      switch (fill) {
+        case 'rgb(238, 238, 238)':
+        case '#eeeeee':
+          return COLORS[0];
+        case 'rgb(214, 230, 133)':
+        case '#d6e685':
+          return COLORS[1];
+        case 'rgb(140, 198, 101)':
+        case '#8cc665':
+          return COLORS[2];
+        case 'rgb(68, 163, 64)':
+        case '#44a340':
+          return COLORS[3];
+        case 'rgb(30, 104, 35)':
+        case '#1e6823':
+          return COLORS[4];
       }
     })();
   };
