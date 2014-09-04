@@ -29,10 +29,10 @@ class Iso
               days     = $('.js-calendar-graph-svg rect')
               bestDay  = null
               maxCount = null
-              (d3.selectAll days).attr 'data-contrib-count', (d, i) ->
-                if d[1] > maxCount
-                  [bestDay, maxCount] = d
-                d[1]
+              (d3.selectAll days).each ->
+                if $(this).data('count') > maxCount
+                  bestDay = ($ this).data('date')
+                  maxCount = ($ this).data('count')
               observer.disconnect()
               target.setAttribute 'data-max-contributions', maxCount
               target.setAttribute 'data-best-day', bestDay
@@ -71,15 +71,15 @@ class Iso
       (($ this).find 'rect').each (r) ->
         r            = ($ this).get 0
         y            = parseInt (($ this).attr 'y') / GH_OFFSET
-        style        = ($ this).attr 'style'
-        contribCount = parseInt ($ this).data 'contrib-count'
+        fill         = ($ this).attr 'fill'
+        contribCount = parseInt ($ this).data 'count'
         cubeHeight   = 3
 
         if maxContributions > 0
           cubeHeight += parseInt MAX_HEIGHT / maxContributions * contribCount
 
         dimension = new obelisk.CubeDimension SIZE, SIZE, cubeHeight
-        color     = self.getSquareColor style
+        color     = self.getSquareColor fill
         cube      = new obelisk.Cube dimension, color, false
         p3d       = new obelisk.Point3D SIZE * x, SIZE * y, 0
         pixelView.renderObject cube, p3d
@@ -226,19 +226,19 @@ class Iso
       """
       ($ html).appendTo $ '.ic-contributions-wrapper'
 
-  getSquareColor: (style) ->
+  getSquareColor: (fill) ->
     color0 = new obelisk.CubeColor().getByHorizontalColor 0xeeeeee
     color1 = new obelisk.CubeColor().getByHorizontalColor 0xd6e685
     color2 = new obelisk.CubeColor().getByHorizontalColor 0x8cc665
     color3 = new obelisk.CubeColor().getByHorizontalColor 0x44a340
     color4 = new obelisk.CubeColor().getByHorizontalColor 0x1e6823
 
-    color = switch style
-      when 'fill: rgb(238, 238, 238);', 'fill: #eeeeee;' then color0
-      when 'fill: rgb(214, 230, 133);', 'fill: #d6e685;' then color1
-      when 'fill: rgb(140, 198, 101);', 'fill: #8cc665;' then color2
-      when 'fill: rgb(68, 163, 64);',   'fill: #44a340;' then color3
-      when 'fill: rgb(30, 104, 35);',   'fill: #1e6823;' then color4
+    color = switch fill
+      when 'rgb(238, 238, 238)', '#eeeeee' then color0
+      when 'rgb(214, 230, 133)', '#d6e685' then color1
+      when 'rgb(140, 198, 101)', '#8cc665' then color2
+      when 'rgb(68, 163, 64)',   '#44a340' then color3
+      when 'rgb(30, 104, 35)',   '#1e6823' then color4
 
 # Inject code
 Iso.inject()

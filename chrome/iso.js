@@ -43,11 +43,11 @@ Iso = (function() {
                 days = $('.js-calendar-graph-svg rect');
                 bestDay = null;
                 maxCount = null;
-                (d3.selectAll(days)).attr('data-contrib-count', function(d, i) {
-                  if (d[1] > maxCount) {
-                    bestDay = d[0], maxCount = d[1];
+                (d3.selectAll(days)).each(function() {
+                  if ($(this).data('count') > maxCount) {
+                    bestDay = ($(this)).data('date');
+                    return maxCount = ($(this)).data('count');
                   }
-                  return d[1];
                 });
                 observer.disconnect();
                 target.setAttribute('data-max-contributions', maxCount);
@@ -85,17 +85,17 @@ Iso = (function() {
       var x;
       x = parseInt(((($(this)).attr('transform')).match(/(\d+)/))[0] / GH_OFFSET);
       return (($(this)).find('rect')).each(function(r) {
-        var color, cube, cubeHeight, dimension, p3d, style, y;
+        var color, cube, cubeHeight, dimension, fill, p3d, y;
         r = ($(this)).get(0);
         y = parseInt((($(this)).attr('y')) / GH_OFFSET);
-        style = ($(this)).attr('style');
-        contribCount = parseInt(($(this)).data('contrib-count'));
+        fill = ($(this)).attr('fill');
+        contribCount = parseInt(($(this)).data('count'));
         cubeHeight = 3;
         if (maxContributions > 0) {
           cubeHeight += parseInt(MAX_HEIGHT / maxContributions * contribCount);
         }
         dimension = new obelisk.CubeDimension(SIZE, SIZE, cubeHeight);
-        color = self.getSquareColor(style);
+        color = self.getSquareColor(fill);
         cube = new obelisk.Cube(dimension, color, false);
         p3d = new obelisk.Point3D(SIZE * x, SIZE * y, 0);
         return pixelView.renderObject(cube, p3d);
@@ -181,7 +181,7 @@ Iso = (function() {
     return ($(html)).appendTo($('.ic-contributions-wrapper'));
   };
 
-  Iso.prototype.getSquareColor = function(style) {
+  Iso.prototype.getSquareColor = function(fill) {
     var color, color0, color1, color2, color3, color4;
     color0 = new obelisk.CubeColor().getByHorizontalColor(0xeeeeee);
     color1 = new obelisk.CubeColor().getByHorizontalColor(0xd6e685);
@@ -189,21 +189,21 @@ Iso = (function() {
     color3 = new obelisk.CubeColor().getByHorizontalColor(0x44a340);
     color4 = new obelisk.CubeColor().getByHorizontalColor(0x1e6823);
     return color = (function() {
-      switch (style) {
-        case 'fill: rgb(238, 238, 238);':
-        case 'fill: #eeeeee;':
+      switch (fill) {
+        case 'rgb(238, 238, 238)':
+        case '#eeeeee':
           return color0;
-        case 'fill: rgb(214, 230, 133);':
-        case 'fill: #d6e685;':
+        case 'rgb(214, 230, 133)':
+        case '#d6e685':
           return color1;
-        case 'fill: rgb(140, 198, 101);':
-        case 'fill: #8cc665;':
+        case 'rgb(140, 198, 101)':
+        case '#8cc665':
           return color2;
-        case 'fill: rgb(68, 163, 64);':
-        case 'fill: #44a340;':
+        case 'rgb(68, 163, 64)':
+        case '#44a340':
           return color3;
-        case 'fill: rgb(30, 104, 35);':
-        case 'fill: #1e6823;':
+        case 'rgb(30, 104, 35)':
+        case '#1e6823':
           return color4;
       }
     })();
