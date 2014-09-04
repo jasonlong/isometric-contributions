@@ -1,4 +1,12 @@
 class Iso
+  COLORS = [
+    new obelisk.CubeColor().getByHorizontalColor(0xeeeeee),
+    new obelisk.CubeColor().getByHorizontalColor(0xd6e685),
+    new obelisk.CubeColor().getByHorizontalColor(0x8cc665),
+    new obelisk.CubeColor().getByHorizontalColor(0x44a340),
+    new obelisk.CubeColor().getByHorizontalColor(0x1e6823)
+  ]
+
   constructor: (target) ->
     if target
       observer = new MutationObserver (mutations) =>
@@ -229,18 +237,12 @@ class Iso
       ($ html).appendTo $ '.ic-contributions-wrapper'
 
   getSquareColor: (fill) ->
-    color0 = new obelisk.CubeColor().getByHorizontalColor 0xeeeeee
-    color1 = new obelisk.CubeColor().getByHorizontalColor 0xd6e685
-    color2 = new obelisk.CubeColor().getByHorizontalColor 0x8cc665
-    color3 = new obelisk.CubeColor().getByHorizontalColor 0x44a340
-    color4 = new obelisk.CubeColor().getByHorizontalColor 0x1e6823
-
     color = switch fill
-      when 'rgb(238, 238, 238)', '#eeeeee' then color0
-      when 'rgb(214, 230, 133)', '#d6e685' then color1
-      when 'rgb(140, 198, 101)', '#8cc665' then color2
-      when 'rgb(68, 163, 64)',   '#44a340' then color3
-      when 'rgb(30, 104, 35)',   '#1e6823' then color4
+      when 'rgb(238, 238, 238)', '#eeeeee' then COLORS[0]
+      when 'rgb(214, 230, 133)', '#d6e685' then COLORS[1]
+      when 'rgb(140, 198, 101)', '#8cc665' then COLORS[2]
+      when 'rgb(68, 163, 64)',   '#44a340' then COLORS[3]
+      when 'rgb(30, 104, 35)',   '#1e6823' then COLORS[4]
 
 # Inject code
 Iso.inject()

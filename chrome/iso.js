@@ -2,6 +2,10 @@
 var Iso;
 
 Iso = (function() {
+  var COLORS;
+
+  COLORS = [new obelisk.CubeColor().getByHorizontalColor(0xeeeeee), new obelisk.CubeColor().getByHorizontalColor(0xd6e685), new obelisk.CubeColor().getByHorizontalColor(0x8cc665), new obelisk.CubeColor().getByHorizontalColor(0x44a340), new obelisk.CubeColor().getByHorizontalColor(0x1e6823)];
+
   function Iso(target) {
     var observer;
     if (target) {
@@ -187,29 +191,24 @@ Iso = (function() {
   };
 
   Iso.prototype.getSquareColor = function(fill) {
-    var color, color0, color1, color2, color3, color4;
-    color0 = new obelisk.CubeColor().getByHorizontalColor(0xeeeeee);
-    color1 = new obelisk.CubeColor().getByHorizontalColor(0xd6e685);
-    color2 = new obelisk.CubeColor().getByHorizontalColor(0x8cc665);
-    color3 = new obelisk.CubeColor().getByHorizontalColor(0x44a340);
-    color4 = new obelisk.CubeColor().getByHorizontalColor(0x1e6823);
+    var color;
     return color = (function() {
       switch (fill) {
         case 'rgb(238, 238, 238)':
         case '#eeeeee':
-          return color0;
+          return COLORS[0];
         case 'rgb(214, 230, 133)':
         case '#d6e685':
-          return color1;
+          return COLORS[1];
         case 'rgb(140, 198, 101)':
         case '#8cc665':
-          return color2;
+          return COLORS[2];
         case 'rgb(68, 163, 64)':
         case '#44a340':
-          return color3;
+          return COLORS[3];
         case 'rgb(30, 104, 35)':
         case '#1e6823':
-          return color4;
+          return COLORS[4];
       }
     })();
   };
