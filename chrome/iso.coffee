@@ -12,7 +12,6 @@ class Iso
       observer = new MutationObserver (mutations) =>
         mutations.forEach (mutation) =>
           if mutation.attributeName is 'data-max-contributions'
-            # We're loaded and ready!
             observer.disconnect()
             @renderIsometricChart()
             @initUI()
@@ -31,24 +30,15 @@ class Iso
       target = document.querySelector '.js-calendar-graph'
 
       if target?
-        observer = new MutationObserver (mutations) =>
-          mutations.forEach (mutation) ->
-            if mutation.type is 'childList'
-              days     = $('.js-calendar-graph-svg rect')
-              bestDay  = null
-              maxCount = null
-              (d3.selectAll days).each ->
-                if $(this).data('count') > maxCount
-                  bestDay = ($ this).data('date')
-                  maxCount = ($ this).data('count')
-              observer.disconnect()
-              target.setAttribute 'data-max-contributions', maxCount
-              target.setAttribute 'data-best-day', bestDay
-
-        observer.observe target,
-          attributes: true
-          childList: true
-          characterData: true
+        days     = $('.js-calendar-graph-svg rect')
+        bestDay  = null
+        maxCount = null
+        (d3.selectAll days).each ->
+          if $(this).data('count') > maxCount
+            bestDay = ($ this).data('date')
+            maxCount = ($ this).data('count')
+        target.setAttribute 'data-max-contributions', maxCount
+        target.setAttribute 'data-best-day', bestDay
 
     script = document.createElement 'script'
     script.appendChild document.createTextNode "(#{icRun})();"

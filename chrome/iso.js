@@ -36,35 +36,20 @@ Iso = (function() {
   Iso.inject = function() {
     var icRun, script;
     icRun = function() {
-      var observer, target;
+      var bestDay, days, maxCount, target;
       target = document.querySelector('.js-calendar-graph');
       if (target != null) {
-        observer = new MutationObserver((function(_this) {
-          return function(mutations) {
-            return mutations.forEach(function(mutation) {
-              var bestDay, days, maxCount;
-              if (mutation.type === 'childList') {
-                days = $('.js-calendar-graph-svg rect');
-                bestDay = null;
-                maxCount = null;
-                (d3.selectAll(days)).each(function() {
-                  if ($(this).data('count') > maxCount) {
-                    bestDay = ($(this)).data('date');
-                    return maxCount = ($(this)).data('count');
-                  }
-                });
-                observer.disconnect();
-                target.setAttribute('data-max-contributions', maxCount);
-                return target.setAttribute('data-best-day', bestDay);
-              }
-            });
-          };
-        })(this));
-        return observer.observe(target, {
-          attributes: true,
-          childList: true,
-          characterData: true
+        days = $('.js-calendar-graph-svg rect');
+        bestDay = null;
+        maxCount = null;
+        (d3.selectAll(days)).each(function() {
+          if ($(this).data('count') > maxCount) {
+            bestDay = ($(this)).data('date');
+            return maxCount = ($(this)).data('count');
+          }
         });
+        target.setAttribute('data-max-contributions', maxCount);
+        return target.setAttribute('data-best-day', bestDay);
       }
     };
     script = document.createElement('script');
