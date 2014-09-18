@@ -30,10 +30,11 @@ class Iso
       target = document.querySelector '.js-calendar-graph'
 
       if target?
-        days     = $('.js-calendar-graph-svg rect')
+        days     = $('.js-calendar-graph rect.day')
         bestDay  = null
         maxCount = null
-        (d3.selectAll days).each ->
+
+        days.each ->
           if $(this).data('count') > maxCount
             bestDay = ($ this).data('date')
             maxCount = ($ this).data('count')
