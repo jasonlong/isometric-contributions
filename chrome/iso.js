@@ -142,12 +142,11 @@ Iso = (function() {
   };
 
   Iso.prototype.loadStats = function() {
-    var countBest, countCurrent, countLongest, countTotal, date, dateBest, dateParts, datesCurrent, datesLongest, datesTotal, html, options, str, strCount;
-    str = ($('.contrib-day')).html();
-    strCount = ($('.contrib-day .num')).html();
-    html = $.parseHTML(str);
+    var contribColumns, countBest, countCurrent, countLongest, countTotal, date, dateBest, dateParts, datesCurrent, datesLongest, datesTotal, html, options, str;
+    contribColumns = $('.contrib-column');
+    str = $(contribColumns[0]).find('.contrib-number').html();
     countTotal = (str.match(/(((\d{1,3})(,\d{3})*)|(\d+))(.\d+)?/))[0];
-    datesTotal = $.trim(html[4].nodeValue);
+    datesTotal = $(contribColumns[0]).find('span:last-child').html();
     countBest = ($('.js-calendar-graph')).data('max-contributions');
     dateParts = (($('.js-calendar-graph')).data('best-day')).split('-');
     dateBest = 'Not so busy after all.';
@@ -161,16 +160,12 @@ Iso = (function() {
     }
     html = "<div class=\"ic-stats-block ic-stats-top\">\n  <span class=\"ic-stats-table\">\n    <span class=\"ic-stats-row\">\n      <span class=\"ic-stats-label\">1 year total\n        <span class=\"ic-stats-count\">" + countTotal + "</span>\n      </span>\n      <span class=\"ic-stats-meta\">\n        <span class=\"ic-stats-unit\">contributions</span>\n        <span class=\"ic-stats-date\">" + datesTotal + "</span>\n      </span>\n    </span>\n    <span class=\"ic-stats-row\">\n      <span class=\"ic-stats-label\">Busiest day\n        <span class=\"ic-stats-count\">" + countBest + "</span>\n      </span>\n      <span class=\"ic-stats-meta\">\n        <span class=\"ic-stats-unit\">contributions</span>\n          <span class=\"ic-stats-date\">" + dateBest + "</span>\n        </span>\n      </span>\n    </span>\n  </span>\n</div>";
     ($(html)).appendTo($('.ic-contributions-wrapper'));
-    str = ($('.contrib-streak')).html();
-    strCount = ($('.contrib-streak .num')).html();
-    html = $.parseHTML(str);
+    str = $(contribColumns[1]).find('.contrib-number').html();
     countLongest = (str.match(/(((\d{1,3})(,\d{3})*)|(\d+))(.\d+)?/))[0];
-    datesLongest = $.trim(html[4].nodeValue);
-    str = ($('.contrib-streak-current')).html();
-    strCount = ($('.contrib-streak-current .num')).html();
-    html = $.parseHTML(str);
+    datesLongest = $(contribColumns[1]).find('span:last-child').html();
+    str = $(contribColumns[1]).find('.contrib-number').html();
     countCurrent = (str.match(/(((\d{1,3})(,\d{3})*)|(\d+))(.\d+)?/))[0];
-    datesCurrent = $.trim(html[4].nodeValue);
+    datesCurrent = $(contribColumns[1]).find('span:last-child').html();
     html = "<div class=\"ic-stats-block ic-stats-bottom\">\n  <span class=\"ic-stats-table\">\n    <span class=\"ic-stats-row\">\n      <span class=\"ic-stats-label\">Longest streak\n        <span class=\"ic-stats-count\">" + countLongest + "</span>\n      </span>\n      <span class=\"ic-stats-meta\">\n        <span class=\"ic-stats-unit\">days</span>\n        <span class=\"ic-stats-date\">" + datesLongest + "</span>\n      </span>\n    </span>\n    <span class=\"ic-stats-row\">\n      <span class=\"ic-stats-label\">Current streak\n        <span class=\"ic-stats-count\">" + countCurrent + "</span>\n      </span>\n      <span class=\"ic-stats-meta\">\n        <span class=\"ic-stats-unit\">days</span>\n        <span class=\"ic-stats-date\">" + datesCurrent + "</span>\n      </span>\n    </span>\n  </span>\n</div>";
     return ($(html)).appendTo($('.ic-contributions-wrapper'));
   };
