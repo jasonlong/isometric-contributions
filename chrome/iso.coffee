@@ -144,12 +144,12 @@ class Iso
     @loadStats()
 
   loadStats: ->
+      contribColumns = ($ '.contrib-column')
+
       # Year total
-      str        = ($ '.contrib-day').html()
-      strCount   = ($ '.contrib-day .num').html()
-      html       = $.parseHTML str
+      str        = $(contribColumns[0]).find('.contrib-number').html()
       countTotal = (str.match /(((\d{1,3})(,\d{3})*)|(\d+))(.\d+)?/)[0]
-      datesTotal = $.trim html[4].nodeValue
+      datesTotal = $(contribColumns[0]).find('span:last-child').html()
 
       # Best day
       countBest = ($ '.js-calendar-graph').data 'max-contributions'
@@ -188,18 +188,14 @@ class Iso
       ($ html).appendTo $ '.ic-contributions-wrapper'
 
       # Longest streak
-      str          = ($ '.contrib-streak').html()
-      strCount     = ($ '.contrib-streak .num').html()
-      html         = $.parseHTML str
+      str          = $(contribColumns[1]).find('.contrib-number').html()
       countLongest = (str.match /(((\d{1,3})(,\d{3})*)|(\d+))(.\d+)?/)[0]
-      datesLongest = $.trim html[4].nodeValue
+      datesLongest = $(contribColumns[1]).find('span:last-child').html()
 
       # Current streak
-      str          = ($ '.contrib-streak-current').html()
-      strCount     = ($ '.contrib-streak-current .num').html()
-      html         = $.parseHTML str
+      str          = $(contribColumns[1]).find('.contrib-number').html()
       countCurrent = (str.match /(((\d{1,3})(,\d{3})*)|(\d+))(.\d+)?/)[0]
-      datesCurrent = $.trim html[4].nodeValue
+      datesCurrent = $(contribColumns[1]).find('span:last-child').html()
 
       html = """
         <div class="ic-stats-block ic-stats-bottom">
