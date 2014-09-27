@@ -197,7 +197,9 @@ Iso = (function() {
 
 })();
 
-Iso.inject();
+if (document.querySelector('.js-calendar-graph')) {
+  Iso.inject();
+}
 
 $(function() {
   var iso, target;
