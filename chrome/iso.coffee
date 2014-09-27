@@ -232,7 +232,8 @@ class Iso
       when 'rgb(30, 104, 35)',   '#1e6823' then COLORS[4]
 
 # Inject code
-Iso.inject()
+if document.querySelector '.js-calendar-graph'
+  Iso.inject()
 
 $ ->
   target = document.querySelector '.js-calendar-graph'
