@@ -193,9 +193,9 @@ class Iso
       datesLongest = $(contribColumns[1]).find('span:last-child').html()
 
       # Current streak
-      str          = $(contribColumns[1]).find('.contrib-number').html()
+      str          = $(contribColumns[2]).find('.contrib-number').html()
       countCurrent = (str.match /(((\d{1,3})(,\d{3})*)|(\d+))(.\d+)?/)[0]
-      datesCurrent = $(contribColumns[1]).find('span:last-child').html()
+      datesCurrent = $(contribColumns[2]).find('span:last-child').html()
 
       html = """
         <div class="ic-stats-block ic-stats-bottom">
