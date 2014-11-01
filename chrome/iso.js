@@ -4,7 +4,7 @@ var Iso;
 Iso = (function() {
   var COLORS;
 
-  COLORS = [new obelisk.CubeColor().getByHorizontalColor(0xeeeeee), new obelisk.CubeColor().getByHorizontalColor(0xffee4a), new obelisk.CubeColor().getByHorizontalColor(0xffc501), new obelisk.CubeColor().getByHorizontalColor(0xfe9600), new obelisk.CubeColor().getByHorizontalColor(0x03001c)];
+  COLORS = [new obelisk.CubeColor().getByHorizontalColor(0xeeeeee), new obelisk.CubeColor().getByHorizontalColor(0xd6e685), new obelisk.CubeColor().getByHorizontalColor(0x8cc665), new obelisk.CubeColor().getByHorizontalColor(0x44a340), new obelisk.CubeColor().getByHorizontalColor(0x1e6823)];
 
   function Iso(target) {
     var observer;
@@ -175,19 +175,19 @@ Iso = (function() {
     return color = (function() {
       switch (fill) {
         case 'rgb(238, 238, 238)':
-        case '#EEEEEE':
+        case '#eeeeee':
           return COLORS[0];
-        case 'rgb(255, 238, 74)':
-        case '#FFEE4A':
+        case 'rgb(214, 230, 133)':
+        case '#d6e685':
           return COLORS[1];
-        case 'rgb(255, 197, 1)':
-        case '#FFC501':
+        case 'rgb(140, 198, 101)':
+        case '#8cc665':
           return COLORS[2];
-        case 'rgb(254, 150, 0)':
-        case '#FE9600':
+        case 'rgb(68, 163, 64)':
+        case '#44a340':
           return COLORS[3];
-        case 'rgb(3, 0, 28)':
-        case '#03001C':
+        case 'rgb(30, 104, 35)':
+        case '#1e6823':
           return COLORS[4];
       }
     })();
