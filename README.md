@@ -6,15 +6,15 @@ Besides being sort of neat looking, this view is interesting in that it highligh
 
 ## Installation
 
+### Safari
+
+Download the [isometric-contributions.safariextz](https://github.com/jasonlong/isometric-contributions/blob/master/safari/isometric-contributions.safariextz?raw=true) and then double-click the file to install it.
+
 ### Chrome
 
 The easiest way to install the extension is through the Chrome Web Store:
 
 https://chrome.google.com/webstore/detail/isometric-contributions/mjoedlfflcchnleknnceiplgaeoegien?hl=en&gl=US
-
-### Safari
-
-Download the [isometric-contributions.safariextz](https://github.com/jasonlong/isometric-contributions/blob/master/safari/isometric-contributions.safariextz?raw=true) and then double-click the file to install it.
 
 ### Developer mode
 
