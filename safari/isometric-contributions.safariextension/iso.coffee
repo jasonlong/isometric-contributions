@@ -91,16 +91,16 @@ class Iso
       ($ '.ic-toggle-option').removeClass 'active'
       ($ this).addClass 'active'
 
-      # chrome.storage.local.set toggleSetting: option
+      localStorage.toggleSetting = option
 
     # Check for user preference
-    # chrome.storage.local.get 'toggleSetting', (result) ->
-    #   if result.toggleSetting?
-    #     ($ ".ic-toggle-option.#{result.toggleSetting}").addClass 'active'
-    #     contributionsBox.addClass "ic-#{result.toggleSetting}"
-    #   else
-    #     ($ '.ic-toggle-option.cubes').addClass 'active'
-    #     (contributionsBox.removeClass 'ic-squares').addClass 'ic-cubes'
+    toggleSetting = localStorage.toggleSetting
+    if toggleSetting?
+      ($ ".ic-toggle-option.#{toggleSetting}").addClass 'active'
+      contributionsBox.addClass "ic-#{toggleSetting}"
+    else
+      ($ '.ic-toggle-option.cubes').addClass 'active'
+      (contributionsBox.removeClass 'ic-squares').addClass 'ic-cubes'
 
     # Inject footer w/ toggle for showing 2D chart
     html = """

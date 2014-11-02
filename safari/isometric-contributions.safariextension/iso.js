@@ -61,7 +61,7 @@ Iso = (function() {
   };
 
   Iso.prototype.initUI = function() {
-    var contributionsBox, html, insertLocation, toggleClass;
+    var contributionsBox, html, insertLocation, toggleClass, toggleSetting;
     contributionsBox = ($('#contributions-calendar')).closest('.boxed-group');
     insertLocation = (($('#contributions-calendar')).closest('.boxed-group')).find('.boxed-group-action');
     toggleClass = '';
@@ -80,8 +80,17 @@ Iso = (function() {
         (contributionsBox.removeClass('ic-squares')).addClass('ic-cubes');
       }
       ($('.ic-toggle-option')).removeClass('active');
-      return ($(this)).addClass('active');
+      ($(this)).addClass('active');
+      return localStorage.toggleSetting = option;
     });
+    toggleSetting = localStorage.toggleSetting;
+    if (toggleSetting != null) {
+      ($(".ic-toggle-option." + toggleSetting)).addClass('active');
+      contributionsBox.addClass("ic-" + toggleSetting);
+    } else {
+      ($('.ic-toggle-option.cubes')).addClass('active');
+      (contributionsBox.removeClass('ic-squares')).addClass('ic-cubes');
+    }
     html = "<span class=\"ic-footer\">\n  <a href=\"#\" class=\"ic-2d-toggle\">Show normal chart below ▾</a>\n</span>";
     ($(html)).appendTo($('.ic-contributions-wrapper'));
     ($('.ic-2d-toggle')).click(function(e) {

@@ -87,7 +87,7 @@
 
 .ic-cubes #contributions-calendar {
   min-height: 3px;
-  border-top: 0;
+  border-top: 0 !important;
 }
 
 .ic-contributions-wrapper {
