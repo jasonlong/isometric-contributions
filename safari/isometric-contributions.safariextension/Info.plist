@@ -53,6 +53,8 @@
 			<string>All</string>
 		</dict>
 	</dict>
+	<key>Update Manifest URL</key>
+	<string>https://github.com/jasonlong/isometric-contributions/raw/master/safari/isometric-contributions.safariextension/updates.plist</string>
 	<key>Website</key>
 	<string>https://github.com/jasonlong/isometric-contributions</string>
 </dict>
