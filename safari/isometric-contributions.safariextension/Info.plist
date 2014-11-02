@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>Author</key>
+	<string>Jason Long</string>
+	<key>Builder Version</key>
+	<string>10600.1.25</string>
+	<key>CFBundleDisplayName</key>
+	<string>isometric-contributions</string>
+	<key>CFBundleIdentifier</key>
+	<string>com.jasonlong.isometric-contributions</string>
+	<key>CFBundleInfoDictionaryVersion</key>
+	<string>6.0</string>
+	<key>CFBundleShortVersionString</key>
+	<string>1.0.5</string>
+	<key>CFBundleVersion</key>
+	<string>1.0.5</string>
+	<key>Chrome</key>
+	<dict>
+		<key>Database Quota</key>
+		<real>1048576</real>
+	</dict>
+	<key>Content</key>
+	<dict>
+		<key>Scripts</key>
+		<dict>
+			<key>End</key>
+			<array>
+				<string>jquery.min.js</string>
+				<string>obelisk.min.js</string>
+				<string>iso.js</string>
+			</array>
+		</dict>
+		<key>Stylesheets</key>
+		<array>
+			<string>iso.css</string>
+		</array>
+	</dict>
+	<key>Description</key>
+	<string>Render an isometric pixel art version of your contribution graph.</string>
+	<key>DeveloperIdentifier</key>
+	<string>DC57SSRSQE</string>
+	<key>ExtensionInfoDictionaryVersion</key>
+	<string>1.0</string>
+	<key>Permissions</key>
+	<dict>
+		<key>Website Access</key>
+		<dict>
+			<key>Include Secure Pages</key>
+			<true/>
+			<key>Level</key>
+			<string>All</string>
+		</dict>
+	</dict>
+	<key>Update Manifest URL</key>
+	<string>https://github.com/jasonlong/isometric-contributions/raw/master/safari/isometric-contributions.safariextension/updates.plist</string>
+	<key>Website</key>
+	<string>https://github.com/jasonlong/isometric-contributions</string>
+</dict>
+</plist>
