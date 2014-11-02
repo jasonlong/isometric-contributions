@@ -9,7 +9,7 @@
 	<key>CFBundleDisplayName</key>
 	<string>isometric-contributions</string>
 	<key>CFBundleIdentifier</key>
-	<string>me.jasonlong.isometric-contributions</string>
+	<string>com.jasonlong.isometric-contributions</string>
 	<key>CFBundleInfoDictionaryVersion</key>
 	<string>6.0</string>
 	<key>CFBundleShortVersionString</key>
@@ -25,11 +25,11 @@
 	<dict>
 		<key>Scripts</key>
 		<dict>
-			<key>Start</key>
+			<key>End</key>
 			<array>
-				<string>iso.js</string>
 				<string>jquery.min.js</string>
 				<string>obelisk.min.js</string>
+				<string>iso.js</string>
 			</array>
 		</dict>
 		<key>Stylesheets</key>
