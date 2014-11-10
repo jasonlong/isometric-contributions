@@ -7,55 +7,23 @@ Iso = (function() {
   COLORS = [new obelisk.CubeColor().getByHorizontalColor(0xeeeeee), new obelisk.CubeColor().getByHorizontalColor(0xd6e685), new obelisk.CubeColor().getByHorizontalColor(0x8cc665), new obelisk.CubeColor().getByHorizontalColor(0x44a340), new obelisk.CubeColor().getByHorizontalColor(0x1e6823)];
 
   function Iso(target) {
-    var observer;
+    var bestDay, days, maxCount;
     if (target) {
-      observer = new MutationObserver((function(_this) {
-        return function(mutations) {
-          return mutations.forEach(function(mutation) {
-            if (mutation.attributeName === 'data-max-contributions') {
-              observer.disconnect();
-              _this.renderIsometricChart();
-              return _this.initUI();
-            }
-          });
-        };
-      })(this));
-      if ((($('.js-calendar-graph')).data('max-contributions')) != null) {
-        this.renderIsometricChart();
-        this.initUI();
-      } else {
-        observer.observe(target, {
-          attributes: true,
-          childList: true,
-          characterData: true
-        });
-      }
+      days = $('.js-calendar-graph rect.day');
+      bestDay = null;
+      maxCount = null;
+      days.each(function() {
+        if ($(this).data('count') > maxCount) {
+          bestDay = ($(this)).data('date');
+          return maxCount = ($(this)).data('count');
+        }
+      });
+      target.setAttribute('data-max-contributions', maxCount);
+      target.setAttribute('data-best-day', bestDay);
+      this.renderIsometricChart();
+      this.initUI();
     }
   }
-
-  Iso.inject = function() {
-    var icRun, script;
-    icRun = function() {
-      var bestDay, days, maxCount, target;
-      target = document.querySelector('.js-calendar-graph');
-      if (target != null) {
-        days = $('.js-calendar-graph rect.day');
-        bestDay = null;
-        maxCount = null;
-        days.each(function() {
-          if ($(this).data('count') > maxCount) {
-            bestDay = ($(this)).data('date');
-            return maxCount = ($(this)).data('count');
-          }
-        });
-        target.setAttribute('data-max-contributions', maxCount);
-        return target.setAttribute('data-best-day', bestDay);
-      }
-    };
-    script = document.createElement('script');
-    script.appendChild(document.createTextNode("(" + icRun + ")();"));
-    return document.documentElement.appendChild(script);
-  };
 
   Iso.prototype.renderIsometricChart = function() {
     var GH_OFFSET, MAX_HEIGHT, SIZE, canvas, contribCount, maxContributions, pixelView, point, self;
@@ -95,13 +63,13 @@ Iso = (function() {
   Iso.prototype.initUI = function() {
     var contributionsBox, html, insertLocation, toggleClass;
     contributionsBox = ($('#contributions-calendar')).closest('.boxed-group');
-    insertLocation = (($('#contributions-calendar')).closest('.boxed-group')).find('.boxed-group-action');
+    insertLocation = (($('#contributions-calendar')).closest('.boxed-group')).find('h3');
     toggleClass = '';
     if (((contributionsBox.closest('.box')).find('.box-header .octicon-lock')).length) {
       toggleClass = 'ic-with-lock';
     }
     html = "<span class=\"ic-toggle " + toggleClass + "\">\n  <a href=\"#\" class=\"ic-toggle-option tooltipped tooltipped-nw squares\" data-ic-option=\"squares\" aria-label=\"Normal chart view\"></a>\n  <a href=\"#\" class=\"ic-toggle-option tooltipped tooltipped-nw cubes\" data-ic-option=\"cubes\" aria-label=\"Isometric chart view\"></a>\n</span>";
-    ($(html)).insertAfter(insertLocation);
+    ($(html)).insertBefore(insertLocation);
     ($('.ic-toggle-option')).click(function(e) {
       var option;
       e.preventDefault();
@@ -197,11 +165,7 @@ Iso = (function() {
 
 })();
 
-if (document.querySelector('.js-calendar-graph')) {
-  Iso.inject();
-}
-
-$(function() {
+$(window).load(function() {
   var iso, target;
   target = document.querySelector('.js-calendar-graph');
   return iso = new Iso(target);

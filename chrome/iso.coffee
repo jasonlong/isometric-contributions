@@ -9,41 +9,19 @@ class Iso
 
   constructor: (target) ->
     if target
-      observer = new MutationObserver (mutations) =>
-        mutations.forEach (mutation) =>
-          if mutation.attributeName is 'data-max-contributions'
-            observer.disconnect()
-            @renderIsometricChart()
-            @initUI()
+      days     = $('.js-calendar-graph rect.day')
+      bestDay  = null
+      maxCount = null
 
-      if (($ '.js-calendar-graph').data 'max-contributions')?
-        @renderIsometricChart()
-        @initUI()
-      else
-        observer.observe target,
-          attributes: true,
-          childList: true,
-          characterData: true
+      days.each ->
+        if $(this).data('count') > maxCount
+          bestDay = ($ this).data('date')
+          maxCount = ($ this).data('count')
+      target.setAttribute 'data-max-contributions', maxCount
+      target.setAttribute 'data-best-day', bestDay
 
-  @inject: ->
-    icRun = ->
-      target = document.querySelector '.js-calendar-graph'
-
-      if target?
-        days     = $('.js-calendar-graph rect.day')
-        bestDay  = null
-        maxCount = null
-
-        days.each ->
-          if $(this).data('count') > maxCount
-            bestDay = ($ this).data('date')
-            maxCount = ($ this).data('count')
-        target.setAttribute 'data-max-contributions', maxCount
-        target.setAttribute 'data-best-day', bestDay
-
-    script = document.createElement 'script'
-    script.appendChild document.createTextNode "(#{icRun})();"
-    document.documentElement.appendChild script
+      @renderIsometricChart()
+      @initUI()
 
   renderIsometricChart: ->
     ($ '<div class="ic-contributions-wrapper"></div>')
@@ -85,7 +63,7 @@ class Iso
 
   initUI: ->
     contributionsBox = (($ '#contributions-calendar').closest '.boxed-group')
-    insertLocation   = (($ '#contributions-calendar').closest '.boxed-group').find '.boxed-group-action'
+    insertLocation   = (($ '#contributions-calendar').closest '.boxed-group').find 'h3'
 
     toggleClass = ''
     # Check for lock octicon
@@ -99,7 +77,7 @@ class Iso
         <a href="#" class="ic-toggle-option tooltipped tooltipped-nw cubes" data-ic-option="cubes" aria-label="Isometric chart view"></a>
       </span>
     """
-    ($ html).insertAfter insertLocation
+    ($ html).insertBefore insertLocation
 
     # Observe toggle
     ($ '.ic-toggle-option').click (e) ->
@@ -231,10 +209,6 @@ class Iso
       when 'rgb(68, 163, 64)',   '#44a340' then COLORS[3]
       when 'rgb(30, 104, 35)',   '#1e6823' then COLORS[4]
 
-# Inject code
-if document.querySelector '.js-calendar-graph'
-  Iso.inject()
-
-$ ->
+$(window).load ->
   target = document.querySelector '.js-calendar-graph'
   iso = new Iso target
