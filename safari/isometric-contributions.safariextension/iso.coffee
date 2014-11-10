@@ -63,7 +63,7 @@ class Iso
 
   initUI: ->
     contributionsBox = (($ '#contributions-calendar').closest '.boxed-group')
-    insertLocation   = (($ '#contributions-calendar').closest '.boxed-group').find '.boxed-group-action'
+    insertLocation   = (($ '#contributions-calendar').closest '.boxed-group').find 'h3'
 
     toggleClass = ''
     # Check for lock octicon
@@ -77,7 +77,7 @@ class Iso
         <a href="#" class="ic-toggle-option tooltipped tooltipped-nw cubes" data-ic-option="cubes" aria-label="Isometric chart view"></a>
       </span>
     """
-    ($ html).insertAfter insertLocation
+    ($ html).insertBefore insertLocation
 
     # Observe toggle
     ($ '.ic-toggle-option').click (e) ->
