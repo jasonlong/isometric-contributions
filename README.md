@@ -6,6 +6,8 @@ Besides being sort of neat looking, this view is interesting in that it highligh
 
 ## Installation
 
+**NOTE: When installing this extension, you will likely see a warning about it needing access to all domains, not just github.com. This is required for people who are using GitHub Enterprise since it can be installed on any domain name.**
+
 ### Safari
 
 Download the [isometric-contributions.safariextz](https://github.com/jasonlong/isometric-contributions/blob/master/safari/isometric-contributions.safariextz?raw=true) and then double-click the file to install it.
