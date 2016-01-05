@@ -120,7 +120,7 @@ Iso = (function() {
     var contribColumns, countBest, countCurrent, countLongest, countTotal, date, dateBest, dateParts, datesCurrent, datesLongest, datesTotal, html, options, str;
     contribColumns = $('.contrib-column');
     str = $(contribColumns[0]).find('.contrib-number').html();
-    countTotal = (str.match(/(((\d{1,3})(,\d{3})*)|(\d+))(.\d+)?/))[0];
+    countTotal = (str.match(/(((\d{1,})(,\d{})*)|(\d+))(.\d+)?/))[0];
     datesTotal = $(contribColumns[0]).find('span:last-child').html();
     countBest = ($('.js-calendar-graph')).data('max-contributions');
     dateParts = (($('.js-calendar-graph')).data('best-day')).split('-');
@@ -136,10 +136,10 @@ Iso = (function() {
     html = "<div class=\"ic-stats-block ic-stats-top\">\n  <span class=\"ic-stats-table\">\n    <span class=\"ic-stats-row\">\n      <span class=\"ic-stats-label\">1 year total\n        <span class=\"ic-stats-count\">" + countTotal + "</span>\n      </span>\n      <span class=\"ic-stats-meta\">\n        <span class=\"ic-stats-unit\">contributions</span>\n        <span class=\"ic-stats-date\">" + datesTotal + "</span>\n      </span>\n    </span>\n    <span class=\"ic-stats-row\">\n      <span class=\"ic-stats-label\">Busiest day\n        <span class=\"ic-stats-count\">" + countBest + "</span>\n      </span>\n      <span class=\"ic-stats-meta\">\n        <span class=\"ic-stats-unit\">contributions</span>\n          <span class=\"ic-stats-date\">" + dateBest + "</span>\n        </span>\n      </span>\n    </span>\n  </span>\n</div>";
     ($(html)).appendTo($('.ic-contributions-wrapper'));
     str = $(contribColumns[1]).find('.contrib-number').html();
-    countLongest = (str.match(/(((\d{1,3})(,\d{3})*)|(\d+))(.\d+)?/))[0];
+    countLongest = (str.match(/(((\d{1,})(,\d{})*)|(\d+))(.\d+)?/))[0];
     datesLongest = $(contribColumns[1]).find('span:last-child').html();
     str = $(contribColumns[2]).find('.contrib-number').html();
-    countCurrent = (str.match(/(((\d{1,3})(,\d{3})*)|(\d+))(.\d+)?/))[0];
+    countCurrent = (str.match(/(((\d{1,})(,\d{})*)|(\d+))(.\d+)?/))[0];
     datesCurrent = $(contribColumns[2]).find('span:last-child').html();
     html = "<div class=\"ic-stats-block ic-stats-bottom\">\n  <span class=\"ic-stats-table\">\n    <span class=\"ic-stats-row\">\n      <span class=\"ic-stats-label\">Longest streak\n        <span class=\"ic-stats-count\">" + countLongest + "</span>\n      </span>\n      <span class=\"ic-stats-meta\">\n        <span class=\"ic-stats-unit\">days</span>\n        <span class=\"ic-stats-date\">" + datesLongest + "</span>\n      </span>\n    </span>\n    <span class=\"ic-stats-row\">\n      <span class=\"ic-stats-label\">Current streak\n        <span class=\"ic-stats-count\">" + countCurrent + "</span>\n      </span>\n      <span class=\"ic-stats-meta\">\n        <span class=\"ic-stats-unit\">days</span>\n        <span class=\"ic-stats-date\">" + datesCurrent + "</span>\n      </span>\n    </span>\n  </span>\n</div>";
     return ($(html)).appendTo($('.ic-contributions-wrapper'));
