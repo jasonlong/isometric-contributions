@@ -10,9 +10,9 @@
        <key>Developer Identifier</key>
        <string>DC57SSRSQE</string>
        <key>CFBundleVersion</key>
-       <string>1.0.7</string>
+       <string>1.0.8</string>
        <key>CFBundleShortVersionString</key>
-       <string>1.0.5</string>
+       <string>1.0.8</string>
        <key>URL</key>
        <string>http://github.com/jasonlong/isometric-contributions/raw/master/safari/isometric-contributions.safariextz</string>
      </dict>
