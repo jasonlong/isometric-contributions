@@ -5,7 +5,7 @@
 	<key>Author</key>
 	<string>Jason Long</string>
 	<key>Builder Version</key>
-	<string>10600.1.25</string>
+	<string>11601.4.4</string>
 	<key>CFBundleDisplayName</key>
 	<string>isometric-contributions</string>
 	<key>CFBundleIdentifier</key>
@@ -13,9 +13,9 @@
 	<key>CFBundleInfoDictionaryVersion</key>
 	<string>6.0</string>
 	<key>CFBundleShortVersionString</key>
-	<string>1.0.5</string>
+	<string>1.0.8</string>
 	<key>CFBundleVersion</key>
-	<string>1.0.5</string>
+	<string>1.0.8</string>
 	<key>Chrome</key>
 	<dict>
 		<key>Database Quota</key>
