@@ -22,7 +22,8 @@ Iso = (function() {
       target.setAttribute('data-best-day', bestDay);
       this.getSettings((function(_this) {
         return function() {
-          _this.renderIsometricChart();
+          _this.prepareIsometricChart();
+          _this.renderIsometricChart(_this.blockSize);
           return _this.initUI();
         };
       })(this));
@@ -30,18 +31,20 @@ Iso = (function() {
   }
 
   Iso.prototype.getSettings = function(callback) {
-    var ref;
+    var ref, ref1;
     if (chrome.storage != null) {
-      return chrome.storage.local.get(['toggleSetting'], (function(_this) {
+      return chrome.storage.local.get(['toggleSetting', 'blockSize'], (function(_this) {
         return function(arg) {
-          var ref, toggleSetting;
-          toggleSetting = (ref = arg.toggleSetting) != null ? ref : 'cubes';
+          var blockSize, ref, ref1, toggleSetting;
+          toggleSetting = (ref = arg.toggleSetting) != null ? ref : 'cubes', blockSize = (ref1 = arg.blockSize) != null ? ref1 : 12;
           _this.toggleSetting = toggleSetting;
+          _this.blockSize = blockSize;
           return callback();
         };
       })(this));
     } else {
       this.toggleSetting = (ref = localStorage.toggleSetting) != null ? ref : 'cubes';
+      this.blockSize = (ref1 = +localStorage.blockSize) != null ? ref1 : 12;
       return callback();
     }
   };
@@ -61,15 +64,21 @@ Iso = (function() {
     }
   };
 
-  Iso.prototype.renderIsometricChart = function() {
-    var GH_OFFSET, MAX_HEIGHT, SIZE, canvas, contribCount, maxContributions, pixelView, point, self;
+  Iso.prototype.prepareIsometricChart = function() {
     ($('<div class="ic-contributions-wrapper"></div>')).insertBefore('#contributions-calendar');
-    ($('<canvas id="isometric-contributions" width="728" height="470"></canvas>')).appendTo('.ic-contributions-wrapper');
-    SIZE = 12;
+    return ($('<canvas id="isometric-contributions" width="728" height="470"></canvas>')).appendTo('.ic-contributions-wrapper');
+  };
+
+  Iso.prototype.renderIsometricChart = function(size) {
+    var GH_OFFSET, MAX_HEIGHT, canvas, contribCount, maxContributions, pixelView, point, pointLeftByBlockSize, self;
     GH_OFFSET = 13;
     MAX_HEIGHT = 100;
     canvas = document.getElementById('isometric-contributions');
-    point = new obelisk.Point(87, 100);
+    pointLeftByBlockSize = {
+      10: 110,
+      12: 87
+    };
+    point = new obelisk.Point(pointLeftByBlockSize[size], 100);
     pixelView = new obelisk.PixelView(canvas, point);
     maxContributions = ($('.js-calendar-graph')).data('max-contributions');
     contribCount = null;
@@ -87,10 +96,10 @@ Iso = (function() {
         if (maxContributions > 0) {
           cubeHeight += parseInt(MAX_HEIGHT / maxContributions * contribCount);
         }
-        dimension = new obelisk.CubeDimension(SIZE, SIZE, cubeHeight);
+        dimension = new obelisk.CubeDimension(size, size, cubeHeight);
         color = self.getSquareColor(fill);
         cube = new obelisk.Cube(dimension, color, false);
-        p3d = new obelisk.Point3D(SIZE * x, SIZE * y, 0);
+        p3d = new obelisk.Point3D(size * x, size * y, 0);
         return pixelView.renderObject(cube, p3d);
       });
     });
@@ -119,6 +128,13 @@ Iso = (function() {
       ($('.ic-toggle-option')).removeClass('active');
       ($(this)).addClass('active');
       return self.persistSetting("toggleSetting", option);
+    });
+    ($('#isometric-contributions')).click(function(e) {
+      e.preventDefault();
+      this.getContext('2d').clearRect(0, 0, 1000, 1000);
+      self.blockSize = self.blockSize === 12 ? 10 : 12;
+      self.renderIsometricChart(self.blockSize);
+      return self.persistSetting("blockSize", self.blockSize);
     });
     ($(".ic-toggle-option." + this.toggleSetting)).addClass('active');
     contributionsBox.addClass("ic-" + this.toggleSetting);

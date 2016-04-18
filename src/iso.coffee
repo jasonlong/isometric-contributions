@@ -21,20 +21,22 @@ class Iso
       target.setAttribute 'data-best-day', bestDay
 
       @getSettings =>
-        @renderIsometricChart()
+        @prepareIsometricChart()
+        @renderIsometricChart @blockSize
         @initUI()
 
   getSettings: (callback) ->
-    # Check for user preference, if chrome.storage is available.
     # The storage API is not supported in content scripts.
     # https://developer.mozilla.org/Add-ons/WebExtensions/Chrome_incompatibilities#storage
     if chrome.storage?
-      chrome.storage.local.get ['toggleSetting'], ({toggleSetting = 'cubes'}) =>
+      chrome.storage.local.get ['toggleSetting', 'blockSize'], ({toggleSetting = 'cubes', blockSize = 12}) =>
         @toggleSetting = toggleSetting
+        @blockSize = blockSize
         callback()
 
     else
       @toggleSetting = localStorage.toggleSetting ? 'cubes'
+      @blockSize = +localStorage.blockSize ? 12
       callback()
 
   persistSetting: (key, value, callback = ->) ->
@@ -47,20 +49,24 @@ class Iso
       localStorage[key] = value
       callback()
 
-  renderIsometricChart: ->
+  prepareIsometricChart: ->
     ($ '<div class="ic-contributions-wrapper"></div>')
       .insertBefore '#contributions-calendar'
     ($ '<canvas id="isometric-contributions" width="728" height="470"></canvas>')
       .appendTo '.ic-contributions-wrapper'
 
-    SIZE       = 12
+  renderIsometricChart: (size) ->
     GH_OFFSET  = 13
     MAX_HEIGHT = 100
 
     canvas = document.getElementById 'isometric-contributions'
 
+    pointLeftByBlockSize =
+      10: 110
+      12: 87
+
     # create pixel view container in point
-    point = new obelisk.Point 87, 100
+    point = new obelisk.Point pointLeftByBlockSize[size], 100
     pixelView = new obelisk.PixelView canvas, point
 
     maxContributions = ($ '.js-calendar-graph').data 'max-contributions'
@@ -79,10 +85,10 @@ class Iso
         if maxContributions > 0
           cubeHeight += parseInt MAX_HEIGHT / maxContributions * contribCount
 
-        dimension = new obelisk.CubeDimension SIZE, SIZE, cubeHeight
+        dimension = new obelisk.CubeDimension size, size, cubeHeight
         color     = self.getSquareColor fill
         cube      = new obelisk.Cube dimension, color, false
-        p3d       = new obelisk.Point3D SIZE * x, SIZE * y, 0
+        p3d       = new obelisk.Point3D size * x, size * y, 0
         pixelView.renderObject cube, p3d
 
   initUI: ->
@@ -103,7 +109,7 @@ class Iso
     """
     ($ html).insertBefore insertLocation
 
-    # Observe toggle
+    # Observe view toggle
     self = this
     ($ '.ic-toggle-option').click (e) ->
       e.preventDefault()
@@ -117,6 +123,15 @@ class Iso
       ($ this).addClass 'active'
 
       self.persistSetting "toggleSetting", option
+
+    # Observe isometric view size toggle
+    ($ '#isometric-contributions').click (e) ->
+      e.preventDefault()
+      this.getContext('2d').clearRect 0, 0, 1000, 1000
+      self.blockSize = if self.blockSize is 12 then 10 else 12
+      self.renderIsometricChart self.blockSize
+
+      self.persistSetting "blockSize", self.blockSize
 
     # Apply user preference
     ($ ".ic-toggle-option.#{@toggleSetting}").addClass 'active'
