@@ -193,7 +193,7 @@ Iso = (function() {
 
 })();
 
-$(window).load(function() {
+$(function() {
   var iso, target;
   target = document.querySelector('.js-calendar-graph');
   return iso = new Iso(target);

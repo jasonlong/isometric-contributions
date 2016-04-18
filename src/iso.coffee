@@ -118,6 +118,7 @@ class Iso
 
       self.persistSetting "toggleSetting", option
 
+    # Apply user preference
     ($ ".ic-toggle-option.#{@toggleSetting}").addClass 'active'
     contributionsBox.addClass "ic-#{@toggleSetting}"
 
@@ -228,6 +229,6 @@ class Iso
       when 'rgb(68, 163, 64)',   '#44a340' then COLORS[3]
       when 'rgb(30, 104, 35)',   '#1e6823' then COLORS[4]
 
-$(window).load ->
+$ ->
   target = document.querySelector '.js-calendar-graph'
   iso = new Iso target
