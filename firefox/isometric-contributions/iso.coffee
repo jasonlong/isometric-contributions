@@ -37,6 +37,16 @@ class Iso
       @toggleSetting = localStorage.toggleSetting ? 'cubes'
       callback()
 
+  persistSetting: (key, value, callback = ->) ->
+    if chrome.storage?
+      obj = {}
+      obj[key] = value
+      chrome.storage.local.set obj, callback
+
+    else
+      localStorage[key] = value
+      callback()
+
   renderIsometricChart: ->
     ($ '<div class="ic-contributions-wrapper"></div>')
       .insertBefore '#contributions-calendar'
@@ -94,6 +104,7 @@ class Iso
     ($ html).insertBefore insertLocation
 
     # Observe toggle
+    self = this
     ($ '.ic-toggle-option').click (e) ->
       e.preventDefault()
       option = $(this).data 'ic-option'
@@ -105,8 +116,7 @@ class Iso
       ($ '.ic-toggle-option').removeClass 'active'
       ($ this).addClass 'active'
 
-      if chrome.storage?
-        chrome.storage.local.set toggleSetting: option
+      self.persistSetting "toggleSetting", option
 
     ($ ".ic-toggle-option.#{@toggleSetting}").addClass 'active'
     contributionsBox.addClass "ic-#{@toggleSetting}"

@@ -25,8 +25,27 @@ class Iso
         @initUI()
 
   getSettings: (callback) ->
-    @toggleSetting = localStorage.toggleSetting ? 'cubes'
-    callback()
+    # Check for user preference, if chrome.storage is available.
+    # The storage API is not supported in content scripts.
+    # https://developer.mozilla.org/Add-ons/WebExtensions/Chrome_incompatibilities#storage
+    if chrome.storage?
+      chrome.storage.local.get ['toggleSetting'], ({toggleSetting = 'cubes'}) =>
+        @toggleSetting = toggleSetting
+        callback()
+
+    else
+      @toggleSetting = localStorage.toggleSetting ? 'cubes'
+      callback()
+
+  persistSetting: (key, value, callback = ->) ->
+    if chrome.storage?
+      obj = {}
+      obj[key] = value
+      chrome.storage.local.set obj, callback
+
+    else
+      localStorage[key] = value
+      callback()
 
   renderIsometricChart: ->
     ($ '<div class="ic-contributions-wrapper"></div>')
@@ -85,6 +104,7 @@ class Iso
     ($ html).insertBefore insertLocation
 
     # Observe toggle
+    self = this
     ($ '.ic-toggle-option').click (e) ->
       e.preventDefault()
       option = $(this).data 'ic-option'
@@ -96,7 +116,7 @@ class Iso
       ($ '.ic-toggle-option').removeClass 'active'
       ($ this).addClass 'active'
 
-      localStorage.toggleSetting = option
+      self.persistSetting "toggleSetting", option
 
     ($ ".ic-toggle-option.#{@toggleSetting}").addClass 'active'
     contributionsBox.addClass "ic-#{@toggleSetting}"

@@ -46,6 +46,21 @@ Iso = (function() {
     }
   };
 
+  Iso.prototype.persistSetting = function(key, value, callback) {
+    var obj;
+    if (callback == null) {
+      callback = function() {};
+    }
+    if (chrome.storage != null) {
+      obj = {};
+      obj[key] = value;
+      return chrome.storage.local.set(obj, callback);
+    } else {
+      localStorage[key] = value;
+      return callback();
+    }
+  };
+
   Iso.prototype.renderIsometricChart = function() {
     var GH_OFFSET, MAX_HEIGHT, SIZE, canvas, contribCount, maxContributions, pixelView, point, self;
     ($('<div class="ic-contributions-wrapper"></div>')).insertBefore('#contributions-calendar');
@@ -82,7 +97,7 @@ Iso = (function() {
   };
 
   Iso.prototype.initUI = function() {
-    var contributionsBox, html, insertLocation, toggleClass;
+    var contributionsBox, html, insertLocation, self, toggleClass;
     contributionsBox = ($('#contributions-calendar')).closest('.boxed-group');
     insertLocation = (($('#contributions-calendar')).closest('.boxed-group')).find('h3');
     toggleClass = '';
@@ -91,6 +106,7 @@ Iso = (function() {
     }
     html = "<span class=\"ic-toggle " + toggleClass + "\">\n  <a href=\"#\" class=\"ic-toggle-option tooltipped tooltipped-nw squares\" data-ic-option=\"squares\" aria-label=\"Normal chart view\"></a>\n  <a href=\"#\" class=\"ic-toggle-option tooltipped tooltipped-nw cubes\" data-ic-option=\"cubes\" aria-label=\"Isometric chart view\"></a>\n</span>";
     ($(html)).insertBefore(insertLocation);
+    self = this;
     ($('.ic-toggle-option')).click(function(e) {
       var option;
       e.preventDefault();
@@ -102,11 +118,7 @@ Iso = (function() {
       }
       ($('.ic-toggle-option')).removeClass('active');
       ($(this)).addClass('active');
-      if (chrome.storage != null) {
-        return chrome.storage.local.set({
-          toggleSetting: option
-        });
-      }
+      return self.persistSetting("toggleSetting", option);
     });
     ($(".ic-toggle-option." + this.toggleSetting)).addClass('active');
     contributionsBox.addClass("ic-" + this.toggleSetting);
