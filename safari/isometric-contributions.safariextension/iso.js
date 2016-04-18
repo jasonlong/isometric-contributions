@@ -20,10 +20,20 @@ Iso = (function() {
       });
       target.setAttribute('data-max-contributions', maxCount);
       target.setAttribute('data-best-day', bestDay);
-      this.renderIsometricChart();
-      this.initUI();
+      this.getSettings((function(_this) {
+        return function() {
+          _this.renderIsometricChart();
+          return _this.initUI();
+        };
+      })(this));
     }
   }
+
+  Iso.prototype.getSettings = function(callback) {
+    var ref;
+    this.toggleSetting = (ref = localStorage.toggleSetting) != null ? ref : 'cubes';
+    return callback();
+  };
 
   Iso.prototype.renderIsometricChart = function() {
     var GH_OFFSET, MAX_HEIGHT, SIZE, canvas, contribCount, maxContributions, pixelView, point, self;
@@ -61,7 +71,7 @@ Iso = (function() {
   };
 
   Iso.prototype.initUI = function() {
-    var contributionsBox, html, insertLocation, toggleClass, toggleSetting;
+    var contributionsBox, html, insertLocation, toggleClass;
     contributionsBox = ($('#contributions-calendar')).closest('.boxed-group');
     insertLocation = (($('#contributions-calendar')).closest('.boxed-group')).find('h3');
     toggleClass = '';
@@ -83,14 +93,8 @@ Iso = (function() {
       ($(this)).addClass('active');
       return localStorage.toggleSetting = option;
     });
-    toggleSetting = localStorage.toggleSetting;
-    if (toggleSetting != null) {
-      ($(".ic-toggle-option." + toggleSetting)).addClass('active');
-      contributionsBox.addClass("ic-" + toggleSetting);
-    } else {
-      ($('.ic-toggle-option.cubes')).addClass('active');
-      (contributionsBox.removeClass('ic-squares')).addClass('ic-cubes');
-    }
+    ($(".ic-toggle-option." + this.toggleSetting)).addClass('active');
+    contributionsBox.addClass("ic-" + this.toggleSetting);
     html = "<span class=\"ic-footer\">\n  <a href=\"#\" class=\"ic-2d-toggle\">Show normal chart below ▾</a>\n</span>";
     ($(html)).appendTo($('.ic-contributions-wrapper'));
     ($('.ic-2d-toggle')).click(function(e) {

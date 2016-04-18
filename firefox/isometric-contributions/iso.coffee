@@ -20,8 +20,22 @@ class Iso
       target.setAttribute 'data-max-contributions', maxCount
       target.setAttribute 'data-best-day', bestDay
 
-      @renderIsometricChart()
-      @initUI()
+      @getSettings =>
+        @renderIsometricChart()
+        @initUI()
+
+  getSettings: (callback) ->
+    # Check for user preference, if chrome.storage is available.
+    # The storage API is not supported in content scripts.
+    # https://developer.mozilla.org/Add-ons/WebExtensions/Chrome_incompatibilities#storage
+    if chrome.storage?
+      chrome.storage.local.get ['toggleSetting'], ({toggleSetting = 'cubes'}) =>
+        @toggleSetting = toggleSetting
+        callback()
+
+    else
+      @toggleSetting = localStorage.toggleSetting ? 'cubes'
+      callback()
 
   renderIsometricChart: ->
     ($ '<div class="ic-contributions-wrapper"></div>')
@@ -94,20 +108,8 @@ class Iso
       if chrome.storage?
         chrome.storage.local.set toggleSetting: option
 
-    # Check for user preference, if chrome.storage is available
-    # The storage API is not supported in content scripts.
-    # https://developer.mozilla.org/Add-ons/WebExtensions/Chrome_incompatibilities#storage
-    if chrome.storage?
-      chrome.storage.local.get 'toggleSetting', (result) ->
-        if result.toggleSetting?
-          ($ ".ic-toggle-option.#{result.toggleSetting}").addClass 'active'
-          contributionsBox.addClass "ic-#{result.toggleSetting}"
-        else
-          ($ '.ic-toggle-option.cubes').addClass 'active'
-          (contributionsBox.removeClass 'ic-squares').addClass 'ic-cubes'
-    else
-      ($ '.ic-toggle-option.cubes').addClass 'active'
-      (contributionsBox.removeClass 'ic-squares').addClass 'ic-cubes'
+    ($ ".ic-toggle-option.#{@toggleSetting}").addClass 'active'
+    contributionsBox.addClass "ic-#{@toggleSetting}"
 
     # Inject footer w/ toggle for showing 2D chart
     html = """

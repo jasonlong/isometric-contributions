@@ -20,10 +20,31 @@ Iso = (function() {
       });
       target.setAttribute('data-max-contributions', maxCount);
       target.setAttribute('data-best-day', bestDay);
-      this.renderIsometricChart();
-      this.initUI();
+      this.getSettings((function(_this) {
+        return function() {
+          _this.renderIsometricChart();
+          return _this.initUI();
+        };
+      })(this));
     }
   }
+
+  Iso.prototype.getSettings = function(callback) {
+    var ref;
+    if (chrome.storage != null) {
+      return chrome.storage.local.get(['toggleSetting'], (function(_this) {
+        return function(arg) {
+          var ref, toggleSetting;
+          toggleSetting = (ref = arg.toggleSetting) != null ? ref : 'cubes';
+          _this.toggleSetting = toggleSetting;
+          return callback();
+        };
+      })(this));
+    } else {
+      this.toggleSetting = (ref = localStorage.toggleSetting) != null ? ref : 'cubes';
+      return callback();
+    }
+  };
 
   Iso.prototype.renderIsometricChart = function() {
     var GH_OFFSET, MAX_HEIGHT, SIZE, canvas, contribCount, maxContributions, pixelView, point, self;
@@ -87,20 +108,8 @@ Iso = (function() {
         });
       }
     });
-    if (chrome.storage != null) {
-      chrome.storage.local.get('toggleSetting', function(result) {
-        if (result.toggleSetting != null) {
-          ($(".ic-toggle-option." + result.toggleSetting)).addClass('active');
-          return contributionsBox.addClass("ic-" + result.toggleSetting);
-        } else {
-          ($('.ic-toggle-option.cubes')).addClass('active');
-          return (contributionsBox.removeClass('ic-squares')).addClass('ic-cubes');
-        }
-      });
-    } else {
-      ($('.ic-toggle-option.cubes')).addClass('active');
-      (contributionsBox.removeClass('ic-squares')).addClass('ic-cubes');
-    }
+    ($(".ic-toggle-option." + this.toggleSetting)).addClass('active');
+    contributionsBox.addClass("ic-" + this.toggleSetting);
     html = "<span class=\"ic-footer\">\n  <a href=\"#\" class=\"ic-2d-toggle\">Show normal chart below ▾</a>\n</span>";
     ($(html)).appendTo($('.ic-contributions-wrapper'));
     ($('.ic-2d-toggle')).click(function(e) {

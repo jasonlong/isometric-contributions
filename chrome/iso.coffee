@@ -20,8 +20,14 @@ class Iso
       target.setAttribute 'data-max-contributions', maxCount
       target.setAttribute 'data-best-day', bestDay
 
-      @renderIsometricChart()
-      @initUI()
+      @getSettings =>
+        @renderIsometricChart()
+        @initUI()
+
+  getSettings: (callback) ->
+    chrome.storage.local.get ['toggleSetting'], ({toggleSetting = 'cubes'}) =>
+      @toggleSetting = toggleSetting
+      callback()
 
   renderIsometricChart: ->
     ($ '<div class="ic-contributions-wrapper"></div>')
@@ -93,14 +99,9 @@ class Iso
 
       chrome.storage.local.set toggleSetting: option
 
-    # Check for user preference
-    chrome.storage.local.get 'toggleSetting', (result) ->
-      if result.toggleSetting?
-        ($ ".ic-toggle-option.#{result.toggleSetting}").addClass 'active'
-        contributionsBox.addClass "ic-#{result.toggleSetting}"
-      else
-        ($ '.ic-toggle-option.cubes').addClass 'active'
-        (contributionsBox.removeClass 'ic-squares').addClass 'ic-cubes'
+    # Apply user preference
+    ($ ".ic-toggle-option.#{@toggleSetting}").addClass 'active'
+    contributionsBox.addClass "ic-#{@toggleSetting}"
 
     # Inject footer w/ toggle for showing 2D chart
     html = """
