@@ -34,9 +34,9 @@ To hack on the extension, you'll first need to make sure you've installed it in 
 
 ![](http://cl.ly/image/10370H2B2Q1G/content)
 
-As of `v0.8.3`, this project uses CoffeeScript. To compile the iso.coffee file:
+As of `v0.8.3`, this project uses CoffeeScript. To compile the `iso.coffee` file to all extensions:
 
-    coffee -cb iso.coffee
+    src/build.sh
 
 
 Feel free to send a pull request if you've made an improvement.

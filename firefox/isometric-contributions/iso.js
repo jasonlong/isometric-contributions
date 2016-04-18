@@ -20,20 +20,65 @@ Iso = (function() {
       });
       target.setAttribute('data-max-contributions', maxCount);
       target.setAttribute('data-best-day', bestDay);
-      this.renderIsometricChart();
-      this.initUI();
+      this.getSettings((function(_this) {
+        return function() {
+          _this.prepareIsometricChart();
+          _this.renderIsometricChart(_this.blockSize);
+          return _this.initUI();
+        };
+      })(this));
     }
   }
 
-  Iso.prototype.renderIsometricChart = function() {
-    var GH_OFFSET, MAX_HEIGHT, SIZE, canvas, contribCount, maxContributions, pixelView, point, self;
+  Iso.prototype.getSettings = function(callback) {
+    var ref, ref1;
+    if (chrome.storage != null) {
+      return chrome.storage.local.get(['toggleSetting', 'blockSize'], (function(_this) {
+        return function(arg) {
+          var blockSize, ref, ref1, toggleSetting;
+          toggleSetting = (ref = arg.toggleSetting) != null ? ref : 'cubes', blockSize = (ref1 = arg.blockSize) != null ? ref1 : 12;
+          _this.toggleSetting = toggleSetting;
+          _this.blockSize = blockSize;
+          return callback();
+        };
+      })(this));
+    } else {
+      this.toggleSetting = (ref = localStorage.toggleSetting) != null ? ref : 'cubes';
+      this.blockSize = (ref1 = +localStorage.blockSize) != null ? ref1 : 12;
+      return callback();
+    }
+  };
+
+  Iso.prototype.persistSetting = function(key, value, callback) {
+    var obj;
+    if (callback == null) {
+      callback = function() {};
+    }
+    if (chrome.storage != null) {
+      obj = {};
+      obj[key] = value;
+      return chrome.storage.local.set(obj, callback);
+    } else {
+      localStorage[key] = value;
+      return callback();
+    }
+  };
+
+  Iso.prototype.prepareIsometricChart = function() {
     ($('<div class="ic-contributions-wrapper"></div>')).insertBefore('#contributions-calendar');
-    ($('<canvas id="isometric-contributions" width="728" height="470"></canvas>')).appendTo('.ic-contributions-wrapper');
-    SIZE = 12;
+    return ($('<canvas id="isometric-contributions" width="728" height="470"></canvas>')).appendTo('.ic-contributions-wrapper');
+  };
+
+  Iso.prototype.renderIsometricChart = function(size) {
+    var GH_OFFSET, MAX_HEIGHT, canvas, contribCount, maxContributions, pixelView, point, pointLeftByBlockSize, self;
     GH_OFFSET = 13;
     MAX_HEIGHT = 100;
     canvas = document.getElementById('isometric-contributions');
-    point = new obelisk.Point(87, 100);
+    pointLeftByBlockSize = {
+      10: 110,
+      12: 87
+    };
+    point = new obelisk.Point(pointLeftByBlockSize[size], 100);
     pixelView = new obelisk.PixelView(canvas, point);
     maxContributions = ($('.js-calendar-graph')).data('max-contributions');
     contribCount = null;
@@ -51,17 +96,17 @@ Iso = (function() {
         if (maxContributions > 0) {
           cubeHeight += parseInt(MAX_HEIGHT / maxContributions * contribCount);
         }
-        dimension = new obelisk.CubeDimension(SIZE, SIZE, cubeHeight);
+        dimension = new obelisk.CubeDimension(size, size, cubeHeight);
         color = self.getSquareColor(fill);
         cube = new obelisk.Cube(dimension, color, false);
-        p3d = new obelisk.Point3D(SIZE * x, SIZE * y, 0);
+        p3d = new obelisk.Point3D(size * x, size * y, 0);
         return pixelView.renderObject(cube, p3d);
       });
     });
   };
 
   Iso.prototype.initUI = function() {
-    var contributionsBox, html, insertLocation, toggleClass;
+    var contributionsBox, html, insertLocation, self, toggleClass;
     contributionsBox = ($('#contributions-calendar')).closest('.boxed-group');
     insertLocation = (($('#contributions-calendar')).closest('.boxed-group')).find('h3');
     toggleClass = '';
@@ -70,6 +115,7 @@ Iso = (function() {
     }
     html = "<span class=\"ic-toggle " + toggleClass + "\">\n  <a href=\"#\" class=\"ic-toggle-option tooltipped tooltipped-nw squares\" data-ic-option=\"squares\" aria-label=\"Normal chart view\"></a>\n  <a href=\"#\" class=\"ic-toggle-option tooltipped tooltipped-nw cubes\" data-ic-option=\"cubes\" aria-label=\"Isometric chart view\"></a>\n</span>";
     ($(html)).insertBefore(insertLocation);
+    self = this;
     ($('.ic-toggle-option')).click(function(e) {
       var option;
       e.preventDefault();
@@ -81,26 +127,17 @@ Iso = (function() {
       }
       ($('.ic-toggle-option')).removeClass('active');
       ($(this)).addClass('active');
-      if (chrome.storage != null) {
-        return chrome.storage.local.set({
-          toggleSetting: option
-        });
-      }
+      return self.persistSetting("toggleSetting", option);
     });
-    if (chrome.storage != null) {
-      chrome.storage.local.get('toggleSetting', function(result) {
-        if (result.toggleSetting != null) {
-          ($(".ic-toggle-option." + result.toggleSetting)).addClass('active');
-          return contributionsBox.addClass("ic-" + result.toggleSetting);
-        } else {
-          ($('.ic-toggle-option.cubes')).addClass('active');
-          return (contributionsBox.removeClass('ic-squares')).addClass('ic-cubes');
-        }
-      });
-    } else {
-      ($('.ic-toggle-option.cubes')).addClass('active');
-      (contributionsBox.removeClass('ic-squares')).addClass('ic-cubes');
-    }
+    ($('#isometric-contributions')).click(function(e) {
+      e.preventDefault();
+      this.getContext('2d').clearRect(0, 0, 1000, 1000);
+      self.blockSize = self.blockSize === 12 ? 10 : 12;
+      self.renderIsometricChart(self.blockSize);
+      return self.persistSetting("blockSize", self.blockSize);
+    });
+    ($(".ic-toggle-option." + this.toggleSetting)).addClass('active');
+    contributionsBox.addClass("ic-" + this.toggleSetting);
     html = "<span class=\"ic-footer\">\n  <a href=\"#\" class=\"ic-2d-toggle\">Show normal chart below ▾</a>\n</span>";
     ($(html)).appendTo($('.ic-contributions-wrapper'));
     ($('.ic-2d-toggle')).click(function(e) {
@@ -172,7 +209,7 @@ Iso = (function() {
 
 })();
 
-$(window).load(function() {
+$(function() {
   var iso, target;
   target = document.querySelector('.js-calendar-graph');
   return iso = new Iso(target);
