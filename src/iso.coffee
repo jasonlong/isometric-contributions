@@ -28,7 +28,7 @@ class Iso
     # Check for user preference, if chrome.storage is available.
     # The storage API is not supported in content scripts.
     # https://developer.mozilla.org/Add-ons/WebExtensions/Chrome_incompatibilities#storage
-    if chrome.storage?
+    if chrome?.storage?
       chrome.storage.local.get ['toggleSetting'], ({toggleSetting}) =>
         this.toggleSetting = toggleSetting ? 'cubes'
         callback()
@@ -38,7 +38,7 @@ class Iso
       callback()
 
   persistSetting: (key, value, callback = ->) ->
-    if chrome.storage?
+    if chrome?.storage?
       obj = {}
       obj[key] = value
       chrome.storage.local.set obj, callback

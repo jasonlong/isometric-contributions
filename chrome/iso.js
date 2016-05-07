@@ -31,7 +31,7 @@ Iso = (function() {
 
   Iso.prototype.getSettings = function(callback) {
     var ref;
-    if (chrome.storage != null) {
+    if ((typeof chrome !== "undefined" && chrome !== null ? chrome.storage : void 0) != null) {
       return chrome.storage.local.get(['toggleSetting'], (function(_this) {
         return function(arg) {
           var toggleSetting;
@@ -51,7 +51,7 @@ Iso = (function() {
     if (callback == null) {
       callback = function() {};
     }
-    if (chrome.storage != null) {
+    if ((typeof chrome !== "undefined" && chrome !== null ? chrome.storage : void 0) != null) {
       obj = {};
       obj[key] = value;
       return chrome.storage.local.set(obj, callback);
