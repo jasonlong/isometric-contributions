@@ -9,19 +9,43 @@ class Iso
 
   constructor: (target) ->
     if target
-      days     = $('.js-calendar-graph rect.day')
+      days     = ($ '.js-calendar-graph rect.day')
       bestDay  = null
       maxCount = null
 
       days.each ->
-        if $(this).data('count') > maxCount
+        if ($ this).data('count') > maxCount
           bestDay = ($ this).data('date')
           maxCount = ($ this).data('count')
       target.setAttribute 'data-max-contributions', maxCount
       target.setAttribute 'data-best-day', bestDay
 
-      @renderIsometricChart()
-      @initUI()
+      this.getSettings =>
+        this.renderIsometricChart()
+        this.initUI()
+
+  getSettings: (callback) ->
+    # Check for user preference, if chrome.storage is available.
+    # The storage API is not supported in content scripts.
+    # https://developer.mozilla.org/Add-ons/WebExtensions/Chrome_incompatibilities#storage
+    if chrome?.storage?
+      chrome.storage.local.get ['toggleSetting'], ({toggleSetting}) =>
+        this.toggleSetting = toggleSetting ? 'cubes'
+        callback()
+
+    else
+      this.toggleSetting = localStorage.toggleSetting ? 'cubes'
+      callback()
+
+  persistSetting: (key, value, callback = ->) ->
+    if chrome?.storage?
+      obj = {}
+      obj[key] = value
+      chrome.storage.local.set obj, callback
+
+    else
+      localStorage[key] = value
+      callback()
 
   renderIsometricChart: ->
     ($ '<div class="ic-contributions-wrapper"></div>')
@@ -80,9 +104,10 @@ class Iso
     ($ html).insertBefore insertLocation
 
     # Observe toggle
+    self = this
     ($ '.ic-toggle-option').click (e) ->
       e.preventDefault()
-      option = $(this).data 'ic-option'
+      option = ($ this).data 'ic-option'
       if option is 'squares'
         (contributionsBox.removeClass 'ic-cubes').addClass 'ic-squares'
       else
@@ -91,16 +116,11 @@ class Iso
       ($ '.ic-toggle-option').removeClass 'active'
       ($ this).addClass 'active'
 
-      localStorage.toggleSetting = option
+      self.persistSetting "toggleSetting", option
 
-    # Check for user preference
-    toggleSetting = localStorage.toggleSetting
-    if toggleSetting?
-      ($ ".ic-toggle-option.#{toggleSetting}").addClass 'active'
-      contributionsBox.addClass "ic-#{toggleSetting}"
-    else
-      ($ '.ic-toggle-option.cubes').addClass 'active'
-      (contributionsBox.removeClass 'ic-squares').addClass 'ic-cubes'
+    # Apply user preference
+    ($ ".ic-toggle-option.#{this.toggleSetting}").addClass 'active'
+    contributionsBox.addClass "ic-#{this.toggleSetting}"
 
     # Inject footer w/ toggle for showing 2D chart
     html = """
@@ -119,15 +139,15 @@ class Iso
         ($ this).text 'Hide normal chart below ▴'
         contributionsBox.addClass 'show-2d'
 
-    @loadStats()
+    this.loadStats()
 
   loadStats: ->
       contribColumns = ($ '.contrib-column')
 
       # Year total
-      str        = $(contribColumns[0]).find('.contrib-number').html()
+      str        = ($ contribColumns[0]).find('.contrib-number').html()
       countTotal = (str.match /(((\d{1,})(,\d{})*)|(\d+))(.\d+)?/)[0]
-      datesTotal = $(contribColumns[0]).find('span:last-child').html()
+      datesTotal = ($ contribColumns[0]).find('span:last-child').html()
 
       # Best day
       countBest = ($ '.js-calendar-graph').data 'max-contributions'
@@ -166,14 +186,14 @@ class Iso
       ($ html).appendTo $ '.ic-contributions-wrapper'
 
       # Longest streak
-      str          = $(contribColumns[1]).find('.contrib-number').html()
+      str          = ($ contribColumns[1]).find('.contrib-number').html()
       countLongest = (str.match /(((\d{1,})(,\d{})*)|(\d+))(.\d+)?/)[0]
-      datesLongest = $(contribColumns[1]).find('span:last-child').html()
+      datesLongest = ($ contribColumns[1]).find('span:last-child').html()
 
       # Current streak
-      str          = $(contribColumns[2]).find('.contrib-number').html()
+      str          = ($ contribColumns[2]).find('.contrib-number').html()
       countCurrent = (str.match /(((\d{1,})(,\d{})*)|(\d+))(.\d+)?/)[0]
-      datesCurrent = $(contribColumns[2]).find('span:last-child').html()
+      datesCurrent = ($ contribColumns[2]).find('span:last-child').html()
 
       html = """
         <div class="ic-stats-block ic-stats-bottom">

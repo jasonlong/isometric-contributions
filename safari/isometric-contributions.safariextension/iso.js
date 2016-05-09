@@ -13,17 +13,53 @@ Iso = (function() {
       bestDay = null;
       maxCount = null;
       days.each(function() {
-        if ($(this).data('count') > maxCount) {
+        if (($(this)).data('count') > maxCount) {
           bestDay = ($(this)).data('date');
           return maxCount = ($(this)).data('count');
         }
       });
       target.setAttribute('data-max-contributions', maxCount);
       target.setAttribute('data-best-day', bestDay);
-      this.renderIsometricChart();
-      this.initUI();
+      this.getSettings((function(_this) {
+        return function() {
+          _this.renderIsometricChart();
+          return _this.initUI();
+        };
+      })(this));
     }
   }
+
+  Iso.prototype.getSettings = function(callback) {
+    var ref;
+    if ((typeof chrome !== "undefined" && chrome !== null ? chrome.storage : void 0) != null) {
+      return chrome.storage.local.get(['toggleSetting'], (function(_this) {
+        return function(arg) {
+          var toggleSetting;
+          toggleSetting = arg.toggleSetting;
+          _this.toggleSetting = toggleSetting != null ? toggleSetting : 'cubes';
+          return callback();
+        };
+      })(this));
+    } else {
+      this.toggleSetting = (ref = localStorage.toggleSetting) != null ? ref : 'cubes';
+      return callback();
+    }
+  };
+
+  Iso.prototype.persistSetting = function(key, value, callback) {
+    var obj;
+    if (callback == null) {
+      callback = function() {};
+    }
+    if ((typeof chrome !== "undefined" && chrome !== null ? chrome.storage : void 0) != null) {
+      obj = {};
+      obj[key] = value;
+      return chrome.storage.local.set(obj, callback);
+    } else {
+      localStorage[key] = value;
+      return callback();
+    }
+  };
 
   Iso.prototype.renderIsometricChart = function() {
     var GH_OFFSET, MAX_HEIGHT, SIZE, canvas, contribCount, maxContributions, pixelView, point, self;
@@ -61,7 +97,7 @@ Iso = (function() {
   };
 
   Iso.prototype.initUI = function() {
-    var contributionsBox, html, insertLocation, toggleClass, toggleSetting;
+    var contributionsBox, html, insertLocation, self, toggleClass;
     contributionsBox = ($('#contributions-calendar')).closest('.boxed-group');
     insertLocation = (($('#contributions-calendar')).closest('.boxed-group')).find('h3');
     toggleClass = '';
@@ -70,10 +106,11 @@ Iso = (function() {
     }
     html = "<span class=\"ic-toggle " + toggleClass + "\">\n  <a href=\"#\" class=\"ic-toggle-option tooltipped tooltipped-nw squares\" data-ic-option=\"squares\" aria-label=\"Normal chart view\"></a>\n  <a href=\"#\" class=\"ic-toggle-option tooltipped tooltipped-nw cubes\" data-ic-option=\"cubes\" aria-label=\"Isometric chart view\"></a>\n</span>";
     ($(html)).insertBefore(insertLocation);
+    self = this;
     ($('.ic-toggle-option')).click(function(e) {
       var option;
       e.preventDefault();
-      option = $(this).data('ic-option');
+      option = ($(this)).data('ic-option');
       if (option === 'squares') {
         (contributionsBox.removeClass('ic-cubes')).addClass('ic-squares');
       } else {
@@ -81,16 +118,10 @@ Iso = (function() {
       }
       ($('.ic-toggle-option')).removeClass('active');
       ($(this)).addClass('active');
-      return localStorage.toggleSetting = option;
+      return self.persistSetting("toggleSetting", option);
     });
-    toggleSetting = localStorage.toggleSetting;
-    if (toggleSetting != null) {
-      ($(".ic-toggle-option." + toggleSetting)).addClass('active');
-      contributionsBox.addClass("ic-" + toggleSetting);
-    } else {
-      ($('.ic-toggle-option.cubes')).addClass('active');
-      (contributionsBox.removeClass('ic-squares')).addClass('ic-cubes');
-    }
+    ($(".ic-toggle-option." + this.toggleSetting)).addClass('active');
+    contributionsBox.addClass("ic-" + this.toggleSetting);
     html = "<span class=\"ic-footer\">\n  <a href=\"#\" class=\"ic-2d-toggle\">Show normal chart below ▾</a>\n</span>";
     ($(html)).appendTo($('.ic-contributions-wrapper'));
     ($('.ic-2d-toggle')).click(function(e) {
@@ -109,9 +140,9 @@ Iso = (function() {
   Iso.prototype.loadStats = function() {
     var contribColumns, countBest, countCurrent, countLongest, countTotal, date, dateBest, dateParts, datesCurrent, datesLongest, datesTotal, html, options, str;
     contribColumns = $('.contrib-column');
-    str = $(contribColumns[0]).find('.contrib-number').html();
+    str = ($(contribColumns[0])).find('.contrib-number').html();
     countTotal = (str.match(/(((\d{1,})(,\d{})*)|(\d+))(.\d+)?/))[0];
-    datesTotal = $(contribColumns[0]).find('span:last-child').html();
+    datesTotal = ($(contribColumns[0])).find('span:last-child').html();
     countBest = ($('.js-calendar-graph')).data('max-contributions');
     dateParts = (($('.js-calendar-graph')).data('best-day')).split('-');
     dateBest = 'Not so busy after all.';
@@ -125,12 +156,12 @@ Iso = (function() {
     }
     html = "<div class=\"ic-stats-block ic-stats-top\">\n  <span class=\"ic-stats-table\">\n    <span class=\"ic-stats-row\">\n      <span class=\"ic-stats-label\">1 year total\n        <span class=\"ic-stats-count\">" + countTotal + "</span>\n      </span>\n      <span class=\"ic-stats-meta\">\n        <span class=\"ic-stats-unit\">contributions</span>\n        <span class=\"ic-stats-date\">" + datesTotal + "</span>\n      </span>\n    </span>\n    <span class=\"ic-stats-row\">\n      <span class=\"ic-stats-label\">Busiest day\n        <span class=\"ic-stats-count\">" + countBest + "</span>\n      </span>\n      <span class=\"ic-stats-meta\">\n        <span class=\"ic-stats-unit\">contributions</span>\n          <span class=\"ic-stats-date\">" + dateBest + "</span>\n        </span>\n      </span>\n    </span>\n  </span>\n</div>";
     ($(html)).appendTo($('.ic-contributions-wrapper'));
-    str = $(contribColumns[1]).find('.contrib-number').html();
+    str = ($(contribColumns[1])).find('.contrib-number').html();
     countLongest = (str.match(/(((\d{1,})(,\d{})*)|(\d+))(.\d+)?/))[0];
-    datesLongest = $(contribColumns[1]).find('span:last-child').html();
-    str = $(contribColumns[2]).find('.contrib-number').html();
+    datesLongest = ($(contribColumns[1])).find('span:last-child').html();
+    str = ($(contribColumns[2])).find('.contrib-number').html();
     countCurrent = (str.match(/(((\d{1,})(,\d{})*)|(\d+))(.\d+)?/))[0];
-    datesCurrent = $(contribColumns[2]).find('span:last-child').html();
+    datesCurrent = ($(contribColumns[2])).find('span:last-child').html();
     html = "<div class=\"ic-stats-block ic-stats-bottom\">\n  <span class=\"ic-stats-table\">\n    <span class=\"ic-stats-row\">\n      <span class=\"ic-stats-label\">Longest streak\n        <span class=\"ic-stats-count\">" + countLongest + "</span>\n      </span>\n      <span class=\"ic-stats-meta\">\n        <span class=\"ic-stats-unit\">days</span>\n        <span class=\"ic-stats-date\">" + datesLongest + "</span>\n      </span>\n    </span>\n    <span class=\"ic-stats-row\">\n      <span class=\"ic-stats-label\">Current streak\n        <span class=\"ic-stats-count\">" + countCurrent + "</span>\n      </span>\n      <span class=\"ic-stats-meta\">\n        <span class=\"ic-stats-unit\">days</span>\n        <span class=\"ic-stats-date\">" + datesCurrent + "</span>\n      </span>\n    </span>\n  </span>\n</div>";
     return ($(html)).appendTo($('.ic-contributions-wrapper'));
   };
