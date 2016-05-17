@@ -7,19 +7,34 @@ Iso = (function() {
   COLORS = [new obelisk.CubeColor().getByHorizontalColor(0xeeeeee), new obelisk.CubeColor().getByHorizontalColor(0xd6e685), new obelisk.CubeColor().getByHorizontalColor(0x8cc665), new obelisk.CubeColor().getByHorizontalColor(0x44a340), new obelisk.CubeColor().getByHorizontalColor(0x1e6823)];
 
   function Iso(target) {
-    var bestDay, days, maxCount;
+    var bestDay, days, firstDay, lastDay, maxCount, yearTotal;
     if (target) {
       days = $('.js-calendar-graph rect.day');
+      yearTotal = 0;
       bestDay = null;
       maxCount = null;
-      days.each(function() {
-        if (($(this)).data('count') > maxCount) {
+      firstDay = null;
+      lastDay = null;
+      days.each(function(d) {
+        var currentCount;
+        currentCount = ($(this)).data('count');
+        yearTotal += currentCount;
+        if (d === 0) {
+          firstDay = ($(this)).data('date');
+        }
+        if (d === days.length - 1) {
+          lastDay = ($(this)).data('date');
+        }
+        if (currentCount > maxCount) {
           bestDay = ($(this)).data('date');
-          return maxCount = ($(this)).data('count');
+          return maxCount = currentCount;
         }
       });
+      target.setAttribute('data-year-total', yearTotal);
       target.setAttribute('data-max-contributions', maxCount);
       target.setAttribute('data-best-day', bestDay);
+      target.setAttribute('data-first-day', firstDay);
+      target.setAttribute('data-last-day', lastDay);
       this.getSettings((function(_this) {
         return function() {
           _this.renderIsometricChart();
@@ -127,10 +142,10 @@ Iso = (function() {
     ($('.ic-2d-toggle')).click(function(e) {
       e.preventDefault();
       if (contributionsBox.hasClass('show-2d')) {
-        ($(this)).text('Show normal chart below ▾');
+        ($(this)).text('Show normal chart ▾');
         return contributionsBox.removeClass('show-2d');
       } else {
-        ($(this)).text('Hide normal chart below ▴');
+        ($(this)).text('Hide normal chart ▴');
         return contributionsBox.addClass('show-2d');
       }
     });
@@ -138,31 +153,32 @@ Iso = (function() {
   };
 
   Iso.prototype.loadStats = function() {
-    var contribColumns, countBest, countCurrent, countLongest, countTotal, date, dateBest, dateParts, datesCurrent, datesLongest, datesTotal, html, options, str;
+    var contribColumns, countBest, countTotal, date, dateBest, dateFirst, dateLast, dateOptions, dateParts, datePartsFirst, datePartsLast, dateWithYearOptions, datesTotal, html, str;
+    dateOptions = {
+      month: "short",
+      day: "numeric"
+    };
+    dateWithYearOptions = {
+      month: "short",
+      day: "numeric",
+      year: "numeric"
+    };
     contribColumns = $('.contrib-column');
     str = ($(contribColumns[0])).find('.contrib-number').html();
-    countTotal = (str.match(/(((\d{1,})(,\d{})*)|(\d+))(.\d+)?/))[0];
-    datesTotal = ($(contribColumns[0])).find('span:last-child').html();
+    countTotal = (($('.js-calendar-graph')).data('year-total')).toLocaleString();
+    datePartsFirst = (($('.js-calendar-graph')).data('first-day')).split('-');
+    datePartsLast = (($('.js-calendar-graph')).data('last-day')).split('-');
+    dateFirst = new Date(datePartsFirst[0], datePartsFirst[1] - 1, datePartsFirst[2], 0, 0, 0).toLocaleDateString('en-US', dateWithYearOptions);
+    dateLast = new Date(datePartsLast[0], datePartsLast[1] - 1, datePartsLast[2], 0, 0, 0).toLocaleDateString('en-US', dateWithYearOptions);
+    datesTotal = dateFirst + " — " + dateLast;
     countBest = ($('.js-calendar-graph')).data('max-contributions');
     dateParts = (($('.js-calendar-graph')).data('best-day')).split('-');
     dateBest = 'Not so busy after all.';
     if (dateParts[0] != null) {
-      options = {
-        month: "long",
-        day: "numeric"
-      };
       date = new Date(dateParts[0], dateParts[1] - 1, dateParts[2], 0, 0, 0);
-      dateBest = date.toLocaleDateString('en-US', options);
+      dateBest = date.toLocaleDateString('en-US', dateOptions);
     }
     html = "<div class=\"ic-stats-block ic-stats-top\">\n  <span class=\"ic-stats-table\">\n    <span class=\"ic-stats-row\">\n      <span class=\"ic-stats-label\">1 year total\n        <span class=\"ic-stats-count\">" + countTotal + "</span>\n      </span>\n      <span class=\"ic-stats-meta\">\n        <span class=\"ic-stats-unit\">contributions</span>\n        <span class=\"ic-stats-date\">" + datesTotal + "</span>\n      </span>\n    </span>\n    <span class=\"ic-stats-row\">\n      <span class=\"ic-stats-label\">Busiest day\n        <span class=\"ic-stats-count\">" + countBest + "</span>\n      </span>\n      <span class=\"ic-stats-meta\">\n        <span class=\"ic-stats-unit\">contributions</span>\n          <span class=\"ic-stats-date\">" + dateBest + "</span>\n        </span>\n      </span>\n    </span>\n  </span>\n</div>";
-    ($(html)).appendTo($('.ic-contributions-wrapper'));
-    str = ($(contribColumns[1])).find('.contrib-number').html();
-    countLongest = (str.match(/(((\d{1,})(,\d{})*)|(\d+))(.\d+)?/))[0];
-    datesLongest = ($(contribColumns[1])).find('span:last-child').html();
-    str = ($(contribColumns[2])).find('.contrib-number').html();
-    countCurrent = (str.match(/(((\d{1,})(,\d{})*)|(\d+))(.\d+)?/))[0];
-    datesCurrent = ($(contribColumns[2])).find('span:last-child').html();
-    html = "<div class=\"ic-stats-block ic-stats-bottom\">\n  <span class=\"ic-stats-table\">\n    <span class=\"ic-stats-row\">\n      <span class=\"ic-stats-label\">Longest streak\n        <span class=\"ic-stats-count\">" + countLongest + "</span>\n      </span>\n      <span class=\"ic-stats-meta\">\n        <span class=\"ic-stats-unit\">days</span>\n        <span class=\"ic-stats-date\">" + datesLongest + "</span>\n      </span>\n    </span>\n    <span class=\"ic-stats-row\">\n      <span class=\"ic-stats-label\">Current streak\n        <span class=\"ic-stats-count\">" + countCurrent + "</span>\n      </span>\n      <span class=\"ic-stats-meta\">\n        <span class=\"ic-stats-unit\">days</span>\n        <span class=\"ic-stats-date\">" + datesCurrent + "</span>\n      </span>\n    </span>\n  </span>\n</div>";
     return ($(html)).appendTo($('.ic-contributions-wrapper'));
   };
 
