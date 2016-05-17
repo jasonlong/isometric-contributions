@@ -153,7 +153,7 @@ Iso = (function() {
   };
 
   Iso.prototype.loadStats = function() {
-    var contribColumns, countBest, countTotal, date, dateBest, dateFirst, dateLast, dateOptions, dateParts, datePartsFirst, datePartsLast, dateWithYearOptions, datesTotal, html, str;
+    var contribColumns, countBest, countTotal, dateBest, dateFirst, dateLast, dateOptions, dateWithYearOptions, datesTotal, html, str;
     dateOptions = {
       month: "short",
       day: "numeric"
@@ -166,17 +166,13 @@ Iso = (function() {
     contribColumns = $('.contrib-column');
     str = ($(contribColumns[0])).find('.contrib-number').html();
     countTotal = (($('.js-calendar-graph')).data('year-total')).toLocaleString();
-    datePartsFirst = (($('.js-calendar-graph')).data('first-day')).split('-');
-    datePartsLast = (($('.js-calendar-graph')).data('last-day')).split('-');
-    dateFirst = new Date(datePartsFirst[0], datePartsFirst[1] - 1, datePartsFirst[2], 0, 0, 0).toLocaleDateString('en-US', dateWithYearOptions);
-    dateLast = new Date(datePartsLast[0], datePartsLast[1] - 1, datePartsLast[2], 0, 0, 0).toLocaleDateString('en-US', dateWithYearOptions);
+    dateFirst = this.formatDateString(($('.js-calendar-graph')).data('first-day'), dateWithYearOptions);
+    dateLast = this.formatDateString(($('.js-calendar-graph')).data('last-day'), dateWithYearOptions);
     datesTotal = dateFirst + " — " + dateLast;
     countBest = ($('.js-calendar-graph')).data('max-contributions');
-    dateParts = (($('.js-calendar-graph')).data('best-day')).split('-');
-    dateBest = 'Not so busy after all.';
-    if (dateParts[0] != null) {
-      date = new Date(dateParts[0], dateParts[1] - 1, dateParts[2], 0, 0, 0);
-      dateBest = date.toLocaleDateString('en-US', dateOptions);
+    dateBest = this.formatDateString(($('.js-calendar-graph')).data('best-day'), dateOptions);
+    if (!dateBest) {
+      dateBest = 'Not so busy after all';
     }
     html = "<div class=\"ic-stats-block ic-stats-top\">\n  <span class=\"ic-stats-table\">\n    <span class=\"ic-stats-row\">\n      <span class=\"ic-stats-label\">1 year total\n        <span class=\"ic-stats-count\">" + countTotal + "</span>\n      </span>\n      <span class=\"ic-stats-meta\">\n        <span class=\"ic-stats-unit\">contributions</span>\n        <span class=\"ic-stats-date\">" + datesTotal + "</span>\n      </span>\n    </span>\n    <span class=\"ic-stats-row\">\n      <span class=\"ic-stats-label\">Busiest day\n        <span class=\"ic-stats-count\">" + countBest + "</span>\n      </span>\n      <span class=\"ic-stats-meta\">\n        <span class=\"ic-stats-unit\">contributions</span>\n          <span class=\"ic-stats-date\">" + dateBest + "</span>\n        </span>\n      </span>\n    </span>\n  </span>\n</div>";
     return ($(html)).appendTo($('.ic-contributions-wrapper'));
@@ -203,6 +199,16 @@ Iso = (function() {
           return COLORS[4];
       }
     })();
+  };
+
+  Iso.prototype.formatDateString = function(dateStr, options) {
+    var date, dateParts;
+    date = null;
+    if (dateStr) {
+      dateParts = dateStr.split('-');
+      date = new Date(dateParts[0], dateParts[1] - 1, dateParts[2], 0, 0, 0).toLocaleDateString('en-US', options);
+    }
+    return date;
   };
 
   return Iso;

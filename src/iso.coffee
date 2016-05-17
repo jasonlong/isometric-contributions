@@ -161,19 +161,16 @@ class Iso
       # Year total
       str        = ($ contribColumns[0]).find('.contrib-number').html()
       countTotal = (($ '.js-calendar-graph').data 'year-total').toLocaleString()
-      datePartsFirst = (($ '.js-calendar-graph').data 'first-day').split '-'
-      datePartsLast = (($ '.js-calendar-graph').data 'last-day').split '-'
-      dateFirst = new Date(datePartsFirst[0], datePartsFirst[1] - 1, datePartsFirst[2], 0, 0, 0).toLocaleDateString('en-US', dateWithYearOptions)
-      dateLast = new Date(datePartsLast[0], datePartsLast[1] - 1, datePartsLast[2], 0, 0, 0).toLocaleDateString('en-US', dateWithYearOptions)
+
+      dateFirst  = this.formatDateString (($ '.js-calendar-graph').data 'first-day'), dateWithYearOptions
+      dateLast   = this.formatDateString (($ '.js-calendar-graph').data 'last-day'), dateWithYearOptions
       datesTotal = dateFirst + " — " + dateLast
 
       # Best day
       countBest = ($ '.js-calendar-graph').data 'max-contributions'
-      dateParts = (($ '.js-calendar-graph').data 'best-day').split '-'
-      dateBest  = 'Not so busy after all.'
-      if dateParts[0]?
-        date = new Date(dateParts[0], dateParts[1] - 1, dateParts[2], 0, 0, 0)
-        dateBest = date.toLocaleDateString('en-US', dateOptions)
+      dateBest  = this.formatDateString (($ '.js-calendar-graph').data 'best-day'), dateOptions
+      if !dateBest
+        dateBest  = 'Not so busy after all'
 
       html = """
         <div class="ic-stats-block ic-stats-top">
@@ -245,6 +242,15 @@ class Iso
       when 'rgb(140, 198, 101)', '#8cc665' then COLORS[2]
       when 'rgb(68, 163, 64)',   '#44a340' then COLORS[3]
       when 'rgb(30, 104, 35)',   '#1e6823' then COLORS[4]
+
+  formatDateString: (dateStr, options) ->
+    date = null
+
+    if dateStr
+      dateParts = dateStr.split '-'
+      date = new Date(dateParts[0], dateParts[1] - 1, dateParts[2], 0, 0, 0).toLocaleDateString('en-US', options)
+
+    return date
 
 $ ->
   target = document.querySelector '.js-calendar-graph'
