@@ -121,7 +121,7 @@ Iso = (function() {
   };
 
   Iso.prototype.loadStats = function() {
-    var contribColumns, countTotal, dateBest, dateFirst, dateLast, datesCurrent, datesLongest, datesTotal, days, longestStreakEnd, longestStreakStart, streakCurrent, streakLongest, tempStreak, tempStreakEnd, tempStreakStart;
+    var contribColumns, countTotal, currentDayCount, currentStreakEnd, currentStreakStart, d, dateBest, dateFirst, dateLast, datesCurrent, datesLongest, datesTotal, days, i, len, longestStreakEnd, longestStreakStart, streakCurrent, streakLongest, tempStreak, tempStreakEnd, tempStreakStart;
     streakLongest = 0;
     streakCurrent = 0;
     tempStreak = 0;
@@ -129,6 +129,8 @@ Iso = (function() {
     tempStreakEnd = null;
     longestStreakStart = null;
     longestStreakEnd = null;
+    currentStreakStart = null;
+    currentStreakEnd = null;
     datesCurrent = null;
     contribColumns = $('.contrib-column');
     days = $('.js-calendar-graph rect.day');
@@ -165,6 +167,25 @@ Iso = (function() {
         return tempStreakEnd = null;
       }
     });
+    days = ($('.js-calendar-graph rect.day')).get().reverse();
+    currentStreakEnd = days[0].getAttribute('data-date');
+    for (i = 0, len = days.length; i < len; i++) {
+      d = days[i];
+      currentDayCount = d.getAttribute('data-count');
+      if (currentDayCount > 0) {
+        streakCurrent++;
+        currentStreakStart = d.getAttribute('data-date');
+      } else {
+        break;
+      }
+    }
+    if (streakCurrent > 0) {
+      currentStreakStart = this.formatDateString(currentStreakStart, dateOptions);
+      currentStreakEnd = this.formatDateString(currentStreakEnd, dateOptions);
+      datesCurrent = currentStreakStart + " — " + currentStreakEnd;
+    } else {
+      datesCurrent = "No current streak";
+    }
     countTotal = yearTotal.toLocaleString();
     dateFirst = this.formatDateString(firstDay, dateWithYearOptions);
     dateLast = this.formatDateString(lastDay, dateWithYearOptions);

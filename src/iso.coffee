@@ -113,6 +113,8 @@ class Iso
     tempStreakEnd      = null
     longestStreakStart = null
     longestStreakEnd   = null
+    currentStreakStart = null
+    currentStreakEnd   = null
     datesCurrent       = null
 
     contribColumns = ($ '.contrib-column')
@@ -149,6 +151,27 @@ class Iso
         tempStreak         = 0
         tempStreakStart    = null
         tempStreakEnd      = null
+
+    # Check for current streak
+    # Have to iterate and access differently than above because
+    # we end up with a regular JS Array after reversing
+    days = ($ '.js-calendar-graph rect.day').get().reverse()
+    currentStreakEnd = days[0].getAttribute('data-date')
+    for d in days
+      currentDayCount  = d.getAttribute('data-count')
+
+      if currentDayCount > 0
+        streakCurrent++
+        currentStreakStart = d.getAttribute('data-date')
+      else
+        break
+
+    if streakCurrent > 0
+      currentStreakStart = this.formatDateString currentStreakStart, dateOptions
+      currentStreakEnd   = this.formatDateString currentStreakEnd, dateOptions
+      datesCurrent       = currentStreakStart + " — " + currentStreakEnd
+    else
+      datesCurrent = "No current streak"
 
     # Year total
     countTotal = yearTotal.toLocaleString()
