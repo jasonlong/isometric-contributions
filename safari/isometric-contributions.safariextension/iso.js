@@ -121,34 +121,63 @@ Iso = (function() {
   };
 
   Iso.prototype.loadStats = function() {
-    var contribColumns, countTotal, dateBest, dateFirst, dateLast, datesTotal, days, str;
+    var contribColumns, countTotal, dateBest, dateFirst, dateLast, datesCurrent, datesLongest, datesTotal, days, longestStreakEnd, longestStreakStart, streakCurrent, streakLongest, tempStreak, tempStreakEnd, tempStreakStart;
+    streakLongest = 0;
+    streakCurrent = 0;
+    tempStreak = 0;
+    tempStreakStart = null;
+    tempStreakEnd = null;
+    longestStreakStart = null;
+    longestStreakEnd = null;
+    datesCurrent = null;
+    contribColumns = $('.contrib-column');
     days = $('.js-calendar-graph rect.day');
     days.each(function(d) {
-      var currentCount;
-      currentCount = ($(this)).data('count');
-      yearTotal += currentCount;
+      var currentDayCount;
+      currentDayCount = ($(this)).data('count');
+      yearTotal += currentDayCount;
       if (d === 0) {
         firstDay = ($(this)).data('date');
       }
       if (d === days.length - 1) {
         lastDay = ($(this)).data('date');
       }
-      if (currentCount > maxCount) {
+      if (currentDayCount > maxCount) {
         bestDay = ($(this)).data('date');
-        return maxCount = currentCount;
+        maxCount = currentDayCount;
+      }
+      if (currentDayCount > 0) {
+        if (tempStreak === 0) {
+          tempStreakStart = ($(this)).data('date');
+        }
+        tempStreak++;
+        if (tempStreak > streakLongest) {
+          streakLongest++;
+          return tempStreakEnd = ($(this)).data('date');
+        }
+      } else {
+        if (tempStreak === streakLongest) {
+          longestStreakStart = tempStreakStart;
+          longestStreakEnd = tempStreakEnd;
+        }
+        tempStreak = 0;
+        tempStreakStart = null;
+        return tempStreakEnd = null;
       }
     });
-    contribColumns = $('.contrib-column');
-    str = ($(contribColumns[0])).find('.contrib-number').html();
     countTotal = yearTotal.toLocaleString();
     dateFirst = this.formatDateString(firstDay, dateWithYearOptions);
     dateLast = this.formatDateString(lastDay, dateWithYearOptions);
     datesTotal = dateFirst + " — " + dateLast;
     dateBest = this.formatDateString(bestDay, dateOptions);
     if (!dateBest) {
-      dateBest = 'Not so busy after all';
+      dateBest = 'No activity found';
     }
-    return this.renderTopStats(countTotal, datesTotal, maxCount, dateBest);
+    longestStreakStart = this.formatDateString(longestStreakStart, dateOptions);
+    longestStreakEnd = this.formatDateString(longestStreakEnd, dateOptions);
+    datesLongest = longestStreakStart + " — " + longestStreakEnd;
+    this.renderTopStats(countTotal, datesTotal, maxCount, dateBest);
+    return this.renderBottomStats(streakLongest, datesLongest, streakCurrent, datesCurrent);
   };
 
   Iso.prototype.renderTopStats = function(countTotal, datesTotal, maxCount, dateBest) {
@@ -157,7 +186,11 @@ Iso = (function() {
     return ($(html)).appendTo($('.ic-contributions-wrapper'));
   };
 
-  Iso.prototype.renderBottomStats = function(countLongest, datesLongest, countCurrent, datesCurrent) {};
+  Iso.prototype.renderBottomStats = function(streakLongest, datesLongest, streakCurrent, datesCurrent) {
+    var html;
+    html = "<div class=\"ic-stats-block ic-stats-bottom\">\n  <span class=\"ic-stats-table\">\n    <span class=\"ic-stats-row\">\n      <span class=\"ic-stats-label\">Longest streak\n        <span class=\"ic-stats-count\">" + streakLongest + "</span>\n      </span>\n      <span class=\"ic-stats-meta\">\n        <span class=\"ic-stats-unit\">days</span>\n        <span class=\"ic-stats-date\">" + datesLongest + "</span>\n      </span>\n    </span>\n    <span class=\"ic-stats-row\">\n      <span class=\"ic-stats-label\">Current streak\n        <span class=\"ic-stats-count\">" + streakCurrent + "</span>\n      </span>\n      <span class=\"ic-stats-meta\">\n        <span class=\"ic-stats-unit\">days</span>\n        <span class=\"ic-stats-date\">" + datesCurrent + "</span>\n      </span>\n    </span>\n  </span>\n</div>";
+    return ($(html)).appendTo($('.ic-contributions-wrapper'));
+  };
 
   Iso.prototype.renderIsometricChart = function() {
     var GH_OFFSET, MAX_HEIGHT, SIZE, canvas, contribCount, pixelView, point, self;

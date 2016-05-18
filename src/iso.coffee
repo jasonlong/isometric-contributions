@@ -106,24 +106,52 @@ class Iso
         contributionsBox.addClass 'show-2d'
 
   loadStats: ->
+    streakLongest      = 0
+    streakCurrent      = 0
+    tempStreak         = 0
+    tempStreakStart    = null
+    tempStreakEnd      = null
+    longestStreakStart = null
+    longestStreakEnd   = null
+    datesCurrent       = null
+
+    contribColumns = ($ '.contrib-column')
+
     days = ($ '.js-calendar-graph rect.day')
     days.each (d) ->
-      currentCount = ($ this).data('count')
-      yearTotal += currentCount
+      currentDayCount = ($ this).data('count')
+      yearTotal += currentDayCount
 
       firstDay = ($ this).data('date') if d == 0
       lastDay  = ($ this).data('date') if d == days.length - 1
 
-      if currentCount > maxCount
-        bestDay   = ($ this).data('date')
-        maxCount = currentCount
+      # Check for best day
+      if currentDayCount > maxCount
+        bestDay  = ($ this).data('date')
+        maxCount = currentDayCount
 
-    contribColumns = ($ '.contrib-column')
+      # Check for longest streak
+      if currentDayCount > 0
+        if tempStreak == 0
+          tempStreakStart = ($ this).data('date')
+
+        tempStreak++
+
+        if tempStreak > streakLongest
+          streakLongest++
+          tempStreakEnd = ($ this).data('date')
+
+      else
+        if tempStreak == streakLongest
+          longestStreakStart = tempStreakStart
+          longestStreakEnd   = tempStreakEnd
+
+        tempStreak         = 0
+        tempStreakStart    = null
+        tempStreakEnd      = null
 
     # Year total
-    str        = ($ contribColumns[0]).find('.contrib-number').html()
     countTotal = yearTotal.toLocaleString()
-
     dateFirst  = this.formatDateString firstDay, dateWithYearOptions
     dateLast   = this.formatDateString lastDay, dateWithYearOptions
     datesTotal = dateFirst + " — " + dateLast
@@ -131,21 +159,15 @@ class Iso
     # Best day
     dateBest  = this.formatDateString bestDay, dateOptions
     if !dateBest
-      dateBest = 'Not so busy after all'
+      dateBest = 'No activity found'
+
+    # Longest streak
+    longestStreakStart = this.formatDateString longestStreakStart, dateOptions
+    longestStreakEnd   = this.formatDateString longestStreakEnd, dateOptions
+    datesLongest       = longestStreakStart + " — " + longestStreakEnd
 
     this.renderTopStats(countTotal, datesTotal, maxCount, dateBest)
-
-    # # Longest streak
-    # str          = ($ contribColumns[1]).find('.contrib-number').html()
-    # countLongest = (str.match /(((\d{1,})(,\d{})*)|(\d+))(.\d+)?/)[0]
-    # datesLongest = ($ contribColumns[1]).find('span:last-child').html()
-    #
-    # # Current streak
-    # str          = ($ contribColumns[2]).find('.contrib-number').html()
-    # countCurrent = (str.match /(((\d{1,})(,\d{})*)|(\d+))(.\d+)?/)[0]
-    # datesCurrent = ($ contribColumns[2]).find('span:last-child').html()
-
-    #this.renderBottomStats(countLongest, datesLongest, countCurrent, datesCurrent)
+    this.renderBottomStats(streakLongest, datesLongest, streakCurrent, datesCurrent)
 
   renderTopStats: (countTotal, datesTotal, maxCount, dateBest) ->
     html = """
@@ -175,32 +197,32 @@ class Iso
     """
     ($ html).appendTo $ '.ic-contributions-wrapper'
 
-  renderBottomStats: (countLongest, datesLongest, countCurrent, datesCurrent) ->
-    # html = """
-    #   <div class="ic-stats-block ic-stats-bottom">
-    #     <span class="ic-stats-table">
-    #       <span class="ic-stats-row">
-    #         <span class="ic-stats-label">Longest streak
-    #           <span class="ic-stats-count">#{countLongest}</span>
-    #         </span>
-    #         <span class="ic-stats-meta">
-    #           <span class="ic-stats-unit">days</span>
-    #           <span class="ic-stats-date">#{datesLongest}</span>
-    #         </span>
-    #       </span>
-    #       <span class="ic-stats-row">
-    #         <span class="ic-stats-label">Current streak
-    #           <span class="ic-stats-count">#{countCurrent}</span>
-    #         </span>
-    #         <span class="ic-stats-meta">
-    #           <span class="ic-stats-unit">days</span>
-    #           <span class="ic-stats-date">#{datesCurrent}</span>
-    #         </span>
-    #       </span>
-    #     </span>
-    #   </div>
-    # """
-    # ($ html).appendTo $ '.ic-contributions-wrapper'
+  renderBottomStats: (streakLongest, datesLongest, streakCurrent, datesCurrent) ->
+    html = """
+      <div class="ic-stats-block ic-stats-bottom">
+        <span class="ic-stats-table">
+          <span class="ic-stats-row">
+            <span class="ic-stats-label">Longest streak
+              <span class="ic-stats-count">#{streakLongest}</span>
+            </span>
+            <span class="ic-stats-meta">
+              <span class="ic-stats-unit">days</span>
+              <span class="ic-stats-date">#{datesLongest}</span>
+            </span>
+          </span>
+          <span class="ic-stats-row">
+            <span class="ic-stats-label">Current streak
+              <span class="ic-stats-count">#{streakCurrent}</span>
+            </span>
+            <span class="ic-stats-meta">
+              <span class="ic-stats-unit">days</span>
+              <span class="ic-stats-date">#{datesCurrent}</span>
+            </span>
+          </span>
+        </span>
+      </div>
+    """
+    ($ html).appendTo $ '.ic-contributions-wrapper'
 
   renderIsometricChart: ->
     SIZE       = 12
