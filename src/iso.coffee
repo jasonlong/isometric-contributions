@@ -157,8 +157,13 @@ class Iso
     # we end up with a regular JS Array after reversing
     days = ($ '.js-calendar-graph rect.day').get().reverse()
     currentStreakEnd = days[0].getAttribute('data-date')
-    for d in days
-      currentDayCount  = d.getAttribute('data-count')
+    for d, i in days
+      currentDayCount = parseInt(d.getAttribute('data-count'), 10)
+
+      # If there's no activity today, continue on to yesterday
+      if i == 0 && currentDayCount == 0
+        currentStreakEnd = days[1].getAttribute('data-date')
+        continue
 
       if currentDayCount > 0
         streakCurrent++

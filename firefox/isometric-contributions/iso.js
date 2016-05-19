@@ -121,7 +121,7 @@ Iso = (function() {
   };
 
   Iso.prototype.loadStats = function() {
-    var contribColumns, countTotal, currentDayCount, currentStreakEnd, currentStreakStart, d, dateBest, dateFirst, dateLast, datesCurrent, datesLongest, datesTotal, days, i, len, longestStreakEnd, longestStreakStart, streakCurrent, streakLongest, tempStreak, tempStreakEnd, tempStreakStart;
+    var contribColumns, countTotal, currentDayCount, currentStreakEnd, currentStreakStart, d, dateBest, dateFirst, dateLast, datesCurrent, datesLongest, datesTotal, days, i, j, len, longestStreakEnd, longestStreakStart, streakCurrent, streakLongest, tempStreak, tempStreakEnd, tempStreakStart;
     streakLongest = 0;
     streakCurrent = 0;
     tempStreak = 0;
@@ -169,9 +169,13 @@ Iso = (function() {
     });
     days = ($('.js-calendar-graph rect.day')).get().reverse();
     currentStreakEnd = days[0].getAttribute('data-date');
-    for (i = 0, len = days.length; i < len; i++) {
+    for (i = j = 0, len = days.length; j < len; i = ++j) {
       d = days[i];
-      currentDayCount = d.getAttribute('data-count');
+      currentDayCount = parseInt(d.getAttribute('data-count'), 10);
+      if (i === 0 && currentDayCount === 0) {
+        currentStreakEnd = days[1].getAttribute('data-date');
+        continue;
+      }
       if (currentDayCount > 0) {
         streakCurrent++;
         currentStreakStart = d.getAttribute('data-date');
