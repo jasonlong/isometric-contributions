@@ -151,16 +151,17 @@ Iso = (function() {
       if (currentDayCount > 0) {
         if (tempStreak === 0) {
           tempStreakStart = ($(this)).data('date');
+          tempStreakEnd = ($(this)).data('date');
         }
         tempStreak++;
-        if (tempStreak > streakLongest) {
-          streakLongest++;
+        if (tempStreak >= streakLongest) {
           return tempStreakEnd = ($(this)).data('date');
         }
       } else {
-        if (tempStreak === streakLongest) {
+        if (tempStreak >= streakLongest) {
           longestStreakStart = tempStreakStart;
           longestStreakEnd = tempStreakEnd;
+          streakLongest = tempStreak;
         }
         tempStreak = 0;
         tempStreakStart = null;
