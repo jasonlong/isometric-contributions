@@ -1,6 +1,6 @@
 {
   "name": "Isometric Contributions",
-  "version": "1.0.9",
+  "version": "1.0.10",
   "description": "Renders an isometric pixel view of GitHub contribution graphs.",
   "content_scripts": [ {
     "css": [ "iso.css" ],
