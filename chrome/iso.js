@@ -74,16 +74,12 @@ Iso = (function() {
   };
 
   Iso.prototype.initUI = function() {
-    var htmlFooter, htmlToggle, insertLocation, toggleClass;
-    ($('<div class="ic-contributions-wrapper"></div>')).insertBefore('#contributions-calendar');
-    ($('<canvas id="isometric-contributions" width="728" height="470"></canvas>')).appendTo('.ic-contributions-wrapper');
-    contributionsBox = ($('#contributions-calendar')).closest('.boxed-group');
-    insertLocation = (($('#contributions-calendar')).closest('.boxed-group')).find('h3');
-    toggleClass = '';
-    if (((contributionsBox.closest('.box')).find('.box-header .octicon-lock')).length) {
-      toggleClass = 'ic-with-lock';
-    }
-    htmlToggle = "<span class=\"ic-toggle " + toggleClass + "\">\n  <a href=\"#\" class=\"ic-toggle-option tooltipped tooltipped-nw squares\" data-ic-option=\"squares\" aria-label=\"Normal chart view\"></a>\n  <a href=\"#\" class=\"ic-toggle-option tooltipped tooltipped-nw cubes\" data-ic-option=\"cubes\" aria-label=\"Isometric chart view\"></a>\n</span>";
+    var htmlFooter, htmlToggle, insertLocation;
+    ($('<div class="ic-contributions-wrapper"></div>')).insertBefore($('.js-calendar-graph'));
+    ($('<canvas id="isometric-contributions" width="720" height="470"></canvas>')).appendTo('.ic-contributions-wrapper');
+    contributionsBox = $('.js-contribution-graph');
+    insertLocation = ($('.js-contribution-graph')).find('h2');
+    htmlToggle = "<span class=\"ic-toggle\">\n  <a href=\"#\" class=\"ic-toggle-option tooltipped tooltipped-nw squares\" data-ic-option=\"squares\" aria-label=\"Normal chart view\"></a>\n  <a href=\"#\" class=\"ic-toggle-option tooltipped tooltipped-nw cubes\" data-ic-option=\"cubes\" aria-label=\"Isometric chart view\"></a>\n</span>";
     ($(htmlToggle)).insertBefore(insertLocation);
     htmlFooter = "<span class=\"ic-footer\">\n  <a href=\"#\" class=\"ic-2d-toggle\">Show normal chart below ▾</a>\n</span>";
     ($(htmlFooter)).appendTo($('.ic-contributions-wrapper'));
@@ -220,11 +216,11 @@ Iso = (function() {
 
   Iso.prototype.renderIsometricChart = function() {
     var GH_OFFSET, MAX_HEIGHT, SIZE, canvas, contribCount, pixelView, point, self;
-    SIZE = 12;
+    SIZE = 10;
     GH_OFFSET = 13;
     MAX_HEIGHT = 100;
     canvas = document.getElementById('isometric-contributions');
-    point = new obelisk.Point(87, 100);
+    point = new obelisk.Point(110, 110);
     pixelView = new obelisk.PixelView(canvas, point);
     contribCount = null;
     self = this;

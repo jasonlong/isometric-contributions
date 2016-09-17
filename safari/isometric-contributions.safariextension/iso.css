@@ -1,6 +1,6 @@
 .ic-toggle {
   position: relative;
-  top: 10px;
+  top: 0px;
   right: 10px;
   float: right;
   margin-left: 20px;
@@ -98,9 +98,6 @@
 
 .ic-contributions-wrapper {
   position: relative;
-  border-top: solid 1px #d8d8d8;
-  border-right: solid 1px #d8d8d8;
-  border-left: solid 1px #d8d8d8;
 }
 
 /*
