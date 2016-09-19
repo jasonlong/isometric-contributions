@@ -30,12 +30,30 @@ Iso = (function() {
   };
 
   function Iso(target) {
+    var graphContainer, observer;
     if (target) {
+      graphContainer = ($('.js-contribution-graph')).parent()[0];
+      if (graphContainer) {
+        observer = new MutationObserver((function(_this) {
+          return function(mutations) {
+            var isGraphAdded;
+            isGraphAdded = mutations.find(function(mutation) {
+              return [].find.call(mutation.addedNodes, function(node) {
+                return node.className === "js-contribution-graph";
+              });
+            });
+            if (isGraphAdded) {
+              return _this.generateIsometricChart();
+            }
+          };
+        })(this));
+        observer.observe(graphContainer, {
+          childList: true
+        });
+      }
       this.getSettings((function(_this) {
         return function() {
-          _this.initUI();
-          _this.loadStats();
-          return _this.renderIsometricChart();
+          return _this.generateIsometricChart();
         };
       })(this));
     }
@@ -73,6 +91,22 @@ Iso = (function() {
     }
   };
 
+  Iso.prototype.generateIsometricChart = function() {
+    this.resetValues();
+    this.initUI();
+    this.loadStats();
+    return this.renderIsometricChart();
+  };
+
+  Iso.prototype.resetValues = function() {
+    yearTotal = 0;
+    maxCount = 0;
+    bestDay = null;
+    firstDay = null;
+    lastDay = null;
+    return contributionsBox = null;
+  };
+
   Iso.prototype.initUI = function() {
     var htmlFooter, htmlToggle, insertLocation;
     ($('<div class="ic-contributions-wrapper"></div>')).insertBefore($('.js-calendar-graph'));
@@ -100,7 +134,8 @@ Iso = (function() {
       }
       ($('.ic-toggle-option')).removeClass('active');
       ($(this)).addClass('active');
-      return self.persistSetting("toggleSetting", option);
+      self.persistSetting("toggleSetting", option);
+      return self.toggleSetting = option;
     });
     ($(".ic-toggle-option." + this.toggleSetting)).addClass('active');
     contributionsBox.addClass("ic-" + this.toggleSetting);

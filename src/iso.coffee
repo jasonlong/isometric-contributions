@@ -18,10 +18,19 @@ class Iso
 
   constructor: (target) ->
     if target
+      graphContainer = ($ '.js-contribution-graph').parent()[0]
+      if graphContainer
+        observer = new MutationObserver (mutations) =>
+          isGraphAdded = mutations.find (mutation) ->
+            [].find.call mutation.addedNodes, (node) -> 
+              node.className == "js-contribution-graph"
+          if isGraphAdded
+            this.generateIsometricChart()
+
+        observer.observe(graphContainer, { childList: true })
+
       this.getSettings =>
-        this.initUI()
-        this.loadStats()
-        this.renderIsometricChart()
+        this.generateIsometricChart()
 
   getSettings: (callback) ->
     # Check for user preference, if chrome.storage is available.
@@ -43,6 +52,20 @@ class Iso
     else
       localStorage[key] = value
       callback()
+
+  generateIsometricChart: ->
+    this.resetValues()
+    this.initUI()
+    this.loadStats()
+    this.renderIsometricChart()
+
+  resetValues: ->
+    yearTotal           = 0
+    maxCount            = 0
+    bestDay             = null
+    firstDay            = null
+    lastDay             = null
+    contributionsBox    = null
 
   initUI: ->
     ($ '<div class="ic-contributions-wrapper"></div>')
@@ -86,6 +109,7 @@ class Iso
       ($ this).addClass 'active'
 
       self.persistSetting "toggleSetting", option
+      self.toggleSetting = option
 
     # Apply user preference
     ($ ".ic-toggle-option.#{this.toggleSetting}").addClass 'active'
