@@ -152,12 +152,11 @@ Iso = (function() {
   };
 
   Iso.prototype.loadStats = function() {
-    var contribColumns, countTotal, currentDayCount, currentStreakEnd, currentStreakStart, d, dateBest, dateFirst, dateLast, datesCurrent, datesLongest, datesTotal, days, i, j, len, longestStreakEnd, longestStreakStart, streakCurrent, streakLongest, tempStreak, tempStreakEnd, tempStreakStart;
+    var contribColumns, countTotal, currentDayCount, currentStreakEnd, currentStreakStart, d, dateBest, dateFirst, dateLast, datesCurrent, datesLongest, datesTotal, days, i, j, len, longestStreakEnd, longestStreakStart, streakCurrent, streakLongest, tempStreak, tempStreakStart;
     streakLongest = 0;
     streakCurrent = 0;
     tempStreak = 0;
     tempStreakStart = null;
-    tempStreakEnd = null;
     longestStreakStart = null;
     longestStreakEnd = null;
     currentStreakStart = null;
@@ -166,7 +165,7 @@ Iso = (function() {
     contribColumns = $('.contrib-column');
     days = $('.js-calendar-graph rect.day');
     days.each(function(d) {
-      var currentDayCount;
+      var currentDayCount, tempStreakEnd;
       currentDayCount = ($(this)).data('count');
       yearTotal += currentDayCount;
       if (d === 0) {
@@ -182,18 +181,14 @@ Iso = (function() {
       if (currentDayCount > 0) {
         if (tempStreak === 0) {
           tempStreakStart = ($(this)).data('date');
-          tempStreakEnd = ($(this)).data('date');
         }
         tempStreak++;
         if (tempStreak >= streakLongest) {
-          return tempStreakEnd = ($(this)).data('date');
+          longestStreakStart = tempStreakStart;
+          longestStreakEnd = ($(this)).data('date');
+          return streakLongest = tempStreak;
         }
       } else {
-        if (tempStreak >= streakLongest) {
-          longestStreakStart = tempStreakStart;
-          longestStreakEnd = tempStreakEnd;
-          streakLongest = tempStreak;
-        }
         tempStreak = 0;
         tempStreakStart = null;
         return tempStreakEnd = null;

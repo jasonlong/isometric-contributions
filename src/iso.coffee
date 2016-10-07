@@ -22,7 +22,7 @@ class Iso
       if graphContainer
         observer = new MutationObserver (mutations) =>
           isGraphAdded = mutations.find (mutation) ->
-            [].find.call mutation.addedNodes, (node) -> 
+            [].find.call mutation.addedNodes, (node) ->
               node.className == "js-contribution-graph"
           if isGraphAdded
             this.generateIsometricChart()
@@ -129,7 +129,6 @@ class Iso
     streakCurrent      = 0
     tempStreak         = 0
     tempStreakStart    = null
-    tempStreakEnd      = null
     longestStreakStart = null
     longestStreakEnd   = null
     currentStreakStart = null
@@ -155,19 +154,15 @@ class Iso
       if currentDayCount > 0
         if tempStreak == 0
           tempStreakStart = ($ this).data('date')
-          tempStreakEnd = ($ this).data('date')
 
         tempStreak++
 
         if tempStreak >= streakLongest
-          tempStreakEnd = ($ this).data('date')
-
-      else
-        if tempStreak >= streakLongest
           longestStreakStart = tempStreakStart
-          longestStreakEnd   = tempStreakEnd
+          longestStreakEnd   = ($ this).data('date')
           streakLongest      = tempStreak
 
+      else
         tempStreak         = 0
         tempStreakStart    = null
         tempStreakEnd      = null
