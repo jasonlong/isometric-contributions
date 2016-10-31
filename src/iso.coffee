@@ -300,12 +300,12 @@ class Iso
         pixelView.renderObject cube, p3d
 
   getSquareColor: (fill) ->
-    color = switch fill
+    color = switch fill.toLowerCase()
       when 'rgb(238, 238, 238)', '#eeeeee' then COLORS[0]
-      when 'rgb(214, 230, 133)', '#d6e685' then COLORS[1]
-      when 'rgb(140, 198, 101)', '#8cc665' then COLORS[2]
-      when 'rgb(68, 163, 64)',   '#44a340' then COLORS[3]
-      when 'rgb(30, 104, 35)',   '#1e6823' then COLORS[4]
+      when 'rgb(214, 230, 133)', '#d6e685', 'rgb(255, 238, 74)', '#ffee4a' then COLORS[1]
+      when 'rgb(140, 198, 101)', '#8cc665', 'rgb(255, 197, 1)',  '#ffc501' then COLORS[2]
+      when 'rgb(68, 163, 64)',   '#44a340', 'rgb(254, 150, 0)',  '#fe9600' then COLORS[3]
+      when 'rgb(30, 104, 35)',   '#1e6823', 'rgb(3, 0, 28)',     '#03001c' then COLORS[4]
 
   formatDateString: (dateStr, options) ->
     date = null
