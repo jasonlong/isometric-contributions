@@ -279,21 +279,29 @@ Iso = (function() {
   Iso.prototype.getSquareColor = function(fill) {
     var color;
     return color = (function() {
-      switch (fill) {
+      switch (fill.toLowerCase()) {
         case 'rgb(238, 238, 238)':
         case '#eeeeee':
           return COLORS[0];
         case 'rgb(214, 230, 133)':
         case '#d6e685':
+        case 'rgb(255, 238, 74)':
+        case '#ffee4a':
           return COLORS[1];
         case 'rgb(140, 198, 101)':
         case '#8cc665':
+        case 'rgb(255, 197, 1)':
+        case '#ffc501':
           return COLORS[2];
         case 'rgb(68, 163, 64)':
         case '#44a340':
+        case 'rgb(254, 150, 0)':
+        case '#fe9600':
           return COLORS[3];
         case 'rgb(30, 104, 35)':
         case '#1e6823':
+        case 'rgb(3, 0, 28)':
+        case '#03001c':
           return COLORS[4];
       }
     })();
