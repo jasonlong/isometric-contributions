@@ -282,7 +282,7 @@ class Iso
 
     self = this
     ($ '.js-calendar-graph g > g').each (g) ->
-      x = parseInt (((($ this).attr 'transform').match /(\d+)/)[0]) / GH_OFFSET
+      x = parseInt (((($ this).attr 'transform').match /(\d+)/)[0]) / (GH_OFFSET + 1)
       (($ this).find 'rect').each (r) ->
         r            = ($ this).get 0
         y            = parseInt (($ this).attr 'y') / GH_OFFSET
