@@ -269,7 +269,7 @@ class Iso
 
   renderIsometricChart: ->
     SIZE       = 10
-    GH_OFFSET  = 13
+    GH_OFFSET  = 12
     MAX_HEIGHT = 100
 
     canvas = document.getElementById 'isometric-contributions'

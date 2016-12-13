@@ -247,7 +247,7 @@ Iso = (function() {
   Iso.prototype.renderIsometricChart = function() {
     var GH_OFFSET, MAX_HEIGHT, SIZE, canvas, contribCount, pixelView, point, self;
     SIZE = 10;
-    GH_OFFSET = 13;
+    GH_OFFSET = 12;
     MAX_HEIGHT = 100;
     canvas = document.getElementById('isometric-contributions');
     point = new obelisk.Point(110, 110);
