@@ -256,7 +256,7 @@ Iso = (function() {
     self = this;
     return ($('.js-calendar-graph g > g')).each(function(g) {
       var x;
-      x = parseInt(((($(this)).attr('transform')).match(/(\d+)/))[0] / GH_OFFSET);
+      x = parseInt(((($(this)).attr('transform')).match(/(\d+)/))[0] / (GH_OFFSET + 1));
       return (($(this)).find('rect')).each(function(r) {
         var color, cube, cubeHeight, dimension, fill, p3d, y;
         r = ($(this)).get(0);
