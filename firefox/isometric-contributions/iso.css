@@ -45,8 +45,8 @@
 }
 
 .ic-toggle-option.active {
-  background-color: #4183c4;
-  border-color: #4183c4;
+  background-color: #035dd2;
+  border-color: #035dd2;
 }
 
 .ic-toggle-option.active.tooltipped:focus::before,

@@ -4,7 +4,7 @@ var Iso;
 Iso = (function() {
   var COLORS, bestDay, contributionsBox, dateOptions, dateWithYearOptions, firstDay, lastDay, maxCount, yearTotal;
 
-  COLORS = [new obelisk.CubeColor().getByHorizontalColor(0xeeeeee), new obelisk.CubeColor().getByHorizontalColor(0xd6e685), new obelisk.CubeColor().getByHorizontalColor(0x8cc665), new obelisk.CubeColor().getByHorizontalColor(0x44a340), new obelisk.CubeColor().getByHorizontalColor(0x1e6823)];
+  COLORS = [new obelisk.CubeColor().getByHorizontalColor(0xebedf0), new obelisk.CubeColor().getByHorizontalColor(0xc6e48b), new obelisk.CubeColor().getByHorizontalColor(0x7bc96f), new obelisk.CubeColor().getByHorizontalColor(0x239a3b), new obelisk.CubeColor().getByHorizontalColor(0x196127)];
 
   yearTotal = 0;
 
@@ -280,28 +280,20 @@ Iso = (function() {
     var color;
     return color = (function() {
       switch (fill.toLowerCase()) {
-        case 'rgb(238, 238, 238)':
-        case '#eeeeee':
+        case 'rgb(235, 237, 240)':
+        case '#ebedf0':
           return COLORS[0];
-        case 'rgb(214, 230, 133)':
-        case '#d6e685':
-        case 'rgb(255, 238, 74)':
-        case '#ffee4a':
+        case 'rgb(198, 228, 139)':
+        case '#c6e48b':
           return COLORS[1];
-        case 'rgb(140, 198, 101)':
-        case '#8cc665':
-        case 'rgb(255, 197, 1)':
-        case '#ffc501':
+        case 'rgb(123, 201, 111)':
+        case '#7bc96f':
           return COLORS[2];
-        case 'rgb(68, 163, 64)':
-        case '#44a340':
-        case 'rgb(254, 150, 0)':
-        case '#fe9600':
+        case 'rgb(35, 154, 59)':
+        case '#239a3b':
           return COLORS[3];
-        case 'rgb(30, 104, 35)':
-        case '#1e6823':
-        case 'rgb(3, 0, 28)':
-        case '#03001c':
+        case 'rgb(25, 97, 39)':
+        case '#196127':
           return COLORS[4];
       }
     })();
