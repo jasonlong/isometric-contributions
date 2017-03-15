@@ -37,11 +37,13 @@ class Iso
     # The storage API is not supported in content scripts.
     # https://developer.mozilla.org/Add-ons/WebExtensions/Chrome_incompatibilities#storage
     if chrome?.storage?
-      chrome.storage.local.get ['toggleSetting'], ({toggleSetting}) =>
+      chrome.storage.local.get ['toggleSetting', 'show2DSetting'], ({toggleSetting, show2DSetting}) =>
         this.toggleSetting = toggleSetting ? 'cubes'
+        this.show2DSetting = show2DSetting ? 'no'
         callback()
     else
       this.toggleSetting = localStorage.toggleSetting ? 'cubes'
+      this.show2DSetting = localStorage.show2DSetting ? 'no'
       callback()
 
   persistSetting: (key, value, callback = ->) ->
@@ -120,9 +122,21 @@ class Iso
       if contributionsBox.hasClass 'show-2d'
         ($ this).text 'Show normal chart ▾'
         contributionsBox.removeClass 'show-2d'
+        self.persistSetting "show2DSetting", 'no'
+        self.show2DSetting = 'no'
       else
         ($ this).text 'Hide normal chart ▴'
         contributionsBox.addClass 'show-2d'
+        self.persistSetting "show2DSetting", 'yes'
+        self.show2DSetting = 'yes'
+
+    # Apply user preference
+    if (this.show2DSetting == "yes")
+      contributionsBox.addClass 'show-2d'
+      ($ '.ic-2d-toggle').text 'Hide normal chart ▴'
+    else
+      contributionsBox.removeClass 'show-2d'
+      ($ '.ic-2d-toggle').text 'Show normal chart ▾'
 
   loadStats: ->
     streakLongest      = 0

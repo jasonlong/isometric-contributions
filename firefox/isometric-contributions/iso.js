@@ -60,18 +60,20 @@ Iso = (function() {
   }
 
   Iso.prototype.getSettings = function(callback) {
-    var ref;
+    var ref, ref1;
     if ((typeof chrome !== "undefined" && chrome !== null ? chrome.storage : void 0) != null) {
-      return chrome.storage.local.get(['toggleSetting'], (function(_this) {
+      return chrome.storage.local.get(['toggleSetting', 'show2DSetting'], (function(_this) {
         return function(arg) {
-          var toggleSetting;
-          toggleSetting = arg.toggleSetting;
+          var show2DSetting, toggleSetting;
+          toggleSetting = arg.toggleSetting, show2DSetting = arg.show2DSetting;
           _this.toggleSetting = toggleSetting != null ? toggleSetting : 'cubes';
+          _this.show2DSetting = show2DSetting != null ? show2DSetting : 'no';
           return callback();
         };
       })(this));
     } else {
       this.toggleSetting = (ref = localStorage.toggleSetting) != null ? ref : 'cubes';
+      this.show2DSetting = (ref1 = localStorage.show2DSetting) != null ? ref1 : 'no';
       return callback();
     }
   };
@@ -139,16 +141,27 @@ Iso = (function() {
     });
     ($(".ic-toggle-option." + this.toggleSetting)).addClass('active');
     contributionsBox.addClass("ic-" + this.toggleSetting);
-    return ($('.ic-2d-toggle')).click(function(e) {
+    ($('.ic-2d-toggle')).click(function(e) {
       e.preventDefault();
       if (contributionsBox.hasClass('show-2d')) {
         ($(this)).text('Show normal chart ▾');
-        return contributionsBox.removeClass('show-2d');
+        contributionsBox.removeClass('show-2d');
+        self.persistSetting("show2DSetting", 'no');
+        return self.show2DSetting = 'no';
       } else {
         ($(this)).text('Hide normal chart ▴');
-        return contributionsBox.addClass('show-2d');
+        contributionsBox.addClass('show-2d');
+        self.persistSetting("show2DSetting", 'yes');
+        return self.show2DSetting = 'yes';
       }
     });
+    if (this.show2DSetting === "yes") {
+      contributionsBox.addClass('show-2d');
+      return ($('.ic-2d-toggle')).text('Hide normal chart ▴');
+    } else {
+      contributionsBox.removeClass('show-2d');
+      return ($('.ic-2d-toggle')).text('Show normal chart ▾');
+    }
   };
 
   Iso.prototype.loadStats = function() {
