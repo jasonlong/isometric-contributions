@@ -320,6 +320,9 @@ class Iso
       when 'rgb(123, 201, 111)', '#7bc96f' then COLORS[2]
       when 'rgb(35, 154, 59)',   '#239a3b' then COLORS[3]
       when 'rgb(25, 97, 39)',    '#196127' then COLORS[4]
+      else
+        if (fill.indexOf('#') != -1)
+          new obelisk.CubeColor().getByHorizontalColor(parseInt('0x'+fill.replace("#", "")));
 
   formatDateString: (dateStr, options) ->
     date = null
