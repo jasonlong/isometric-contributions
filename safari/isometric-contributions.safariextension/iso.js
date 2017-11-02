@@ -308,6 +308,10 @@ Iso = (function() {
         case 'rgb(25, 97, 39)':
         case '#196127':
           return COLORS[4];
+        default:
+          if (fill.indexOf('#') !== -1) {
+            return new obelisk.CubeColor().getByHorizontalColor(parseInt('0x' + fill.replace("#", "")));
+          }
       }
     })();
   };
