@@ -150,6 +150,10 @@
   vertical-align: bottom;
 }
 
+.ic-stats-total-meta {
+  vertical-align: middle;
+}
+
 .ic-stats-unit {
   display: block;
   font-size: 15px;
