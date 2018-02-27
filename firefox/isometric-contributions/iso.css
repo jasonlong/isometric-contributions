@@ -154,6 +154,11 @@
   vertical-align: middle;
 }
 
+.ic-stats-average {
+  font-weight: bold;
+  color: black;
+}
+
 .ic-stats-unit {
   display: block;
   font-size: 15px;

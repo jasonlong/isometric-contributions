@@ -239,7 +239,7 @@ class Iso
           <span class="ic-stats-row">
             <span class="ic-stats-label">1 year total
               <span class="ic-stats-count">#{countTotal}</span>
-              <span>#{averageCount}</span> per day
+              <span class="ic-stats-average">#{averageCount}</span> per day
             </span>
             <span class="ic-stats-meta ic-stats-total-meta">
               <span class="ic-stats-unit">contributions</span>
