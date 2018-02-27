@@ -2,11 +2,13 @@
 var Iso;
 
 Iso = (function() {
-  var COLORS, bestDay, contributionsBox, dateOptions, dateWithYearOptions, firstDay, lastDay, maxCount, yearTotal;
+  var COLORS, averageCount, bestDay, contributionsBox, dateOptions, dateWithYearOptions, firstDay, lastDay, maxCount, yearTotal;
 
   COLORS = [new obelisk.CubeColor().getByHorizontalColor(0xebedf0), new obelisk.CubeColor().getByHorizontalColor(0xc6e48b), new obelisk.CubeColor().getByHorizontalColor(0x7bc96f), new obelisk.CubeColor().getByHorizontalColor(0x239a3b), new obelisk.CubeColor().getByHorizontalColor(0x196127)];
 
   yearTotal = 0;
+
+  averageCount = 0;
 
   maxCount = 0;
 
@@ -102,6 +104,7 @@ Iso = (function() {
 
   Iso.prototype.resetValues = function() {
     yearTotal = 0;
+    averageCount = 0;
     maxCount = 0;
     bestDay = null;
     firstDay = null;
@@ -165,7 +168,7 @@ Iso = (function() {
   };
 
   Iso.prototype.loadStats = function() {
-    var contribColumns, countTotal, currentDayCount, currentStreakEnd, currentStreakStart, d, dateBest, dateFirst, dateLast, datesCurrent, datesLongest, datesTotal, days, i, j, len, longestStreakEnd, longestStreakStart, streakCurrent, streakLongest, tempStreak, tempStreakStart;
+    var contribColumns, countTotal, currentDayCount, currentStreakEnd, currentStreakStart, d, dateBest, dateFirst, dateLast, datesCurrent, datesLongest, datesTotal, dayDifference, days, i, j, len, longestStreakEnd, longestStreakStart, streakCurrent, streakLongest, tempStreak, tempStreakStart;
     streakLongest = 0;
     streakCurrent = 0;
     tempStreak = 0;
@@ -234,6 +237,8 @@ Iso = (function() {
     dateFirst = this.formatDateString(firstDay, dateWithYearOptions);
     dateLast = this.formatDateString(lastDay, dateWithYearOptions);
     datesTotal = dateFirst + " — " + dateLast;
+    dayDifference = this.datesDayDifference(firstDay, lastDay);
+    averageCount = this.precisionRound(yearTotal / dayDifference, 2);
     dateBest = this.formatDateString(bestDay, dateOptions);
     if (!dateBest) {
       dateBest = 'No activity found';
@@ -241,13 +246,13 @@ Iso = (function() {
     longestStreakStart = this.formatDateString(longestStreakStart, dateOptions);
     longestStreakEnd = this.formatDateString(longestStreakEnd, dateOptions);
     datesLongest = longestStreakStart + " — " + longestStreakEnd;
-    this.renderTopStats(countTotal, datesTotal, maxCount, dateBest);
+    this.renderTopStats(countTotal, averageCount, datesTotal, maxCount, dateBest);
     return this.renderBottomStats(streakLongest, datesLongest, streakCurrent, datesCurrent);
   };
 
-  Iso.prototype.renderTopStats = function(countTotal, datesTotal, maxCount, dateBest) {
+  Iso.prototype.renderTopStats = function(countTotal, averageCount, datesTotal, maxCount, dateBest) {
     var html;
-    html = "<div class=\"ic-stats-block ic-stats-top\">\n  <span class=\"ic-stats-table\">\n    <span class=\"ic-stats-row\">\n      <span class=\"ic-stats-label\">1 year total\n        <span class=\"ic-stats-count\">" + countTotal + "</span>\n      </span>\n      <span class=\"ic-stats-meta\">\n        <span class=\"ic-stats-unit\">contributions</span>\n        <span class=\"ic-stats-date\">" + datesTotal + "</span>\n      </span>\n    </span>\n    <span class=\"ic-stats-row\">\n      <span class=\"ic-stats-label\">Busiest day\n        <span class=\"ic-stats-count\">" + maxCount + "</span>\n      </span>\n      <span class=\"ic-stats-meta\">\n        <span class=\"ic-stats-unit\">contributions</span>\n          <span class=\"ic-stats-date\">" + dateBest + "</span>\n        </span>\n      </span>\n    </span>\n  </span>\n</div>";
+    html = "<div class=\"ic-stats-block ic-stats-top\">\n  <span class=\"ic-stats-table\">\n    <span class=\"ic-stats-row\">\n      <span class=\"ic-stats-label\">1 year total\n        <span class=\"ic-stats-count\">" + countTotal + "</span>\n        <span class=\"ic-stats-average\">" + averageCount + "</span> per day\n      </span>\n      <span class=\"ic-stats-meta ic-stats-total-meta\">\n        <span class=\"ic-stats-unit\">contributions</span>\n        <span class=\"ic-stats-date\">" + datesTotal + "</span>\n      </span>\n    </span>\n    <span class=\"ic-stats-row\">\n      <span class=\"ic-stats-label\">Busiest day\n        <span class=\"ic-stats-count\">" + maxCount + "</span>\n      </span>\n      <span class=\"ic-stats-meta\">\n        <span class=\"ic-stats-unit\">contributions</span>\n          <span class=\"ic-stats-date\">" + dateBest + "</span>\n        </span>\n      </span>\n    </span>\n  </span>\n</div>";
     return ($(html)).appendTo($('.ic-contributions-wrapper'));
   };
 
@@ -324,6 +329,32 @@ Iso = (function() {
       date = new Date(dateParts[0], dateParts[1] - 1, dateParts[2], 0, 0, 0).toLocaleDateString('en-US', options);
     }
     return date;
+  };
+
+  Iso.prototype.datesDayDifference = function(dateStr1, dateStr2) {
+    var date1, date2, dateParts, diffDays, timeDiff;
+    diffDays = null;
+    date1 = null;
+    date2 = null;
+    if (dateStr1) {
+      dateParts = dateStr1.split('-');
+      date1 = new Date(dateParts[0], dateParts[1] - 1, dateParts[2], 0, 0, 0);
+    }
+    if (dateStr2) {
+      dateParts = dateStr2.split('-');
+      date2 = new Date(dateParts[0], dateParts[1] - 1, dateParts[2], 0, 0, 0);
+    }
+    if (dateStr1 && dateStr2) {
+      timeDiff = Math.abs(date2.getTime() - date1.getTime());
+      diffDays = Math.ceil(timeDiff / (1000 * 3600 * 24));
+    }
+    return diffDays;
+  };
+
+  Iso.prototype.precisionRound = function(number, precision) {
+    var factor;
+    factor = Math.pow(10, precision);
+    return Math.round(number * factor) / factor;
   };
 
   return Iso;
