@@ -8,6 +8,7 @@ class Iso
   ]
 
   yearTotal           = 0
+  averageCount        = 0
   maxCount            = 0
   bestDay             = null
   firstDay            = null
@@ -63,6 +64,7 @@ class Iso
 
   resetValues: ->
     yearTotal           = 0
+    averageCount        = 0
     maxCount            = 0
     bestDay             = null
     firstDay            = null
@@ -213,6 +215,10 @@ class Iso
     dateLast   = this.formatDateString lastDay, dateWithYearOptions
     datesTotal = dateFirst + " — " + dateLast
 
+    # Average Contribution per Day
+    dayDifference = this.datesDayDifference firstDay, lastDay
+    averageCount = this.precisionRound((yearTotal / dayDifference), 2)
+
     # Best day
     dateBest  = this.formatDateString bestDay, dateOptions
     if !dateBest
@@ -223,18 +229,19 @@ class Iso
     longestStreakEnd   = this.formatDateString longestStreakEnd, dateOptions
     datesLongest       = longestStreakStart + " — " + longestStreakEnd
 
-    this.renderTopStats(countTotal, datesTotal, maxCount, dateBest)
+    this.renderTopStats(countTotal, averageCount, datesTotal, maxCount, dateBest)
     this.renderBottomStats(streakLongest, datesLongest, streakCurrent, datesCurrent)
 
-  renderTopStats: (countTotal, datesTotal, maxCount, dateBest) ->
+  renderTopStats: (countTotal, averageCount, datesTotal, maxCount, dateBest) ->
     html = """
       <div class="ic-stats-block ic-stats-top">
         <span class="ic-stats-table">
           <span class="ic-stats-row">
             <span class="ic-stats-label">1 year total
               <span class="ic-stats-count">#{countTotal}</span>
+              <span>#{averageCount}</span> per day
             </span>
-            <span class="ic-stats-meta">
+            <span class="ic-stats-meta ic-stats-total-meta">
               <span class="ic-stats-unit">contributions</span>
               <span class="ic-stats-date">#{datesTotal}</span>
             </span>
@@ -332,6 +339,28 @@ class Iso
       date = new Date(dateParts[0], dateParts[1] - 1, dateParts[2], 0, 0, 0).toLocaleDateString('en-US', options)
 
     return date
+
+  datesDayDifference: (dateStr1, dateStr2) ->
+    diffDays = null
+    date1 = null
+    date2 = null
+
+    if dateStr1
+      dateParts = dateStr1.split '-'
+      date1 = new Date(dateParts[0], dateParts[1] - 1, dateParts[2], 0, 0, 0)
+    if dateStr2
+      dateParts = dateStr2.split '-'
+      date2 = new Date(dateParts[0], dateParts[1] - 1, dateParts[2], 0, 0, 0)
+      
+    if dateStr1 && dateStr2 
+      timeDiff = Math.abs(date2.getTime() - date1.getTime())
+      diffDays = Math.ceil(timeDiff / (1000 * 3600 * 24))
+
+    return diffDays
+
+  precisionRound: (number, precision) ->
+    factor = Math.pow(10, precision)
+    return Math.round(number * factor) / factor
 
 $ ->
   target = document.querySelector '.js-calendar-graph'
