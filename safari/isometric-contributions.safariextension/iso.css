@@ -150,6 +150,15 @@
   vertical-align: bottom;
 }
 
+.ic-stats-total-meta {
+  vertical-align: middle;
+}
+
+.ic-stats-average {
+  font-weight: bold;
+  color: #24292e;
+}
+
 .ic-stats-unit {
   display: block;
   font-size: 15px;
