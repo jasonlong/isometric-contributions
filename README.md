@@ -24,6 +24,11 @@ Only [Firefox Developer Edition](https://www.mozilla.org/firefox/developer/) is 
 
 I'm no longer able to build Safari extensions because you now need a paid Apple Developer account to do so. I've decided not to spend the $99 for an account since this is the only thing I'd use it for.
 
+### Userscript
+
+Install userscript extensions (Tampermonkey, Greasemonkey, Violentmonkey or more) and [click here](https://github.com/jasonlong/isometric-contributions/raw/master/userscript/iso.user.js) to install.
+
+
 ### Developer mode
 
 If you want to hack on the extension, you'll need to install it manually. First clone or fork this repo. Then, on your Chrome Extensions page, make sure "Developer mode" is checked. You can then click the "Load unpacked extension..." button and browse to the `chrome` directory of this repo.
