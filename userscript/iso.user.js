@@ -1,10 +1,14 @@
 // ==UserScript==
-// @name         Iso Github
+// @name         Github Isometric Contributions
 // @namespace    https://github.com/jasonlong/isometric-contributions
 // @version      1.0.20
 // @description  User Script for rendering an isometric pixel art version of your GitHub contribution graph.
+// @icon         https://raw.githubusercontent.com/jasonlong/isometric-contributions/master/chrome/icon-128.png
 // @author       jasonlong
 // @match        http*://*.github.com/*
+// @run-at       document-body
+// @homepageURL  https://github.com/jasonlong/isometric-contributions
+// @supportURL   https://github.com/jasonlong/isometric-contributions/issues
 // @require      https://cdn.rawgit.com/jasonlong/isometric-contributions/master/chrome/jquery.min.js
 // @require      https://cdn.rawgit.com/jasonlong/isometric-contributions/master/chrome/obelisk.min.js
 // @grant        none
