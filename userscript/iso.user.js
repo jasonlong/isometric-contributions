@@ -5,8 +5,7 @@
 // @description  User Script for rendering an isometric pixel art version of your GitHub contribution graph.
 // @icon         https://raw.githubusercontent.com/jasonlong/isometric-contributions/master/chrome/icon-128.png
 // @author       jasonlong
-// @match        http*://*.github.com/*
-// @run-at       document-body
+// @match        *://*.github.com/*
 // @homepageURL  https://github.com/jasonlong/isometric-contributions
 // @supportURL   https://github.com/jasonlong/isometric-contributions/issues
 // @require      https://cdn.rawgit.com/jasonlong/isometric-contributions/master/chrome/jquery.min.js
