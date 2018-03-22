@@ -5,7 +5,7 @@
 // @description  User Script for rendering an isometric pixel art version of your GitHub contribution graph.
 // @icon         https://raw.githubusercontent.com/jasonlong/isometric-contributions/master/chrome/icon-128.png
 // @author       jasonlong
-// @match        *://*.github.com/*
+// @include      https://github.com/*
 // @homepageURL  https://github.com/jasonlong/isometric-contributions
 // @supportURL   https://github.com/jasonlong/isometric-contributions/issues
 // @require      https://cdn.rawgit.com/jasonlong/isometric-contributions/master/chrome/jquery.min.js
@@ -13,7 +13,7 @@
 // @grant        none
 // ==/UserScript==
 
-var isoCss = `
+var isoCss = (function(){/*
 .ic-toggle {
   position: relative;
   top: 0px;
@@ -86,17 +86,11 @@ var isoCss = `
   background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABIAAAAWCAYAAADNX8xBAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAyNpVFh0WE1MOmNvbS5hZG9iZS54bXAAAAAAADw/eHBhY2tldCBiZWdpbj0i77u/IiBpZD0iVzVNME1wQ2VoaUh6cmVTek5UY3prYzlkIj8+IDx4OnhtcG1ldGEgeG1sbnM6eD0iYWRvYmU6bnM6bWV0YS8iIHg6eG1wdGs9IkFkb2JlIFhNUCBDb3JlIDUuNS1jMDIxIDc5LjE1NDkxMSwgMjAxMy8xMC8yOS0xMTo0NzoxNiAgICAgICAgIj4gPHJkZjpSREYgeG1sbnM6cmRmPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5LzAyLzIyLXJkZi1zeW50YXgtbnMjIj4gPHJkZjpEZXNjcmlwdGlvbiByZGY6YWJvdXQ9IiIgeG1sbnM6eG1wPSJodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvIiB4bWxuczp4bXBNTT0iaHR0cDovL25zLmFkb2JlLmNvbS94YXAvMS4wL21tLyIgeG1sbnM6c3RSZWY9Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC9zVHlwZS9SZXNvdXJjZVJlZiMiIHhtcDpDcmVhdG9yVG9vbD0iQWRvYmUgUGhvdG9zaG9wIENDIChNYWNpbnRvc2gpIiB4bXBNTTpJbnN0YW5jZUlEPSJ4bXAuaWlkOjkyRjY4NTJCQUQzRTExRTM5NzQ1QzFFMDFGOUU0RUFBIiB4bXBNTTpEb2N1bWVudElEPSJ4bXAuZGlkOjkyRjY4NTJDQUQzRTExRTM5NzQ1QzFFMDFGOUU0RUFBIj4gPHhtcE1NOkRlcml2ZWRGcm9tIHN0UmVmOmluc3RhbmNlSUQ9InhtcC5paWQ6MzMxMEU4QzJBRDI0MTFFMzk3NDVDMUUwMUY5RTRFQUEiIHN0UmVmOmRvY3VtZW50SUQ9InhtcC5kaWQ6OTJGNjg1MkFBRDNFMTFFMzk3NDVDMUUwMUY5RTRFQUEiLz4gPC9yZGY6RGVzY3JpcHRpb24+IDwvcmRmOlJERj4gPC94OnhtcG1ldGE+IDw/eHBhY2tldCBlbmQ9InIiPz4zDy6UAAAB60lEQVR42rRUsUsCYRS/EwKXOCHIMahAcJMaHNprDEFdI/ob1MVNLmiJWryxAmsMlyZJTkJwiKaWqyAQLFAiLsg66673s++T787zpKEHP/x87/f73ffuHU9yHEeaAJmQJTwwZFnOxRvFBJMkoemMR5PVphotEE65yjCM51QqdQ7gLBieMe6Y0SxBtW37A6xut2vmcrlaKBQqEGURwBk51MBhXBVabrRPyVcU+/2+pWlaS1GUPSqtEmShBRk51Mrlcou4n8wQ2gOJ35UStqqqNSJvEGYmDQE1wjq40HC95PNCbwnxgGnGGccVQ6N2u/1Sr9cN4Qn4vSBEBIMIy9m8A2igHRl1Op0nuu52LBY78UxngP4ZBuI0wYUGWpcR618h5NPpdLXX6715r49cJpOpggMuNL5GwgtdIuyWSiWdm+CMHGFZ5AYaCYZreG0Azn4cbhSSAoLqV35nvwg0+lPYv/FNT9QI896r89Z82gJXgxYGUrFYvDRN8519G5hUgRAOMEItz7gOtPDApZLRaPSwUqncWJb1xQwf+f4RjIb7idUccKGBFh58OmHCZiKRONZ1/c6zf8bOjUbjHlxomFbyjnuOsOOzf1z7CRxwp25Icf+gBUDcT34bUg4YKGorhC32/4hwjWdL/xk/AgwA7kGg+q2lp1UAAAAASUVORK5CYII=);
 }
 
-/*
- * Normal chart display
- */
 .ic-squares #isometric-contributions,
 .ic-squares .ic-contributions-wrapper {
   display: none;
 }
 
-/*
- * Isometric cube display
- */
 .ic-cubes .calendar-graph,
 .ic-cubes .contrib-details,
 .ic-cubes .contrib-footer {
@@ -117,9 +111,6 @@ var isoCss = `
   position: relative;
 }
 
-/*
- * Stats display
- */
 .ic-stats-block {
   position: absolute;
 }
@@ -197,7 +188,7 @@ var isoCss = `
 .ic-footer a {
   color: #777;
 }
-`;
+*/}).slice(15).slice(0, -4);
 
 window.addEventListener('load', function(){
     var style = document.createElement('style');
