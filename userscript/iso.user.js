@@ -188,7 +188,7 @@ var isoCss = (function(){/*
 .ic-footer a {
   color: #777;
 }
-*/}).slice(15).slice(0, -4);
+*/}).toString().slice(15).slice(0, -4);
 
 window.addEventListener('load', function(){
     var style = document.createElement('style');
