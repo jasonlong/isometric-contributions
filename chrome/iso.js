@@ -371,61 +371,56 @@ Iso = (function() {
 
 }).call(this);
 
-loadIso = function() {
-  if (!($('.js-contribution-graph')).hasClass('ic-cubes')) {
-    return $(function() {
-      var iso, target;
-      target = document.querySelector('.js-calendar-graph');
-      return iso = new Iso(target);
-    });
-  }
-};
-
-// load iso graph when the page first load
-loadIso();
-
-// load iso graph when pjax request load (switch between tabs)
-document.addEventListener('pjax:success', function() {
-  console.log('pjax:success');
-  return loadIso();
-});
-
-// load iso graph when contribution graph upload (change time)
-targetNode = document.getElementById('js-pjax-container');
-
-config = {
-  attributes: false,
-  childList: true,
-  subtree: true
-};
-
-callback = function(mutationsList) {
-  var j, len, mutation, node, results;
-  results = [];
-  for (j = 0, len = mutationsList.length; j < len; j++) {
-    mutation = mutationsList[j];
-    if (mutation.type === 'childList') {
-      results.push((function() {
-        var k, len1, ref, results1;
-        ref = mutation.addedNodes;
-        results1 = [];
-        for (k = 0, len1 = ref.length; k < len1; k++) {
-          node = ref[k];
-          if (($(node)).hasClass('js-contribution-graph')) {
-            results1.push(loadIso());
-          } else {
-            results1.push(void 0);
-          }
-        }
-        return results1;
-      })());
-    } else {
-      results.push(void 0);
+if (document.querySelector('.js-calendar-graph')) {
+  loadIso = function() {
+    if (!($('.js-contribution-graph')).hasClass('ic-cubes')) {
+      return $(function() {
+        var iso, target;
+        target = document.querySelector('.js-calendar-graph');
+        return iso = new Iso(target);
+      });
     }
-  }
-  return results;
-};
-
-observer = new MutationObserver(callback);
-
-observer.observe(targetNode, config);
+  };
+  // load iso graph when the page first load
+  loadIso();
+  // load iso graph when pjax request load (switch between tabs)
+  document.addEventListener('pjax:success', function() {
+    console.log('pjax:success');
+    return loadIso();
+  });
+  // load iso graph when contribution graph upload (change time)
+  targetNode = document.getElementById('js-pjax-container');
+  config = {
+    attributes: false,
+    childList: true,
+    subtree: true
+  };
+  callback = function(mutationsList) {
+    var j, len, mutation, node, results;
+    results = [];
+    for (j = 0, len = mutationsList.length; j < len; j++) {
+      mutation = mutationsList[j];
+      if (mutation.type === 'childList') {
+        results.push((function() {
+          var k, len1, ref, results1;
+          ref = mutation.addedNodes;
+          results1 = [];
+          for (k = 0, len1 = ref.length; k < len1; k++) {
+            node = ref[k];
+            if (($(node)).hasClass('js-contribution-graph')) {
+              results1.push(loadIso());
+            } else {
+              results1.push(void 0);
+            }
+          }
+          return results1;
+        })());
+      } else {
+        results.push(void 0);
+      }
+    }
+    return results;
+  };
+  observer = new MutationObserver(callback);
+  observer.observe(targetNode, config);
+}

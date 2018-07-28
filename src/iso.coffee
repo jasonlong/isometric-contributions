@@ -362,28 +362,29 @@ class Iso
     factor = Math.pow(10, precision)
     return Math.round(number * factor) / factor
 
-loadIso = () ->
-  if !($ '.js-contribution-graph').hasClass 'ic-cubes'
-    $ ->
-      target = document.querySelector '.js-calendar-graph'
-      iso = new Iso target
+if document.querySelector '.js-calendar-graph'
+  loadIso = () ->
+    if !($ '.js-contribution-graph').hasClass 'ic-cubes'
+      $ ->
+        target = document.querySelector '.js-calendar-graph'
+        iso = new Iso target
 
-# load iso graph when the page first load
-loadIso()
-
-# load iso graph when pjax request load (switch between tabs)
-document.addEventListener 'pjax:success', () ->
-  console.log 'pjax:success'
+  # load iso graph when the page first load
   loadIso()
 
-# load iso graph when contribution graph upload (change time)
-targetNode = document.getElementById 'js-pjax-container'
-config = { attributes: false, childList: true, subtree: true }
-callback = (mutationsList) ->
-  for mutation in mutationsList
-    if mutation.type == 'childList'
-      for node in mutation.addedNodes
-        if ($ node).hasClass 'js-contribution-graph'
-          loadIso()
-observer = new MutationObserver(callback)
-observer.observe(targetNode, config)
+  # load iso graph when pjax request load (switch between tabs)
+  document.addEventListener 'pjax:success', () ->
+    console.log 'pjax:success'
+    loadIso()
+
+  # load iso graph when contribution graph upload (change time)
+  targetNode = document.getElementById 'js-pjax-container'
+  config = { attributes: false, childList: true, subtree: true }
+  callback = (mutationsList) ->
+    for mutation in mutationsList
+      if mutation.type == 'childList'
+        for node in mutation.addedNodes
+          if ($ node).hasClass 'js-contribution-graph'
+            loadIso()
+  observer = new MutationObserver(callback)
+  observer.observe(targetNode, config)
