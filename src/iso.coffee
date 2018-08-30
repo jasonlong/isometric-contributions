@@ -77,7 +77,7 @@ class Iso
     ($ '<canvas id="isometric-contributions" width="720" height="470"></canvas>')
       .appendTo '.ic-contributions-wrapper'
 
-    contributionsBox = ($ '.js-contribution-graph')
+    contributionsBox = ($ '.js-yearly-contributions')
     insertLocation = ($ '.js-yearly-contributions').find 'h2'
 
     # Inject toggle

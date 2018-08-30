@@ -82,7 +82,7 @@ Iso = (function() {
       var htmlFooter, htmlToggle, insertLocation;
       ($('<div class="ic-contributions-wrapper"></div>')).insertBefore($('.js-calendar-graph'));
       ($('<canvas id="isometric-contributions" width="720" height="470"></canvas>')).appendTo('.ic-contributions-wrapper');
-      contributionsBox = $('.js-contribution-graph');
+      contributionsBox = $('.js-yearly-contributions');
       insertLocation = ($('.js-yearly-contributions')).find('h2');
       // Inject toggle
       htmlToggle = "<span class=\"ic-toggle\">\n  <a href=\"#\" class=\"ic-toggle-option tooltipped tooltipped-nw squares\" data-ic-option=\"squares\" aria-label=\"Normal chart view\"></a>\n  <a href=\"#\" class=\"ic-toggle-option tooltipped tooltipped-nw cubes\" data-ic-option=\"cubes\" aria-label=\"Isometric chart view\"></a>\n</span>";
