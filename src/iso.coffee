@@ -78,7 +78,7 @@ class Iso
       .appendTo '.ic-contributions-wrapper'
 
     contributionsBox = ($ '.js-contribution-graph')
-    insertLocation = ($ '.js-contribution-graph').find 'h2'
+    insertLocation = ($ '.js-yearly-contributions').find 'h2'
 
     # Inject toggle
     htmlToggle = """
