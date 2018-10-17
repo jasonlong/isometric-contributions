@@ -245,15 +245,19 @@ Iso = (function() {
     renderIsometricChart() {
       var GH_OFFSET, MAX_HEIGHT, SIZE, canvas, contribCount, pixelView, point, self;
       SIZE = 10;
-      GH_OFFSET = 12;
       MAX_HEIGHT = 100;
+      GH_OFFSET = parseInt(($('.js-calendar-graph-svg g > g > rect'))[1].getAttribute('y'));
       canvas = document.getElementById('isometric-contributions');
       // create pixel view container in point
-      point = new obelisk.Point(110, 110);
+      if (GH_OFFSET === 10) {
+        point = new obelisk.Point(70, 70);
+      } else {
+        point = new obelisk.Point(110, 90);
+      }
       pixelView = new obelisk.PixelView(canvas, point);
       contribCount = null;
       self = this;
-      return ($('.js-calendar-graph g > g')).each(function(g) {
+      return ($('.js-calendar-graph-svg g > g')).each(function(g) {
         var x;
         x = parseInt(((($(this)).attr('transform')).match(/(\d+)/))[0] / (GH_OFFSET + 1));
         return (($(this)).find('rect')).each(function(r) {
