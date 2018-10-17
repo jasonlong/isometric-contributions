@@ -290,8 +290,8 @@ class Iso
 
   renderIsometricChart: ->
     SIZE       = 10
-    GH_OFFSET  = 12
     MAX_HEIGHT = 100
+    GH_OFFSET  = parseInt ($ '.js-calendar-graph-svg g > g > rect')[1].getAttribute 'y'
 
     canvas = document.getElementById 'isometric-contributions'
 
@@ -302,7 +302,7 @@ class Iso
     contribCount = null
 
     self = this
-    ($ '.js-calendar-graph g > g').each (g) ->
+    ($ '.js-calendar-graph-svg g > g').each (g) ->
       x = parseInt (((($ this).attr 'transform').match /(\d+)/)[0]) / (GH_OFFSET + 1)
       (($ this).find 'rect').each (r) ->
         r            = ($ this).get 0
