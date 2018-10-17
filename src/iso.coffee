@@ -296,7 +296,11 @@ class Iso
     canvas = document.getElementById 'isometric-contributions'
 
     # create pixel view container in point
-    point = new obelisk.Point 110, 110
+    if GH_OFFSET == 10
+      point = new obelisk.Point 70,70
+    else
+      point = new obelisk.Point 110,90
+
     pixelView = new obelisk.PixelView canvas, point
 
     contribCount = null
