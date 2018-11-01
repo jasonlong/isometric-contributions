@@ -225,9 +225,12 @@ class Iso
       dateBest = 'No activity found'
 
     # Longest streak
-    longestStreakStart = this.formatDateString longestStreakStart, dateOptions
-    longestStreakEnd   = this.formatDateString longestStreakEnd, dateOptions
-    datesLongest       = longestStreakStart + " — " + longestStreakEnd
+    if streakLongest > 0
+      longestStreakStart = this.formatDateString longestStreakStart, dateOptions
+      longestStreakEnd   = this.formatDateString longestStreakEnd, dateOptions
+      datesLongest       = longestStreakStart + " — " + longestStreakEnd
+    else
+      datesLongest = "No longest streak"
 
     this.renderTopStats(countTotal, averageCount, datesTotal, maxCount, dateBest)
     this.renderBottomStats(streakLongest, datesLongest, streakCurrent, datesCurrent)
