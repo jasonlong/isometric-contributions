@@ -91,8 +91,8 @@ class Iso
 
     # Inject color cycle
     htmlToggle = """
-      <span class="ic-toggle">
-        <a href="#" class="ic-option tooltipped tooltipped-nw color-selector" data-ic-option="color-selector" aria-label="Cycle colors">
+      <span class="ic-cycle">
+        <a href="#" class="ic-cycle-option tooltipped tooltipped-nw color-selector" data-ic-option="color-selector" aria-label="Cycle colors">
           <span class="color-selector-color"></span>
         </a>
       </span>
@@ -116,8 +116,10 @@ class Iso
       option = ($ this).data 'ic-option'
       if option is 'squares'
         (contributionsBox.removeClass 'ic-cubes').addClass 'ic-squares'
+        ($ '.ic-cycle-option.color-selector').css('display', 'none')
       else
         (contributionsBox.removeClass 'ic-squares').addClass 'ic-cubes'
+        ($ '.ic-cycle-option.color-selector').css('display', 'initial')
 
       ($ '.ic-toggle-option').removeClass 'active'
       ($ this).addClass 'active'
@@ -125,7 +127,7 @@ class Iso
       self.persistSetting "toggleSetting", option
       self.toggleSetting = option
 
-    ($ '.ic-option').click (e) ->
+    ($ '.ic-cycle-option').click (e) ->
       e.preventDefault()
 
       self.colors = switch self.colors
@@ -142,6 +144,7 @@ class Iso
     # Apply user preference
     ($ ".ic-toggle-option.#{this.toggleSetting}").addClass 'active'
     contributionsBox.addClass "ic-#{this.toggleSetting}"
+    ($ '.ic-cycle-option.color-selector').css('display', if this.toggleSetting is 'cubes' then 'initial' else 'none')
     ($ '.color-selector-color').css('background', '#'+COLORS[this.colors][2].toString(16))
 
     ($ '.ic-2d-toggle').click (e) ->

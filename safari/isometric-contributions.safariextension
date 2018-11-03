@@ -90,7 +90,7 @@ Iso = (function() {
       htmlToggle = "<span class=\"ic-toggle\">\n  <a href=\"#\" class=\"ic-toggle-option tooltipped tooltipped-nw squares\" data-ic-option=\"squares\" aria-label=\"Normal chart view\"></a>\n  <a href=\"#\" class=\"ic-toggle-option tooltipped tooltipped-nw cubes\" data-ic-option=\"cubes\" aria-label=\"Isometric chart view\"></a>\n</span>";
       ($(htmlToggle)).insertBefore(insertLocation);
       // Inject color cycle
-      htmlToggle = "<span class=\"ic-toggle\">\n  <a href=\"#\" class=\"ic-option tooltipped tooltipped-nw color-selector\" data-ic-option=\"color-selector\" aria-label=\"Cycle colors\">\n    <span class=\"color-selector-color\"></span>\n  </a>\n</span>";
+      htmlToggle = "<span class=\"ic-cycle\">\n  <a href=\"#\" class=\"ic-cycle-option tooltipped tooltipped-nw color-selector\" data-ic-option=\"color-selector\" aria-label=\"Cycle colors\">\n    <span class=\"color-selector-color\"></span>\n  </a>\n</span>";
       ($(htmlToggle)).insertBefore(insertLocation);
       // Inject footer w/ toggle for showing 2D chart
       htmlFooter = "<span class=\"ic-footer\">\n  <a href=\"#\" class=\"ic-2d-toggle\">Show normal chart below ▾</a>\n</span>";
@@ -107,15 +107,17 @@ Iso = (function() {
         option = ($(this)).data('ic-option');
         if (option === 'squares') {
           (contributionsBox.removeClass('ic-cubes')).addClass('ic-squares');
+          ($('.ic-cycle-option.color-selector')).css('display', 'none');
         } else {
           (contributionsBox.removeClass('ic-squares')).addClass('ic-cubes');
+          ($('.ic-cycle-option.color-selector')).css('display', 'initial');
         }
         ($('.ic-toggle-option')).removeClass('active');
         ($(this)).addClass('active');
         self.persistSetting("toggleSetting", option);
         return self.toggleSetting = option;
       });
-      ($('.ic-option')).click(function(e) {
+      ($('.ic-cycle-option')).click(function(e) {
         e.preventDefault();
         self.colors = (function() {
           switch (self.colors) {
@@ -135,6 +137,7 @@ Iso = (function() {
       // Apply user preference
       ($(`.ic-toggle-option.${this.toggleSetting}`)).addClass('active');
       contributionsBox.addClass(`ic-${this.toggleSetting}`);
+      ($('.ic-cycle-option.color-selector')).css('display', this.toggleSetting === 'cubes' ? 'initial' : 'none');
       ($('.color-selector-color')).css('background', '#' + COLORS[this.colors][2].toString(16));
       ($('.ic-2d-toggle')).click(function(e) {
         e.preventDefault();
