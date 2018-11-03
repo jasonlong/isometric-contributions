@@ -1,11 +1,9 @@
 class Iso
-  COLORS = [
-    new obelisk.CubeColor().getByHorizontalColor(0xebedf0),
-    new obelisk.CubeColor().getByHorizontalColor(0xc6e48b),
-    new obelisk.CubeColor().getByHorizontalColor(0x7bc96f),
-    new obelisk.CubeColor().getByHorizontalColor(0x239a3b),
-    new obelisk.CubeColor().getByHorizontalColor(0x196127)
-  ]
+  COLORS = {
+    green: [0xebedf0,0xc6e48b,0x7bc96f,0x239a3b,0x196127],
+    red:   [0xebedf0,0xef6262,0xe53d3d,0xdb0000,0xa00000],
+    blue:  [0xebedf0,0x6e89ef,0x345bed,0x072fc4,0x0828a0]
+  }
 
   yearTotal           = 0
   averageCount        = 0
@@ -38,13 +36,15 @@ class Iso
     # The storage API is not supported in content scripts.
     # https://developer.mozilla.org/Add-ons/WebExtensions/Chrome_incompatibilities#storage
     if chrome?.storage?
-      chrome.storage.local.get ['toggleSetting', 'show2DSetting'], ({toggleSetting, show2DSetting}) =>
+      chrome.storage.local.get ['toggleSetting', 'show2DSetting', 'colors'], ({toggleSetting, show2DSetting, colors}) =>
         this.toggleSetting = toggleSetting ? 'cubes'
         this.show2DSetting = show2DSetting ? 'no'
+        this.colors        = colors ? 'green'
         callback()
     else
       this.toggleSetting = localStorage.toggleSetting ? 'cubes'
       this.show2DSetting = localStorage.show2DSetting ? 'no'
+      this.colors        = localStorage.show2DSetting ? 'green'
       callback()
 
   persistSetting: (key, value, callback = ->) ->
@@ -89,6 +89,16 @@ class Iso
     """
     ($ htmlToggle).insertBefore insertLocation
 
+    # Inject color cycle
+    htmlToggle = """
+      <span class="ic-toggle">
+        <a href="#" class="ic-option tooltipped tooltipped-nw color-selector" data-ic-option="color-selector" aria-label="Cycle colors">
+          <span class="color-selector-color"></span>
+        </a>
+      </span>
+    """
+    ($ htmlToggle).insertBefore insertLocation
+
     # Inject footer w/ toggle for showing 2D chart
     htmlFooter = """
       <span class="ic-footer">
@@ -115,9 +125,24 @@ class Iso
       self.persistSetting "toggleSetting", option
       self.toggleSetting = option
 
+    ($ '.ic-option').click (e) ->
+      e.preventDefault()
+
+      self.colors = switch self.colors
+        when 'green' then 'red'
+        when 'red' then 'blue'
+        else 'green'
+
+      ($ '.color-selector-color').css('background', '#'+COLORS[self.colors][2].toString(16))
+      ($ '.ic-stats-count').css('color', '#'+COLORS[self.colors][2].toString(16))
+      self.renderIsometricChart()
+      self.persistSetting 'colors', self.colors
+
+
     # Apply user preference
     ($ ".ic-toggle-option.#{this.toggleSetting}").addClass 'active'
     contributionsBox.addClass "ic-#{this.toggleSetting}"
+    ($ '.color-selector-color').css('background', '#'+COLORS[this.colors][2].toString(16))
 
     ($ '.ic-2d-toggle').click (e) ->
       e.preventDefault()
@@ -234,6 +259,7 @@ class Iso
 
     this.renderTopStats(countTotal, averageCount, datesTotal, maxCount, dateBest)
     this.renderBottomStats(streakLongest, datesLongest, streakCurrent, datesCurrent)
+    ($ '.ic-stats-count').css('color', '#'+COLORS[this.colors][2].toString(16))
 
   renderTopStats: (countTotal, averageCount, datesTotal, maxCount, dateBest) ->
     html = """
@@ -329,11 +355,11 @@ class Iso
 
   getSquareColor: (fill) ->
     color = switch fill.toLowerCase()
-      when 'rgb(235, 237, 240)', '#ebedf0' then COLORS[0]
-      when 'rgb(198, 228, 139)', '#c6e48b' then COLORS[1]
-      when 'rgb(123, 201, 111)', '#7bc96f' then COLORS[2]
-      when 'rgb(35, 154, 59)',   '#239a3b' then COLORS[3]
-      when 'rgb(25, 97, 39)',    '#196127' then COLORS[4]
+      when 'rgb(235, 237, 240)', '#ebedf0' then new obelisk.CubeColor().getByHorizontalColor(COLORS[this.colors][0])
+      when 'rgb(198, 228, 139)', '#c6e48b' then new obelisk.CubeColor().getByHorizontalColor(COLORS[this.colors][1])
+      when 'rgb(123, 201, 111)', '#7bc96f' then new obelisk.CubeColor().getByHorizontalColor(COLORS[this.colors][2])
+      when 'rgb(35, 154, 59)',   '#239a3b' then new obelisk.CubeColor().getByHorizontalColor(COLORS[this.colors][3])
+      when 'rgb(25, 97, 39)',    '#196127' then new obelisk.CubeColor().getByHorizontalColor(COLORS[this.colors][4])
       else
         if (fill.indexOf('#') != -1)
           new obelisk.CubeColor().getByHorizontalColor(parseInt('0x'+fill.replace("#", "")));
