@@ -250,7 +250,7 @@ Iso = (function() {
       var GH_OFFSET, MAX_HEIGHT, SIZE, canvas, contribCount, pixelView, point, self;
       SIZE = 10;
       MAX_HEIGHT = 100;
-      GH_OFFSET = parseInt(($('.js-calendar-graph-svg g > g > rect'))[1].getAttribute('y'));
+      GH_OFFSET = parseInt(((($('.js-calendar-graph-svg g > g'))[1].getAttribute('transform')).match(/(\d+)/))[0] - 1);
       canvas = document.getElementById('isometric-contributions');
       // create pixel view container in point
       if (GH_OFFSET === 10) {
