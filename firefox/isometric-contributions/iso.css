@@ -108,12 +108,12 @@
 }
 
 .ic-stats-top {
-  top: 20px;
-  left: 390px;
+  top: 8px;
+  right: 20px;
 }
 
 .ic-stats-bottom {
-  top: 265px;
+  top: 225px;
   left: 20px;
 }
 
@@ -127,7 +127,7 @@
 
 .ic-stats-label {
   display: table-cell;
-  padding-bottom: 20px;
+  padding-bottom: 12px;
   font-size: 14px;
   color: #777;
   text-align: right;
@@ -136,17 +136,18 @@
 
 .ic-stats-count {
   display: block;
-  font-size: 40px;
-  font-weight: bold;
-  line-height: 38px;
+  font-size: 32px;
+  font-weight: 600;
+  line-height: 1;
   color: #1e6823;
 }
 
 .ic-stats-meta {
   display: table-cell;
-  padding-bottom: 20px;
+  padding-bottom: 12px;
   padding-left: 8px;
   text-align: left;
+  line-height: 1.2;
   vertical-align: bottom;
 }
 
@@ -155,23 +156,25 @@
 }
 
 .ic-stats-average {
+  font-size: 12px;
   font-weight: bold;
   color: #24292e;
 }
 
 .ic-stats-unit {
   display: block;
-  font-size: 15px;
+  font-size: 14px;
 }
 
 .ic-stats-date {
   display: block;
   color: #999;
+  font-size: 12px;
 }
 
 .ic-footer {
   position: absolute;
-  top: 450px;
+  top: 380px;
   left: 20px;
   font-size: 11px;
   color: #999;
