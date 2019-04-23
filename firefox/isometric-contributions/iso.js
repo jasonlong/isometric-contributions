@@ -391,11 +391,6 @@ if (document.querySelector('.js-calendar-graph')) {
   };
   // load iso graph when the page first load
   loadIso();
-  // load iso graph when pjax request load (switch between tabs)
-  document.addEventListener('pjax:success', function() {
-    console.log('pjax:success');
-    return loadIso();
-  });
   // load iso graph when contribution graph upload (change time)
   targetNode = document.getElementById('js-pjax-container');
   config = {
@@ -415,7 +410,7 @@ if (document.querySelector('.js-calendar-graph')) {
           results1 = [];
           for (k = 0, len1 = ref.length; k < len1; k++) {
             node = ref[k];
-            if (($(node)).hasClass('js-contribution-graph')) {
+            if (($(node)).hasClass('js-yearly-contributions')) {
               results1.push(loadIso());
             } else {
               results1.push(void 0);
