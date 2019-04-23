@@ -379,11 +379,6 @@ if document.querySelector '.js-calendar-graph'
   # load iso graph when the page first load
   loadIso()
 
-  # load iso graph when pjax request load (switch between tabs)
-  document.addEventListener 'pjax:success', () ->
-    console.log 'pjax:success'
-    loadIso()
-
   # load iso graph when contribution graph upload (change time)
   targetNode = document.getElementById 'js-pjax-container'
   config = { attributes: false, childList: true, subtree: true }
@@ -391,7 +386,7 @@ if document.querySelector '.js-calendar-graph'
     for mutation in mutationsList
       if mutation.type == 'childList'
         for node in mutation.addedNodes
-          if ($ node).hasClass 'js-contribution-graph'
+          if ($ node).hasClass 'js-yearly-contributions'
             loadIso()
   observer = new MutationObserver(callback)
   observer.observe(targetNode, config)
