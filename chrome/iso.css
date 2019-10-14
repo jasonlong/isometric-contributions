@@ -80,15 +80,21 @@
 /*
  * Isometric cube display
  */
-.ic-cubes .calendar-graph,
 .ic-cubes .contrib-details,
 .ic-cubes .contrib-footer {
   display: none;
 }
 
-.ic-cubes.show-2d .calendar-graph,
+.ic-cubes .calendar-graph {
+  display: none !important;
+}
+
 .ic-cubes.show-2d .contrib-footer {
   display: block;
+}
+
+.ic-cubes.show-2d .calendar-graph {
+  display: block !important;
 }
 
 .ic-cubes #contributions-calendar {
