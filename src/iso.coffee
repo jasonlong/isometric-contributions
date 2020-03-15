@@ -83,8 +83,8 @@ class Iso
     # Inject toggle
     htmlToggle = """
       <span class="ic-toggle">
-        <a href="#" class="ic-toggle-option tooltipped tooltipped-nw squares" data-ic-option="squares" aria-label="Normal chart view"></a>
-        <a href="#" class="ic-toggle-option tooltipped tooltipped-nw cubes" data-ic-option="cubes" aria-label="Isometric chart view"></a>
+        <a href="javascript:;" class="ic-toggle-option tooltipped tooltipped-nw squares" data-ic-option="squares" aria-label="Normal chart view"></a>
+        <a href="javascript:;" class="ic-toggle-option tooltipped tooltipped-nw cubes" data-ic-option="cubes" aria-label="Isometric chart view"></a>
       </span>
     """
     ($ htmlToggle).insertBefore insertLocation
@@ -92,7 +92,7 @@ class Iso
     # Inject footer w/ toggle for showing 2D chart
     htmlFooter = """
       <span class="ic-footer">
-        <a href="#" class="ic-2d-toggle">Show normal chart below ▾</a>
+        <a href="javascript:;" class="ic-2d-toggle">Show normal chart below ▾</a>
       </span>
     """
     ($ htmlFooter).appendTo $ '.ic-contributions-wrapper'
