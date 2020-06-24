@@ -2,7 +2,7 @@ This is an extension for Chrome, ~~Safari~~ (see note below), and Firefox (beta)
 
 Besides being sort of neat looking, this view is interesting in that it highlights the differences between the number of contributions with more granularity. This isn't meant to completely replace the standard 2D graph though, because in most ways it is actually less useful. For example, there are no axis labels, shorter bars can be hidden behind taller ones, you can't hover over a bar to see the day and count, etc.
 
-![Preview](http://cl.ly/image/1j0j3l1R1d2Z/content)
+![Preview](img/preview.png)
 
 ## Installation
 
@@ -28,13 +28,13 @@ I'm no longer able to build Safari extensions because you now need a paid Apple 
 
 If you want to hack on the extension, you'll need to install it manually. First clone or fork this repo. Then, on your Chrome Extensions page, make sure "Developer mode" is checked. You can then click the "Load unpacked extension..." button and browse to the `chrome` directory of this repo.
 
-![](http://cl.ly/image/0J0p1H2u0F0E/content)
+![](img/dev-mode.png)
 
 ## Hacking
 
 To hack on the extension, you'll first need to make sure you've installed it in Developer mode (see above). Once you've made changes to the extension, go back to the Extensions page and click the Reload link under the extension entry.
 
-![](http://cl.ly/image/10370H2B2Q1G/content)
+![](img/reload-link.png)
 
 As of `v0.8.3`, this project uses CoffeeScript. To compile the `iso.coffee` file to all extensions:
 
