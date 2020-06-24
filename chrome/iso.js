@@ -290,17 +290,17 @@ Iso = (function() {
           case 'rgb(235, 237, 240)':
           case '#ebedf0':
             return COLORS[0];
-          case 'rgb(198, 228, 139)':
-          case '#c6e48b':
+          case 'rgb(155, 233, 168)':
+          case '#9BE9A8':
             return COLORS[1];
-          case 'rgb(123, 201, 111)':
-          case '#7bc96f':
+          case 'rgb(64, 196, 99)':
+          case '#40C463':
             return COLORS[2];
-          case 'rgb(35, 154, 59)':
-          case '#239a3b':
+          case 'rgb(50, 162, 78)':
+          case '#32A24E':
             return COLORS[3];
-          case 'rgb(25, 97, 39)':
-          case '#196127':
+          case 'rgb(33, 110, 57)':
+          case '#216E39':
             return COLORS[4];
           default:
             if (fill.indexOf('#') !== -1) {
