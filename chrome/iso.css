@@ -11,9 +11,9 @@
 }
 
 .ic-toggle .tooltipped {
-  top: 0 ! important;
-  right: 0 ! important;
-  float: none ! important;
+  top: 0 !important;
+  right: 0 !important;
+  float: none !important;
 }
 
 .ic-toggle-option {
@@ -145,7 +145,7 @@
   font-size: 32px;
   font-weight: 600;
   line-height: 1;
-  color: #1e6823;
+  color: #216e39;
 }
 
 .ic-stats-meta {

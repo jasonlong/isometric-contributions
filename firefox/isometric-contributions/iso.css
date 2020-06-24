@@ -11,9 +11,9 @@
 }
 
 .ic-toggle .tooltipped {
-  top: 0 ! important;
-  right: 0 ! important;
-  float: none ! important;
+  top: 0 !important;
+  right: 0 !important;
+  float: none !important;
 }
 
 .ic-toggle-option {
@@ -80,22 +80,22 @@
 /*
  * Isometric cube display
  */
- .ic-cubes .contrib-details,
- .ic-cubes .contrib-footer {
-   display: none;
- }
+.ic-cubes .contrib-details,
+.ic-cubes .contrib-footer {
+  display: none;
+}
 
- .ic-cubes .calendar-graph {
-   display: none !important;
- }
+.ic-cubes .calendar-graph {
+  display: none !important;
+}
 
- .ic-cubes.show-2d .contrib-footer {
-   display: block;
- }
+.ic-cubes.show-2d .contrib-footer {
+  display: block;
+}
 
- .ic-cubes.show-2d .calendar-graph {
-   display: block !important;
- }
+.ic-cubes.show-2d .calendar-graph {
+  display: block !important;
+}
 
 .ic-cubes #contributions-calendar {
   min-height: 3px;
@@ -145,7 +145,7 @@
   font-size: 32px;
   font-weight: 600;
   line-height: 1;
-  color: #1e6823;
+  color: #216e39;
 }
 
 .ic-stats-meta {
