@@ -330,10 +330,10 @@ class Iso
   getSquareColor: (fill) ->
     color = switch fill.toLowerCase()
       when 'rgb(235, 237, 240)', '#ebedf0' then COLORS[0]
-      when 'rgb(198, 228, 139)', '#c6e48b' then COLORS[1]
-      when 'rgb(123, 201, 111)', '#7bc96f' then COLORS[2]
-      when 'rgb(35, 154, 59)',   '#239a3b' then COLORS[3]
-      when 'rgb(25, 97, 39)',    '#196127' then COLORS[4]
+      when 'rgb(155, 233, 168)', '#9BE9A8' then COLORS[1]
+      when 'rgb(50, 162, 78)', '#40C463' then COLORS[2]
+      when 'rgb(35, 154, 59)',   '#32A24E' then COLORS[3]
+      when 'rgb(33, 110, 57)',    '#216E39' then COLORS[4]
       else
         if (fill.indexOf('#') != -1)
           new obelisk.CubeColor().getByHorizontalColor(parseInt('0x'+fill.replace("#", "")));
