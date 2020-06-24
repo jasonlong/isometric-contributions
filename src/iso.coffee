@@ -331,8 +331,8 @@ class Iso
     color = switch fill.toLowerCase()
       when 'rgb(235, 237, 240)', '#ebedf0' then COLORS[0]
       when 'rgb(155, 233, 168)', '#9BE9A8' then COLORS[1]
-      when 'rgb(50, 162, 78)', '#40C463' then COLORS[2]
-      when 'rgb(35, 154, 59)',   '#32A24E' then COLORS[3]
+      when 'rgb(64, 196, 99)', '#40C463' then COLORS[2]
+      when 'rgb(49, 161, 78)',   '#31A14E' then COLORS[3]
       when 'rgb(33, 110, 57)',    '#216E39' then COLORS[4]
       else
         if (fill.indexOf('#') != -1)

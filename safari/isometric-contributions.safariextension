@@ -342,11 +342,11 @@ Iso = (function() {
           case 'rgb(155, 233, 168)':
           case '#9BE9A8':
             return COLORS[1];
-          case 'rgb(50, 162, 78)':
+          case 'rgb(64, 196, 99)':
           case '#40C463':
             return COLORS[2];
-          case 'rgb(35, 154, 59)':
-          case '#32A24E':
+          case 'rgb(49, 161, 78)':
+          case '#31A14E':
             return COLORS[3];
           case 'rgb(33, 110, 57)':
           case '#216E39':
