@@ -135,7 +135,7 @@
   display: table-cell;
   padding-bottom: 12px;
   font-size: 14px;
-  color: #777;
+  color: #586069;
   text-align: right;
   vertical-align: bottom;
 }
@@ -145,7 +145,7 @@
   font-size: 32px;
   font-weight: 600;
   line-height: 1;
-  color: #216e39;
+  color: #28a745;
 }
 
 .ic-stats-meta {
@@ -174,7 +174,7 @@
 
 .ic-stats-date {
   display: block;
-  color: #999;
+  color: #6a737d;
   font-size: 12px;
 }
 
@@ -183,9 +183,9 @@
   top: 380px;
   left: 20px;
   font-size: 11px;
-  color: #999;
+  color: #6a737d;
 }
 
 .ic-footer a {
-  color: #777;
+  color: #586069;
 }

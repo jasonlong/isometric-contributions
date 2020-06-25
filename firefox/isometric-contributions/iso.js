@@ -336,20 +336,15 @@ Iso = (function() {
       var color;
       return color = (function() {
         switch (fill.toLowerCase()) {
-          case 'rgb(235, 237, 240)':
           case '#ebedf0':
             return COLORS[0];
-          case 'rgb(155, 233, 168)':
-          case '#9BE9A8':
+          case '#c6e48b':
             return COLORS[1];
-          case 'rgb(64, 196, 99)':
-          case '#40C463':
+          case '#7bc96f':
             return COLORS[2];
-          case 'rgb(49, 161, 78)':
-          case '#31A14E':
+          case '#239a3b':
             return COLORS[3];
-          case 'rgb(33, 110, 57)':
-          case '#216E39':
+          case '#196127':
             return COLORS[4];
           default:
             if (fill.indexOf('#') !== -1) {
@@ -397,7 +392,7 @@ Iso = (function() {
 
   };
 
-  COLORS = [new obelisk.CubeColor().getByHorizontalColor(0xebedf0), new obelisk.CubeColor().getByHorizontalColor(0xc6e48b), new obelisk.CubeColor().getByHorizontalColor(0x7bc96f), new obelisk.CubeColor().getByHorizontalColor(0x239a3b), new obelisk.CubeColor().getByHorizontalColor(0x196127)];
+  COLORS = [new obelisk.CubeColor().getByHorizontalColor(0xebedf0), new obelisk.CubeColor().getByHorizontalColor(0x9be9a8), new obelisk.CubeColor().getByHorizontalColor(0x40c463), new obelisk.CubeColor().getByHorizontalColor(0x30a14e), new obelisk.CubeColor().getByHorizontalColor(0x216e39)];
 
   yearTotal = 0;
 
