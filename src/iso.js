@@ -69,17 +69,17 @@ const initUI = () => {
   contributionsWrapper.appendChild(canvas)
 
   // Inject toggle
-  let insertLocation = contributionsBox.querySelector("h2")
+  const insertLocation = contributionsBox.querySelector("h2")
 
-  let htmlToggle = document.createElement("span")
+  const htmlToggle = document.createElement("span")
   htmlToggle.className = "ic-toggle"
 
-  let squaresButton = document.createElement("a")
+  const squaresButton = document.createElement("a")
   squaresButton.className = "ic-toggle-option tooltipped tooltipped-nw squares"
   squaresButton.setAttribute("aria-label", "Normal chart view")
   squaresButton.setAttribute("data-ic-option", "squares")
 
-  let cubesButton = document.createElement("a")
+  const cubesButton = document.createElement("a")
   cubesButton.className = "ic-toggle-option tooltipped tooltipped-nw cubes"
   cubesButton.setAttribute("aria-label", "Isometric chart view")
   cubesButton.setAttribute("data-ic-option", "cubes")
@@ -90,15 +90,15 @@ const initUI = () => {
   htmlToggle.appendChild(cubesButton)
 
   // Inject footer w/ toggle for showing 2D chart
-  let htmlFooter = document.createElement("span")
+  const htmlFooter = document.createElement("span")
   htmlFooter.className = "ic-footer"
 
-  let normalChartToggle = document.createElement("a")
+  const normalChartToggle = document.createElement("a")
   normalChartToggle.className = "ic-2d-toggle text-small muted-link"
   normalChartToggle.innerHTML = "Show normal chart below"
   normalChartToggle.setAttribute("href", "#")
 
-  let caret = document.createElement("div")
+  const caret = document.createElement("div")
   caret.className = "dropdown-caret ml-1"
   normalChartToggle.append(caret)
 

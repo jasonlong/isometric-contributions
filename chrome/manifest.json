@@ -4,7 +4,7 @@
   "description": "Renders an isometric pixel view of GitHub contribution graphs.",
   "content_scripts": [ {
     "css": [ "iso.css" ],
-    "js": [ "jquery.min.js", "obelisk.min.js", "iso.js" ],
+    "js": [ "obelisk.min.js", "iso.js" ],
     "matches": [ "http://*/*", "https://*/*" ]
   }],
   "permissions": [
