@@ -1,4 +1,5 @@
 const calendarGraph = document.querySelector('.js-calendar-graph')
+const contributionsBox = document.querySelector('.js-yearly-contributions')
 const observedContainer = document.getElementById('js-contribution-activity')
 
 const COLORS = [
@@ -18,10 +19,18 @@ let maxCount            = 0
 let bestDay             = null
 let firstDay            = null
 let lastDay             = null
-let contributionsBox    = null
 
 let toggleSetting = "cubes"
 let show2DSetting = "no"
+
+const resetValues = () => {
+  yearTotal           = 0
+  averageCount        = 0
+  maxCount            = 0
+  bestDay             = null
+  firstDay            = null
+  lastDay             = null
+}
 
 const getSettings = () => {
   // Check for user preference, if chrome.storage is available.
@@ -46,8 +55,78 @@ const persistSetting = (key, value) => {
   }
 }
 
-const loadIso = () => {
-  console.log("loadIso")
+const initUI = () => {
+  console.log("initUI")
+
+  const contributionsWrapper = document.createElement("div")
+  contributionsWrapper.className = "ic-contributions-wrapper"
+  calendarGraph.before(contributionsWrapper)
+
+  const canvas = document.createElement("canvas")
+  canvas.id = "isometric-contributions"
+  canvas.width = 720
+  canvas.height = 410
+  contributionsWrapper.appendChild(canvas)
+
+  // Inject toggle
+  let insertLocation = contributionsBox.querySelector("h2")
+
+  let htmlToggle = document.createElement("span")
+  htmlToggle.className = "ic-toggle"
+
+  let squaresButton = document.createElement("a")
+  squaresButton.className = "ic-toggle-option tooltipped tooltipped-nw squares"
+  squaresButton.setAttribute("aria-label", "Normal chart view")
+  squaresButton.setAttribute("data-ic-option", "squares")
+
+  let cubesButton = document.createElement("a")
+  cubesButton.className = "ic-toggle-option tooltipped tooltipped-nw cubes"
+  cubesButton.setAttribute("aria-label", "Isometric chart view")
+  cubesButton.setAttribute("data-ic-option", "cubes")
+  cubesButton.setAttribute("href", "#")
+
+  insertLocation.before(htmlToggle)
+  htmlToggle.appendChild(squaresButton)
+  htmlToggle.appendChild(cubesButton)
+
+  // Inject footer w/ toggle for showing 2D chart
+  let htmlFooter = document.createElement("span")
+  htmlFooter.className = "ic-footer"
+
+  let normalChartToggle = document.createElement("a")
+  normalChartToggle.className = "ic-2d-toggle text-small muted-link"
+  normalChartToggle.innerHTML = "Show normal chart below ▾"
+  normalChartToggle.setAttribute("href", "#")
+
+  contributionsWrapper.append(htmlFooter)
+  htmlFooter.append(normalChartToggle)
+
+  observeToggle()
+}
+
+const observeToggle = () => {
+  console.log("observeToggle")
+}
+
+const loadStats = () => {
+  console.log("loadStats")
+}
+
+const renderIsometricChart = () => {
+  console.log("renderIsometricChart")
+}
+
+const generateIsometricChart = () => {
+  console.log("generateIsometricChart")
+  resetValues()
+  initUI()
+  loadStats()
+  renderIsometricChart()
+}
+
+const precisionRound = (number, precision) => {
+  let factor = Math.pow(10, precision)
+  return Math.round(number * factor) / factor
 }
 
 if (calendarGraph) {
@@ -56,67 +135,16 @@ if (calendarGraph) {
   if (graphContainer) {
     // Watch for changes to the activity overview section
     let config = { attributes: false, childList: true, subtree: true }
-    observer = new MutationObserver(loadIso)
+    observer = new MutationObserver(generateIsometricChart)
     observer.observe(observedContainer, config)
   }
+
+  // load iso graph on page load
+  generateIsometricChart()
 }
 
 /*
 class Iso
-  constructor: (target) ->
-    if target
-      graphContainer = ($ '.js-contribution-graph').parent()[0]
-      if graphContainer
-        observer = new MutationObserver (mutations) =>
-          isGraphAdded = mutations.find (mutation) ->
-            [].find.call mutation.addedNodes, (node) ->
-              node.className == "js-contribution-graph"
-          if isGraphAdded
-            this.generateIsometricChart()
-
-        observer.observe(graphContainer, { childList: true })
-
-      this.getSettings =>
-        this.generateIsometricChart()
-
-  getSettings: (callback) ->
-    # Check for user preference, if chrome.storage is available.
-    # The storage API is not supported in content scripts.
-    # https://developer.mozilla.org/Add-ons/WebExtensions/Chrome_incompatibilities#storage
-    if chrome?.storage?
-      chrome.storage.local.get ['toggleSetting', 'show2DSetting'], ({toggleSetting, show2DSetting}) =>
-        this.toggleSetting = toggleSetting ? 'cubes'
-        this.show2DSetting = show2DSetting ? 'no'
-        callback()
-    else
-      this.toggleSetting = localStorage.toggleSetting ? 'cubes'
-      this.show2DSetting = localStorage.show2DSetting ? 'no'
-      callback()
-
-  persistSetting: (key, value, callback = ->) ->
-    if chrome?.storage?
-      obj = {}
-      obj[key] = value
-      chrome.storage.local.set obj, callback
-    else
-      localStorage[key] = value
-      callback()
-
-  generateIsometricChart: ->
-    this.resetValues()
-    this.initUI()
-    this.loadStats()
-    this.renderIsometricChart()
-
-  resetValues: ->
-    yearTotal           = 0
-    averageCount        = 0
-    maxCount            = 0
-    bestDay             = null
-    firstDay            = null
-    lastDay             = null
-    contributionsBox    = null
-
   initUI: ->
     ($ '<div class="ic-contributions-wrapper"></div>')
       .insertBefore ($ '.js-calendar-graph')
@@ -410,30 +438,4 @@ class Iso
       diffDays = Math.ceil(timeDiff / (1000 * 3600 * 24))
 
     return diffDays
-
-  precisionRound: (number, precision) ->
-    factor = Math.pow(10, precision)
-    return Math.round(number * factor) / factor
-
-if document.querySelector '.js-calendar-graph'
-  loadIso = () ->
-    if !($ '.js-contribution-graph').hasClass 'ic-cubes'
-      $ ->
-        target = document.querySelector '.js-calendar-graph'
-        iso = new Iso target
-
-  # load iso graph when the page first load
-  loadIso()
-
-  # load iso graph when contribution graph upload (change time)
-  targetNode = document.getElementById 'js-pjax-container'
-  config = { attributes: false, childList: true, subtree: true }
-  callback = (mutationsList) ->
-    for mutation in mutationsList
-      if mutation.type == 'childList'
-        for node in mutation.addedNodes
-          if ($ node).hasClass 'js-yearly-contributions'
-            loadIso()
-  observer = new MutationObserver(callback)
-  observer.observe(targetNode, config)
   */

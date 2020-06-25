@@ -133,19 +133,12 @@
 
 .ic-stats-label {
   display: table-cell;
-  padding-bottom: 12px;
-  font-size: 14px;
-  color: #586069;
   text-align: right;
   vertical-align: bottom;
 }
 
 .ic-stats-count {
   display: block;
-  font-size: 32px;
-  font-weight: 600;
-  line-height: 1;
-  color: #28a745;
 }
 
 .ic-stats-meta {
@@ -161,31 +154,19 @@
   vertical-align: middle;
 }
 
-.ic-stats-average {
-  font-size: 12px;
-  font-weight: bold;
-  color: #24292e;
-}
-
 .ic-stats-unit {
   display: block;
-  font-size: 14px;
 }
 
 .ic-stats-date {
   display: block;
-  color: #6a737d;
-  font-size: 12px;
 }
 
 .ic-footer {
   position: absolute;
   top: 380px;
   left: 20px;
-  font-size: 11px;
-  color: #6a737d;
 }
 
 .ic-footer a {
-  color: #586069;
 }
