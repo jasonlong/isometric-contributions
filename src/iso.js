@@ -51,7 +51,6 @@ const loadIso = () => {
 }
 
 if (calendarGraph) {
-  debugger
   const graphContainer = calendarGraph.parentElement
 
   if (graphContainer) {
