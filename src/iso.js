@@ -95,8 +95,12 @@ const initUI = () => {
 
   let normalChartToggle = document.createElement("a")
   normalChartToggle.className = "ic-2d-toggle text-small muted-link"
-  normalChartToggle.innerHTML = "Show normal chart below ▾"
+  normalChartToggle.innerHTML = "Show normal chart below"
   normalChartToggle.setAttribute("href", "#")
+
+  let caret = document.createElement("div")
+  caret.className = "dropdown-caret ml-1"
+  normalChartToggle.append(caret)
 
   contributionsWrapper.append(htmlFooter)
   htmlFooter.append(normalChartToggle)
@@ -145,34 +149,6 @@ if (calendarGraph) {
 
 /*
 class Iso
-  initUI: ->
-    ($ '<div class="ic-contributions-wrapper"></div>')
-      .insertBefore ($ '.js-calendar-graph')
-    ($ '<canvas id="isometric-contributions" width="720" height="410"></canvas>')
-      .appendTo '.ic-contributions-wrapper'
-
-    contributionsBox = ($ '.js-yearly-contributions')
-    insertLocation = ($ '.js-yearly-contributions').find 'h2'
-
-    # Inject toggle
-    htmlToggle = """
-      <span class="ic-toggle">
-        <a href="#" class="ic-toggle-option tooltipped tooltipped-nw squares" data-ic-option="squares" aria-label="Normal chart view"></a>
-        <a href="#" class="ic-toggle-option tooltipped tooltipped-nw cubes" data-ic-option="cubes" aria-label="Isometric chart view"></a>
-      </span>
-    """
-    ($ htmlToggle).insertBefore insertLocation
-
-    # Inject footer w/ toggle for showing 2D chart
-    htmlFooter = """
-      <span class="ic-footer">
-        <a href="#" class="ic-2d-toggle">Show normal chart below ▾</a>
-      </span>
-    """
-    ($ htmlFooter).appendTo $ '.ic-contributions-wrapper'
-
-    this.observeToggle()
-
   observeToggle: ->
     self = this
     ($ '.ic-toggle-option').click (e) ->
