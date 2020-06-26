@@ -84,34 +84,32 @@ const initUI = () => {
   contributionsWrapper.appendChild(canvas)
 
   // Inject toggle
-  const insertLocation = contributionsBox.querySelector("h2")
+  const insertLocation = contributionsBox.querySelector("h2").parentElement
 
-  const htmlToggle = document.createElement("span")
-  htmlToggle.className = "ic-toggle"
+  const btnGroup = document.createElement("div")
+  btnGroup.className = "BtnGroup mt-1 ml-3 position-relative top-0 float-right"
 
-  const squaresButton = document.createElement("a")
-  squaresButton.className = "ic-toggle-option tooltipped tooltipped-nw squares"
-  squaresButton.setAttribute("aria-label", "Standard chart view")
+  const squaresButton = document.createElement("button")
+  squaresButton.innerHTML = "2D"
+  squaresButton.className = "ic-toggle-option squares btn BtnGroup-item btn-sm py-0 px-1"
   squaresButton.setAttribute("data-ic-option", "squares")
-  squaresButton.setAttribute("href", "#")
   squaresButton.addEventListener("click", handleViewToggle);
   if (toggleSetting === "squares") {
-    squaresButton.classList.add("active")
+    squaresButton.classList.add("selected")
   }
 
   const cubesButton = document.createElement("a")
-  cubesButton.className = "ic-toggle-option tooltipped tooltipped-nw cubes"
-  cubesButton.setAttribute("aria-label", "Isometric chart view")
+  cubesButton.innerHTML = "3D"
+  cubesButton.className = "ic-toggle-option cubes btn BtnGroup-item btn-sm py-0 px-1"
   cubesButton.setAttribute("data-ic-option", "cubes")
-  cubesButton.setAttribute("href", "#")
   cubesButton.addEventListener("click", handleViewToggle);
   if (toggleSetting === "cubes") {
-    cubesButton.classList.add("active")
+    cubesButton.classList.add("selected")
   }
 
-  insertLocation.before(htmlToggle)
-  htmlToggle.appendChild(squaresButton)
-  htmlToggle.appendChild(cubesButton)
+  insertLocation.prepend(btnGroup)
+  btnGroup.appendChild(squaresButton)
+  btnGroup.appendChild(cubesButton)
 
   // Inject footer w/ toggle for showing 2D chart
   const htmlFooter = document.createElement("span")
@@ -130,13 +128,26 @@ const initUI = () => {
 
   contributionsWrapper.append(htmlFooter)
   htmlFooter.append(standardChartToggle)
+  setContainerViewType(toggleSetting)
 }
 
 const handleViewToggle = (e) => {
   e.preventDefault()
-  let option = e.target.dataset.icOption
+  setContainerViewType(e.target.dataset.icOption)
 
-  if (option === "squares") {
+  document.querySelectorAll(".ic-toggle-option").forEach(toggle => { toggle.classList.remove("selected") })
+  e.target.classList.add("selected")
+
+  persistSetting("toggleSetting", option)
+  toggleSetting = option
+
+  // Apply user preference
+  document.querySelector(`.ic-toggle-option.${toggleSetting}`).classList.add("selected")
+  contributionsBox.classList.add(`ic-${toggleSetting}`)
+}
+
+const setContainerViewType = (type) => {
+  if (type === "squares") {
     contributionsBox.classList.remove("ic-cubes")
     contributionsBox.classList.add("ic-squares")
   }
@@ -144,16 +155,6 @@ const handleViewToggle = (e) => {
     contributionsBox.classList.remove("ic-squares")
     contributionsBox.classList.add("ic-cubes")
   }
-
-  document.querySelectorAll(".ic-toggle-option").forEach(toggle => { toggle.classList.remove("active") })
-  e.target.classList.add("active")
-
-  persistSetting("toggleSetting", option)
-  toggleSetting = option
-
-  // Apply user preference
-  document.querySelector(`.ic-toggle-option.${toggleSetting}`).classList.add("active")
-  contributionsBox.classList.add(`ic-${toggleSetting}`)
 }
 
 const handle2DToggle = (e) => {
@@ -209,47 +210,6 @@ if (calendarGraph) {
 
 /*
 class Iso
-  observeToggle: ->
-    self = this
-    ($ '.ic-toggle-option').click (e) ->
-      e.preventDefault()
-      option = ($ this).data 'ic-option'
-      if option is 'squares'
-        (contributionsBox.removeClass 'ic-cubes').addClass 'ic-squares'
-      else
-        (contributionsBox.removeClass 'ic-squares').addClass 'ic-cubes'
-
-      ($ '.ic-toggle-option').removeClass 'active'
-      ($ this).addClass 'active'
-
-      self.persistSetting "toggleSetting", option
-      self.toggleSetting = option
-
-    # Apply user preference
-    ($ ".ic-toggle-option.#{this.toggleSetting}").addClass 'active'
-    contributionsBox.addClass "ic-#{this.toggleSetting}"
-
-    ($ '.ic-2d-toggle').click (e) ->
-      e.preventDefault()
-      if contributionsBox.hasClass 'show-2d'
-        ($ this).text 'Show normal chart ▾'
-        contributionsBox.removeClass 'show-2d'
-        self.persistSetting "show2DSetting", 'no'
-        self.show2DSetting = 'no'
-      else
-        ($ this).text 'Hide normal chart ▴'
-        contributionsBox.addClass 'show-2d'
-        self.persistSetting "show2DSetting", 'yes'
-        self.show2DSetting = 'yes'
-
-    # Apply user preference
-    if (this.show2DSetting == "yes")
-      contributionsBox.addClass 'show-2d'
-      ($ '.ic-2d-toggle').text 'Hide normal chart ▴'
-    else
-      contributionsBox.removeClass 'show-2d'
-      ($ '.ic-2d-toggle').text 'Show normal chart ▾'
-
   loadStats: ->
     streakLongest      = 0
     streakCurrent      = 0
