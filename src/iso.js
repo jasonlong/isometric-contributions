@@ -91,7 +91,7 @@ const initUI = () => {
 
   const squaresButton = document.createElement("a")
   squaresButton.className = "ic-toggle-option tooltipped tooltipped-nw squares"
-  squaresButton.setAttribute("aria-label", "Normal chart view")
+  squaresButton.setAttribute("aria-label", "Standard chart view")
   squaresButton.setAttribute("data-ic-option", "squares")
   squaresButton.setAttribute("href", "#")
   squaresButton.addEventListener("click", handleViewToggle);
@@ -117,19 +117,19 @@ const initUI = () => {
   const htmlFooter = document.createElement("span")
   htmlFooter.className = "ic-footer"
 
-  const normalChartToggle = document.createElement("a")
-  normalChartToggle.className = "ic-2d-toggle text-small muted-link"
+  const standardChartToggle = document.createElement("a")
+  standardChartToggle.className = "ic-2d-toggle text-small muted-link"
   if (show2DSetting === "yes") {
-    normalChartToggle.innerHTML = "Hide normal chart below"
+    standardChartToggle.innerHTML = "Hide normal chart below"
   }
   else {
-    normalChartToggle.innerHTML = "Show normal chart below"
+    standardChartToggle.innerHTML = "Show normal chart below"
   }
-  normalChartToggle.setAttribute("href", "#")
-  normalChartToggle.addEventListener("click", handle2DToggle);
+  standardChartToggle.setAttribute("href", "#")
+  standardChartToggle.addEventListener("click", handle2DToggle);
 
   contributionsWrapper.append(htmlFooter)
-  htmlFooter.append(normalChartToggle)
+  htmlFooter.append(standardChartToggle)
 }
 
 const handleViewToggle = (e) => {
@@ -160,13 +160,13 @@ const handle2DToggle = (e) => {
   e.preventDefault()
 
   if (contributionsBox.classList.contains("show-2d")) {
-    e.target.innerHTML = "Show normal chart"
+    e.target.innerHTML = "Show standard chart"
     contributionsBox.classList.remove("show-2d")
     persistSetting("show2DSetting", "no")
     show2DSetting = "no"
   }
   else {
-    e.target.innerHTML = "Hide normal chart"
+    e.target.innerHTML = "Hide standard chart"
     contributionsBox.classList.add("show-2d")
     persistSetting("show2DSetting", "yes")
     show2DSetting = "yes"
