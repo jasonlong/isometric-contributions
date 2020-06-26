@@ -33,15 +33,25 @@ const resetValues = () => {
 }
 
 const getSettings = () => {
-  // Check for user preference, if chrome.storage is available.
-  // The storage API is not supported in content scripts.
-  // https://developer.mozilla.org/Add-ons/WebExtensions/Chrome_incompatibilities#storage
-  if (chrome && chrome.storage) {
-    chrome.storage.local.get(["toggleSetting", "show2DSetting"], (settings) => {
-      toggleSetting = settings.toggleSetting ? settings.toggleSetting : "cubes"
-      show2DSetting = settings.show2DSetting ? settings.show2DSetting : "no"
-    })
-  }
+  return new Promise(function(resolve, reject) {
+    // Check for user preference, if chrome.storage is available.
+    // The storage API is not supported in content scripts.
+    // https://developer.mozilla.org/Add-ons/WebExtensions/Chrome_incompatibilities#storage
+    if (chrome && chrome.storage) {
+      chrome.storage.local.get(["toggleSetting", "show2DSetting"], (settings) => {
+        toggleSetting = settings.toggleSetting ? settings.toggleSetting : "cubes"
+        show2DSetting = settings.show2DSetting ? settings.show2DSetting : "no"
+        console.log(`toggleSetting: ${toggleSetting}`)
+        console.log(`show2DSetting: ${show2DSetting}`)
+        resolve('Settings loaded')
+      })
+    }
+    else {
+      toggleSetting = localStorage.toggleSetting ? localStorage.toggleSetting : "cubes"
+      show2DSetting = localStorage.show2DSetting ? localStorage.show2DSetting : "no"
+      resolve('Settings loaded')
+    }
+  })
 }
 
 const persistSetting = (key, value) => {
@@ -56,7 +66,12 @@ const persistSetting = (key, value) => {
 }
 
 const initUI = () => {
-  console.log("initUI")
+  if (show2DSetting === "yes") {
+    contributionsBox.classList.add("show-2d")
+  }
+  else {
+    contributionsBox.classList.remove("show-2d")
+  }
 
   const contributionsWrapper = document.createElement("div")
   contributionsWrapper.className = "ic-contributions-wrapper"
@@ -78,12 +93,21 @@ const initUI = () => {
   squaresButton.className = "ic-toggle-option tooltipped tooltipped-nw squares"
   squaresButton.setAttribute("aria-label", "Normal chart view")
   squaresButton.setAttribute("data-ic-option", "squares")
+  squaresButton.setAttribute("href", "#")
+  squaresButton.addEventListener("click", handleViewToggle);
+  if (toggleSetting === "squares") {
+    squaresButton.classList.add("active")
+  }
 
   const cubesButton = document.createElement("a")
   cubesButton.className = "ic-toggle-option tooltipped tooltipped-nw cubes"
   cubesButton.setAttribute("aria-label", "Isometric chart view")
   cubesButton.setAttribute("data-ic-option", "cubes")
   cubesButton.setAttribute("href", "#")
+  cubesButton.addEventListener("click", handleViewToggle);
+  if (toggleSetting === "cubes") {
+    cubesButton.classList.add("active")
+  }
 
   insertLocation.before(htmlToggle)
   htmlToggle.appendChild(squaresButton)
@@ -95,21 +119,58 @@ const initUI = () => {
 
   const normalChartToggle = document.createElement("a")
   normalChartToggle.className = "ic-2d-toggle text-small muted-link"
-  normalChartToggle.innerHTML = "Show normal chart below"
+  if (show2DSetting === "yes") {
+    normalChartToggle.innerHTML = "Hide normal chart below"
+  }
+  else {
+    normalChartToggle.innerHTML = "Show normal chart below"
+  }
   normalChartToggle.setAttribute("href", "#")
-
-  const caret = document.createElement("div")
-  caret.className = "dropdown-caret ml-1"
-  normalChartToggle.append(caret)
+  normalChartToggle.addEventListener("click", handle2DToggle);
 
   contributionsWrapper.append(htmlFooter)
   htmlFooter.append(normalChartToggle)
-
-  observeToggle()
 }
 
-const observeToggle = () => {
-  console.log("observeToggle")
+const handleViewToggle = (e) => {
+  e.preventDefault()
+  let option = e.target.dataset.icOption
+
+  if (option === "squares") {
+    contributionsBox.classList.remove("ic-cubes")
+    contributionsBox.classList.add("ic-squares")
+  }
+  else {
+    contributionsBox.classList.remove("ic-squares")
+    contributionsBox.classList.add("ic-cubes")
+  }
+
+  document.querySelectorAll(".ic-toggle-option").forEach(toggle => { toggle.classList.remove("active") })
+  e.target.classList.add("active")
+
+  persistSetting("toggleSetting", option)
+  toggleSetting = option
+
+  // Apply user preference
+  document.querySelector(`.ic-toggle-option.${toggleSetting}`).classList.add("active")
+  contributionsBox.classList.add(`ic-${toggleSetting}`)
+}
+
+const handle2DToggle = (e) => {
+  e.preventDefault()
+
+  if (contributionsBox.classList.contains("show-2d")) {
+    e.target.innerHTML = "Show normal chart"
+    contributionsBox.classList.remove("show-2d")
+    persistSetting("show2DSetting", "no")
+    show2DSetting = "no"
+  }
+  else {
+    e.target.innerHTML = "Hide normal chart"
+    contributionsBox.classList.add("show-2d")
+    persistSetting("show2DSetting", "yes")
+    show2DSetting = "yes"
+  }
 }
 
 const loadStats = () => {
@@ -121,7 +182,6 @@ const renderIsometricChart = () => {
 }
 
 const generateIsometricChart = () => {
-  console.log("generateIsometricChart")
   resetValues()
   initUI()
   loadStats()
@@ -143,8 +203,8 @@ if (calendarGraph) {
     observer.observe(observedContainer, config)
   }
 
-  // load iso graph on page load
-  generateIsometricChart()
+  let settingsPromise = getSettings()
+  settingsPromise.then(generateIsometricChart)
 }
 
 /*
