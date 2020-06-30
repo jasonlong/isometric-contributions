@@ -99,7 +99,7 @@ const initUI = () => {
     squaresButton.classList.add("selected")
   }
 
-  const cubesButton = document.createElement("a")
+  const cubesButton = document.createElement("button")
   cubesButton.innerHTML = "3D"
   cubesButton.className = "ic-toggle-option cubes btn BtnGroup-item btn-sm py-0 px-1"
   cubesButton.setAttribute("data-ic-option", "cubes")
@@ -116,15 +116,14 @@ const initUI = () => {
   const htmlFooter = document.createElement("span")
   htmlFooter.className = "ic-footer"
 
-  const standardChartToggle = document.createElement("a")
-  standardChartToggle.className = "ic-2d-toggle text-small muted-link"
+  const standardChartToggle = document.createElement("button")
+  standardChartToggle.className = "ic-2d-toggle text-small btn-link muted-link"
   if (show2DSetting === "yes") {
-    standardChartToggle.innerHTML = "Hide normal chart below"
+    standardChartToggle.innerHTML = "Hide standard chart"
   }
   else {
-    standardChartToggle.innerHTML = "Show normal chart below"
+    standardChartToggle.innerHTML = "Show standard chart"
   }
-  standardChartToggle.setAttribute("href", "#")
   standardChartToggle.addEventListener("click", handle2DToggle);
 
   contributionsWrapper.append(htmlFooter)
