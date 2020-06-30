@@ -138,8 +138,8 @@ const handleViewToggle = (e) => {
   document.querySelectorAll(".ic-toggle-option").forEach(toggle => { toggle.classList.remove("selected") })
   e.target.classList.add("selected")
 
-  persistSetting("toggleSetting", option)
-  toggleSetting = option
+  persistSetting("toggleSetting", e.target.dataset.icOption)
+  toggleSetting = e.target.dataset.icOption
 
   // Apply user preference
   document.querySelector(`.ic-toggle-option.${toggleSetting}`).classList.add("selected")
@@ -175,7 +175,115 @@ const handle2DToggle = (e) => {
 }
 
 const loadStats = () => {
-  console.log("loadStats")
+  let streakLongest      = 0
+  let streakCurrent      = 0
+  let tempStreak         = 0
+  let tempStreakStart    = null
+  let longestStreakStart = null
+  let longestStreakEnd   = null
+  let datesLongest       = null
+  let currentStreakStart = null
+  let currentStreakEnd   = null
+  let datesCurrent       = null
+
+  let days = document.querySelectorAll(".js-calendar-graph rect.day")
+  days.forEach(d => {
+    currentDayCount = d.dataset.count
+    yearTotal += parseInt(currentDayCount)
+
+    if (days[0] === d) {
+      firstDay = d.dataset.date
+    }
+    if (days[days.length - 1] === d) {
+      lastDay = d.dataset.date
+    }
+
+    // Check for best day
+    if (currentDayCount > maxCount) {
+      bestDay = d.dataset.date
+      maxCount = currentDayCount
+    }
+
+    // Check for longest streak
+    if (currentDayCount > 0) {
+      if (tempStreak == 0) {
+        tempStreakStart = d.dataset.date
+      }
+
+      tempStreak++
+
+      if (tempStreak >= streakLongest) {
+        longestStreakStart = tempStreakStart
+        longestStreakEnd   = d.dataset.date
+        streakLongest      = tempStreak
+      }
+    }
+    else {
+      tempStreak         = 0
+      tempStreakStart    = null
+      tempStreakEnd      = null
+    }
+  })
+
+  // Check for current streak
+  // Convert days NodeList to Array so we can reverse it
+  let daysArray = Array.prototype.slice.call(days);
+  daysArray.reverse()
+
+  currentStreakEnd = daysArray[0].dataset.date
+
+  for (let i=0; i < daysArray.length; i++) {
+    currentDayCount = parseInt(daysArray[i].dataset.count, 10)
+
+    // If there's no activity today, continue on to yesterday
+    if (i === 0 && currentDayCount === 0) {
+      currentStreakEnd = daysArray[1].dataset.date
+      continue
+    }
+
+    if (currentDayCount > 0) {
+      streakCurrent++
+      currentStreakStart = daysArray[i].dataset.date
+    }
+    else {
+      break
+    }
+  }
+
+  if (streakCurrent > 0) {
+    currentStreakStart = formatDateString(currentStreakStart, dateOptions)
+    currentStreakEnd   = formatDateString(currentStreakEnd, dateOptions)
+    datesCurrent       = `${currentStreakStart} — ${currentStreakEnd}`
+  }
+  else {
+    datesCurrent = "No current streak"
+  }
+
+  // Year total
+  let countTotal = yearTotal.toLocaleString()
+  let dateFirst  = formatDateString(firstDay, dateWithYearOptions)
+  let dateLast   = formatDateString(lastDay, dateWithYearOptions)
+  let datesTotal = `${dateFirst} — ${dateLast}`
+
+  // Average contributions per day
+  let dayDifference = datesDayDifference(firstDay, lastDay)
+  let averageCount = precisionRound((yearTotal / dayDifference), 2)
+
+  // Best day
+  let dateBest  = formatDateString(bestDay, dateOptions)
+  if (!dateBest) {
+    dateBest = 'No activity found'
+  }
+
+  // Longest streak
+  if (streakLongest > 0) {
+    longestStreakStart = formatDateString(longestStreakStart, dateOptions)
+    longestStreakEnd   = formatDateString(longestStreakEnd, dateOptions)
+    datesLongest       = `${longestStreakStart} — ${longestStreakEnd}`
+  }
+  else {
+    datesLongest = "No longest streak"
+  }
 }
 
 const renderIsometricChart = () => {
@@ -192,6 +300,38 @@ const generateIsometricChart = () => {
 const precisionRound = (number, precision) => {
   let factor = Math.pow(10, precision)
   return Math.round(number * factor) / factor
+}
+
+const datesDayDifference = (dateStr1, dateStr2) => {
+  let diffDays = null
+  let date1 = null
+  let date2 = null
+
+  if (dateStr1) {
+    dateParts = dateStr1.split('-')
+    date1 = new Date(dateParts[0], dateParts[1] - 1, dateParts[2], 0, 0, 0)
+  }
+  if (dateStr2) {
+    dateParts = dateStr2.split('-')
+    date2 = new Date(dateParts[0], dateParts[1] - 1, dateParts[2], 0, 0, 0)
+  }
+  if (dateStr1 && dateStr2) {
+    timeDiff = Math.abs(date2.getTime() - date1.getTime())
+    diffDays = Math.ceil(timeDiff / (1000 * 3600 * 24))
+  }
+
+  return diffDays
+}
+
+const formatDateString = (dateStr, options) => {
+  let date = null
+
+  if (dateStr) {
+    let dateParts = dateStr.split('-')
+    date = new Date(dateParts[0], dateParts[1] - 1, dateParts[2], 0, 0, 0).toLocaleDateString('en-US', options)
+  }
+
+  return date
 }
 
 if (calendarGraph) {
@@ -211,96 +351,7 @@ if (calendarGraph) {
 /*
 class Iso
   loadStats: ->
-    streakLongest      = 0
-    streakCurrent      = 0
-    tempStreak         = 0
-    tempStreakStart    = null
-    longestStreakStart = null
-    longestStreakEnd   = null
-    currentStreakStart = null
-    currentStreakEnd   = null
-    datesCurrent       = null
 
-    contribColumns = ($ '.contrib-column')
-
-    days = ($ '.js-calendar-graph rect.day')
-    days.each (d) ->
-      currentDayCount = ($ this).data('count')
-      yearTotal += currentDayCount
-
-      firstDay = ($ this).data('date') if d == 0
-      lastDay  = ($ this).data('date') if d == days.length - 1
-
-      # Check for best day
-      if currentDayCount > maxCount
-        bestDay  = ($ this).data('date')
-        maxCount = currentDayCount
-
-      # Check for longest streak
-      if currentDayCount > 0
-        if tempStreak == 0
-          tempStreakStart = ($ this).data('date')
-
-        tempStreak++
-
-        if tempStreak >= streakLongest
-          longestStreakStart = tempStreakStart
-          longestStreakEnd   = ($ this).data('date')
-          streakLongest      = tempStreak
-
-      else
-        tempStreak         = 0
-        tempStreakStart    = null
-        tempStreakEnd      = null
-
-    # Check for current streak
-    # Have to iterate and access differently than above because
-    # we end up with a regular JS Array after reversing
-    days = ($ '.js-calendar-graph rect.day').get().reverse()
-    currentStreakEnd = days[0].getAttribute('data-date')
-    for d, i in days
-      currentDayCount = parseInt(d.getAttribute('data-count'), 10)
-
-      # If there's no activity today, continue on to yesterday
-      if i == 0 && currentDayCount == 0
-        currentStreakEnd = days[1].getAttribute('data-date')
-        continue
-
-      if currentDayCount > 0
-        streakCurrent++
-        currentStreakStart = d.getAttribute('data-date')
-      else
-        break
-
-    if streakCurrent > 0
-      currentStreakStart = this.formatDateString currentStreakStart, dateOptions
-      currentStreakEnd   = this.formatDateString currentStreakEnd, dateOptions
-      datesCurrent       = currentStreakStart + " — " + currentStreakEnd
-    else
-      datesCurrent = "No current streak"
-
-    # Year total
-    countTotal = yearTotal.toLocaleString()
-    dateFirst  = this.formatDateString firstDay, dateWithYearOptions
-    dateLast   = this.formatDateString lastDay, dateWithYearOptions
-    datesTotal = dateFirst + " — " + dateLast
-
-    # Average Contribution per Day
-    dayDifference = this.datesDayDifference firstDay, lastDay
-    averageCount = this.precisionRound((yearTotal / dayDifference), 2)
-
-    # Best day
-    dateBest  = this.formatDateString bestDay, dateOptions
-    if !dateBest
-      dateBest = 'No activity found'
-
-    # Longest streak
-    if streakLongest > 0
-      longestStreakStart = this.formatDateString longestStreakStart, dateOptions
-      longestStreakEnd   = this.formatDateString longestStreakEnd, dateOptions
-      datesLongest       = longestStreakStart + " — " + longestStreakEnd
-    else
-      datesLongest = "No longest streak"
 
     this.renderTopStats(countTotal, averageCount, datesTotal, maxCount, dateBest)
     this.renderBottomStats(streakLongest, datesLongest, streakCurrent, datesCurrent)
@@ -408,30 +459,5 @@ class Iso
         if (fill.indexOf('#') != -1)
           new obelisk.CubeColor().getByHorizontalColor(parseInt('0x'+fill.replace("#", "")))
 
-  formatDateString: (dateStr, options) ->
-    date = null
 
-    if dateStr
-      dateParts = dateStr.split '-'
-      date = new Date(dateParts[0], dateParts[1] - 1, dateParts[2], 0, 0, 0).toLocaleDateString('en-US', options)
-
-    return date
-
-  datesDayDifference: (dateStr1, dateStr2) ->
-    diffDays = null
-    date1 = null
-    date2 = null
-
-    if dateStr1
-      dateParts = dateStr1.split '-'
-      date1 = new Date(dateParts[0], dateParts[1] - 1, dateParts[2], 0, 0, 0)
-    if dateStr2
-      dateParts = dateStr2.split '-'
-      date2 = new Date(dateParts[0], dateParts[1] - 1, dateParts[2], 0, 0, 0)
-
-    if dateStr1 && dateStr2
-      timeDiff = Math.abs(date2.getTime() - date1.getTime())
-      diffDays = Math.ceil(timeDiff / (1000 * 3600 * 24))
-
-    return diffDays
   */
