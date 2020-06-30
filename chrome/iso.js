@@ -48,8 +48,6 @@ const getSettings = () => {
       chrome.storage.local.get(["toggleSetting", "show2DSetting"], (settings) => {
         toggleSetting = settings.toggleSetting ? settings.toggleSetting : "cubes"
         show2DSetting = settings.show2DSetting ? settings.show2DSetting : "no"
-        console.log(`toggleSetting: ${toggleSetting}`)
-        console.log(`show2DSetting: ${show2DSetting}`)
         resolve('Settings loaded')
       })
     }
@@ -73,7 +71,6 @@ const persistSetting = (key, value) => {
 }
 
 const initUI = () => {
-  console.log("initUI")
   if (show2DSetting === "yes") {
     contributionsBox.classList.add("show-2d")
   }
@@ -233,8 +230,8 @@ const loadStats = () => {
   currentStreakEnd = daysArray[0].dataset.date
 
   for (let i=0; i < daysArray.length; i++) {
-    currentDayCount = parseInt(daysArray[i].dataset.count, 10)
 
+    currentDayCount = parseInt(daysArray[i].dataset.count, 10)
     // If there's no activity today, continue on to yesterday
     if (i === 0 && currentDayCount === 0) {
       currentStreakEnd = daysArray[1].dataset.date
@@ -287,7 +284,47 @@ const loadStats = () => {
 }
 
 const renderIsometricChart = () => {
-  console.log("renderIsometricChart")
+  const SIZE = 10
+  const MAX_HEIGHT = 100
+  const firstRect = document.querySelectorAll('.js-calendar-graph-svg g > g')[1]
+  const canvas = document.getElementById('isometric-contributions')
+  const GH_OFFSET = parseInt(firstRect.getAttribute('transform').match(/(\d+)/)[0]) - 1
+
+  let point
+
+  // create pixel view container in point
+  if (GH_OFFSET === 10) {
+    point = new obelisk.Point(70, 70)
+  }
+  else {
+    point = new obelisk.Point(110,90)
+  }
+
+  let pixelView = new obelisk.PixelView(canvas, point)
+
+  let contribCount = null
+
+  let weeks = document.querySelectorAll(".js-calendar-graph-svg g > g")
+  weeks.forEach(w => {
+    let x = parseInt(((w.getAttribute('transform')).match(/(\d+)/))[0]) / (GH_OFFSET + 1)
+    w.querySelectorAll('rect').forEach (r => {
+      let r            = w.get(0)
+      let y            = parseInt(w.getAttribute('y')) / GH_OFFSET
+      let fill         = w.getAttribute('fill')
+      let contribCount = parseInt(w.dataset.count)
+      let cubeHeight   = 3
+
+      if (maxCount > 0) {
+        cubeHeight += parseInt(MAX_HEIGHT / maxCount * contribCount)
+      }
+
+      let dimension = new obelisk.CubeDimension(SIZE, SIZE, cubeHeight)
+      let color     = self.getSquareColor(fill)
+      let cube      = new obelisk.Cube(dimension, color, false)
+      let p3d       = new obelisk.Point3D(SIZE * x, SIZE * y, 0)
+      pixelView.renderObject(cube, p3d)
+    })
+  })
 }
 
 const renderStats = () => {
@@ -342,12 +379,12 @@ const renderStats = () => {
   const icStatsBlockTop = document.createElement("div")
   icStatsBlockTop.className = "ic-stats-block ic-stats-top"
   icStatsBlockTop.innerHTML = topMarkup
-  document.querySelectorAll('.ic-contributions-wrapper')[0].appendChild(icStatsBlockTop)
+  document.querySelector('.ic-contributions-wrapper').appendChild(icStatsBlockTop)
 
   const icStatsBlockBottom = document.createElement("div")
   icStatsBlockBottom.className = "ic-stats-block ic-stats-bottom"
   icStatsBlockBottom.innerHTML = bottomMarkup
-  document.querySelectorAll('.ic-contributions-wrapper')[0].appendChild(icStatsBlockBottom)
+  document.querySelector('.ic-contributions-wrapper').appendChild(icStatsBlockBottom)
 }
 
 const generateIsometricChart = () => {
@@ -412,40 +449,6 @@ if (calendarGraph) {
 /*
 class Iso
   renderIsometricChart: ->
-    SIZE       = 10
-    MAX_HEIGHT = 100
-    GH_OFFSET  = parseInt (((($ '.js-calendar-graph-svg g > g')[1].getAttribute 'transform').match /(\d+)/)[0]) - 1
-
-    canvas = document.getElementById 'isometric-contributions'
-
-    # create pixel view container in point
-    if GH_OFFSET == 10
-      point = new obelisk.Point 70,70
-    else
-      point = new obelisk.Point 110,90
-
-    pixelView = new obelisk.PixelView canvas, point
-
-    contribCount = null
-
-    self = this
-    ($ '.js-calendar-graph-svg g > g').each (g) ->
-      x = parseInt (((($ this).attr 'transform').match /(\d+)/)[0]) / (GH_OFFSET + 1)
-      (($ this).find 'rect').each (r) ->
-        r            = ($ this).get 0
-        y            = parseInt (($ this).attr 'y') / GH_OFFSET
-        fill         = ($ this).attr 'fill'
-        contribCount = parseInt ($ this).data 'count'
-        cubeHeight   = 3
-
-        if maxCount > 0
-          cubeHeight += parseInt MAX_HEIGHT / maxCount * contribCount
-
-        dimension = new obelisk.CubeDimension SIZE, SIZE, cubeHeight
-        color     = self.getSquareColor fill
-        cube      = new obelisk.Cube dimension, color, false
-        p3d       = new obelisk.Point3D SIZE * x, SIZE * y, 0
-        pixelView.renderObject cube, p3d
 
   getSquareColor: (fill) ->
     color = switch fill.toLowerCase()
