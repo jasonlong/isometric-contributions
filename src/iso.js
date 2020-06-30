@@ -16,9 +16,16 @@ const dateWithYearOptions = {month: "short", day: "numeric", year: "numeric"}
 let yearTotal           = 0
 let averageCount        = 0
 let maxCount            = 0
+let countTotal          = 0
+let streakLongest       = 0
+let streakCurrent       = 0
 let bestDay             = null
 let firstDay            = null
 let lastDay             = null
+let datesTotal          = null
+let datesLongest        = null
+let datesCurrent        = null
+let dateBest            = null
 
 let toggleSetting = "cubes"
 let show2DSetting = "no"
@@ -66,6 +73,7 @@ const persistSetting = (key, value) => {
 }
 
 const initUI = () => {
+  console.log("initUI")
   if (show2DSetting === "yes") {
     contributionsBox.classList.add("show-2d")
   }
@@ -98,7 +106,7 @@ const initUI = () => {
     squaresButton.classList.add("selected")
   }
 
-  const cubesButton = document.createElement("a")
+  const cubesButton = document.createElement("button")
   cubesButton.innerHTML = "3D"
   cubesButton.className = "ic-toggle-option cubes btn BtnGroup-item btn-sm py-0 px-1"
   cubesButton.setAttribute("data-ic-option", "cubes")
@@ -115,15 +123,14 @@ const initUI = () => {
   const htmlFooter = document.createElement("span")
   htmlFooter.className = "ic-footer"
 
-  const standardChartToggle = document.createElement("a")
-  standardChartToggle.className = "ic-2d-toggle text-small muted-link"
+  const standardChartToggle = document.createElement("button")
+  standardChartToggle.className = "ic-2d-toggle text-small btn-link muted-link"
   if (show2DSetting === "yes") {
-    standardChartToggle.innerHTML = "Hide normal chart below"
+    standardChartToggle.innerHTML = "Hide standard chart"
   }
   else {
-    standardChartToggle.innerHTML = "Show normal chart below"
+    standardChartToggle.innerHTML = "Show standard chart"
   }
-  standardChartToggle.setAttribute("href", "#")
   standardChartToggle.addEventListener("click", handle2DToggle);
 
   contributionsWrapper.append(htmlFooter)
@@ -132,7 +139,6 @@ const initUI = () => {
 }
 
 const handleViewToggle = (e) => {
-  e.preventDefault()
   setContainerViewType(e.target.dataset.icOption)
 
   document.querySelectorAll(".ic-toggle-option").forEach(toggle => { toggle.classList.remove("selected") })
@@ -158,8 +164,6 @@ const setContainerViewType = (type) => {
 }
 
 const handle2DToggle = (e) => {
-  e.preventDefault()
-
   if (contributionsBox.classList.contains("show-2d")) {
     e.target.innerHTML = "Show standard chart"
     contributionsBox.classList.remove("show-2d")
@@ -175,16 +179,12 @@ const handle2DToggle = (e) => {
 }
 
 const loadStats = () => {
-  let streakLongest      = 0
-  let streakCurrent      = 0
   let tempStreak         = 0
   let tempStreakStart    = null
   let longestStreakStart = null
   let longestStreakEnd   = null
-  let datesLongest       = null
   let currentStreakStart = null
   let currentStreakEnd   = null
-  let datesCurrent       = null
 
   let days = document.querySelectorAll(".js-calendar-graph rect.day")
   days.forEach(d => {
@@ -260,17 +260,17 @@ const loadStats = () => {
   }
 
   // Year total
-  let countTotal = yearTotal.toLocaleString()
+  countTotal = yearTotal.toLocaleString()
   let dateFirst  = formatDateString(firstDay, dateWithYearOptions)
   let dateLast   = formatDateString(lastDay, dateWithYearOptions)
-  let datesTotal = `${dateFirst} — ${dateLast}`
+  datesTotal = `${dateFirst} — ${dateLast}`
 
   // Average contributions per day
   let dayDifference = datesDayDifference(firstDay, lastDay)
   let averageCount = precisionRound((yearTotal / dayDifference), 2)
 
   // Best day
-  let dateBest  = formatDateString(bestDay, dateOptions)
+  dateBest  = formatDateString(bestDay, dateOptions)
   if (!dateBest) {
     dateBest = 'No activity found'
   }
@@ -290,10 +290,71 @@ const renderIsometricChart = () => {
   console.log("renderIsometricChart")
 }
 
+const renderStats = () => {
+  const topMarkup = `
+    <span class="ic-stats-table">
+      <span class="ic-stats-row">
+        <span class="ic-stats-label">1 year total
+          <span class="ic-stats-count">${countTotal}</span>
+          <span class="ic-stats-average">${averageCount}</span> per day
+        </span>
+        <span class="ic-stats-meta ic-stats-total-meta">
+          <span class="ic-stats-unit">contributions</span>
+          <span class="ic-stats-date">${datesTotal}</span>
+        </span>
+      </span>
+      <span class="ic-stats-row">
+        <span class="ic-stats-label">Busiest day
+          <span class="ic-stats-count">${maxCount}</span>
+        </span>
+        <span class="ic-stats-meta">
+          <span class="ic-stats-unit">contributions</span>
+            <span class="ic-stats-date">${dateBest}</span>
+          </span>
+        </span>
+      </span>
+    </span>
+  `
+
+  const bottomMarkup = `
+    <span class="ic-stats-table">
+      <span class="ic-stats-row">
+        <span class="ic-stats-label">Longest streak
+          <span class="ic-stats-count">${streakLongest}</span>
+        </span>
+        <span class="ic-stats-meta">
+          <span class="ic-stats-unit">days</span>
+          <span class="ic-stats-date">${datesLongest}</span>
+        </span>
+      </span>
+      <span class="ic-stats-row">
+        <span class="ic-stats-label">Current streak
+          <span class="ic-stats-count">${streakCurrent}</span>
+        </span>
+        <span class="ic-stats-meta">
+          <span class="ic-stats-unit">days</span>
+          <span class="ic-stats-date">${datesCurrent}</span>
+        </span>
+      </span>
+    </span>
+  `
+
+  const icStatsBlockTop = document.createElement("div")
+  icStatsBlockTop.className = "ic-stats-block ic-stats-top"
+  icStatsBlockTop.innerHTML = topMarkup
+  document.querySelectorAll('.ic-contributions-wrapper')[0].appendChild(icStatsBlockTop)
+
+  const icStatsBlockBottom = document.createElement("div")
+  icStatsBlockBottom.className = "ic-stats-block ic-stats-bottom"
+  icStatsBlockBottom.innerHTML = bottomMarkup
+  document.querySelectorAll('.ic-contributions-wrapper')[0].appendChild(icStatsBlockBottom)
+}
+
 const generateIsometricChart = () => {
   resetValues()
   initUI()
   loadStats()
+  renderStats()
   renderIsometricChart()
 }
 
@@ -340,7 +401,7 @@ if (calendarGraph) {
   if (graphContainer) {
     // Watch for changes to the activity overview section
     let config = { attributes: false, childList: true, subtree: true }
-    observer = new MutationObserver(generateIsometricChart)
+    observer = new MutationObserver(renderIsometricChart)
     observer.observe(observedContainer, config)
   }
 
@@ -350,68 +411,6 @@ if (calendarGraph) {
 
 /*
 class Iso
-  loadStats: ->
-
-
-    this.renderTopStats(countTotal, averageCount, datesTotal, maxCount, dateBest)
-    this.renderBottomStats(streakLongest, datesLongest, streakCurrent, datesCurrent)
-
-  renderTopStats: (countTotal, averageCount, datesTotal, maxCount, dateBest) ->
-    html = """
-      <div class="ic-stats-block ic-stats-top">
-        <span class="ic-stats-table">
-          <span class="ic-stats-row">
-            <span class="ic-stats-label">1 year total
-              <span class="ic-stats-count">#{countTotal}</span>
-              <span class="ic-stats-average">#{averageCount}</span> per day
-            </span>
-            <span class="ic-stats-meta ic-stats-total-meta">
-              <span class="ic-stats-unit">contributions</span>
-              <span class="ic-stats-date">#{datesTotal}</span>
-            </span>
-          </span>
-          <span class="ic-stats-row">
-            <span class="ic-stats-label">Busiest day
-              <span class="ic-stats-count">#{maxCount}</span>
-            </span>
-            <span class="ic-stats-meta">
-              <span class="ic-stats-unit">contributions</span>
-                <span class="ic-stats-date">#{dateBest}</span>
-              </span>
-            </span>
-          </span>
-        </span>
-      </div>
-    """
-    ($ html).appendTo $ '.ic-contributions-wrapper'
-
-  renderBottomStats: (streakLongest, datesLongest, streakCurrent, datesCurrent) ->
-    html = """
-      <div class="ic-stats-block ic-stats-bottom">
-        <span class="ic-stats-table">
-          <span class="ic-stats-row">
-            <span class="ic-stats-label">Longest streak
-              <span class="ic-stats-count">#{streakLongest}</span>
-            </span>
-            <span class="ic-stats-meta">
-              <span class="ic-stats-unit">days</span>
-              <span class="ic-stats-date">#{datesLongest}</span>
-            </span>
-          </span>
-          <span class="ic-stats-row">
-            <span class="ic-stats-label">Current streak
-              <span class="ic-stats-count">#{streakCurrent}</span>
-            </span>
-            <span class="ic-stats-meta">
-              <span class="ic-stats-unit">days</span>
-              <span class="ic-stats-date">#{datesCurrent}</span>
-            </span>
-          </span>
-        </span>
-      </div>
-    """
-    ($ html).appendTo $ '.ic-contributions-wrapper'
-
   renderIsometricChart: ->
     SIZE       = 10
     MAX_HEIGHT = 100
