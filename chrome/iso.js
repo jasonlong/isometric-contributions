@@ -66,6 +66,7 @@ const persistSetting = (key, value) => {
 }
 
 const initUI = () => {
+  console.log("initUI")
   if (show2DSetting === "yes") {
     contributionsBox.classList.add("show-2d")
   }
@@ -132,7 +133,6 @@ const initUI = () => {
 }
 
 const handleViewToggle = (e) => {
-  e.preventDefault()
   setContainerViewType(e.target.dataset.icOption)
 
   document.querySelectorAll(".ic-toggle-option").forEach(toggle => { toggle.classList.remove("selected") })
@@ -158,8 +158,6 @@ const setContainerViewType = (type) => {
 }
 
 const handle2DToggle = (e) => {
-  e.preventDefault()
-
   if (contributionsBox.classList.contains("show-2d")) {
     e.target.innerHTML = "Show standard chart"
     contributionsBox.classList.remove("show-2d")
@@ -340,7 +338,7 @@ if (calendarGraph) {
   if (graphContainer) {
     // Watch for changes to the activity overview section
     let config = { attributes: false, childList: true, subtree: true }
-    observer = new MutationObserver(generateIsometricChart)
+    observer = new MutationObserver(renderIsometricChart)
     observer.observe(observedContainer, config)
   }
 
