@@ -283,6 +283,24 @@ const loadStats = () => {
   }
 }
 
+const getSquareColor = (fill) => {
+  switch (fill.toLowerCase()) {
+    case '#ebedf0':
+      return COLORS[0]
+    case '#c6e48b':
+      return COLORS[1]
+    case '#7bc96f':
+      return COLORS[2]
+    case '#239a3b':
+      return COLORS[3]
+    case '#196127':
+      return COLORS[4]
+    default:
+      if (fill.indexOf('#') != -1)
+        new obelisk.CubeColor().getByHorizontalColor(parseInt('0x'+fill.replace("#", "")))
+  }
+}
+
 const renderIsometricChart = () => {
   const SIZE = 10
   const MAX_HEIGHT = 100
@@ -308,10 +326,9 @@ const renderIsometricChart = () => {
   weeks.forEach(w => {
     let x = parseInt(((w.getAttribute('transform')).match(/(\d+)/))[0]) / (GH_OFFSET + 1)
     w.querySelectorAll('rect').forEach (r => {
-      let r            = w.get(0)
-      let y            = parseInt(w.getAttribute('y')) / GH_OFFSET
-      let fill         = w.getAttribute('fill')
-      let contribCount = parseInt(w.dataset.count)
+      let y            = parseInt(r.getAttribute('y')) / GH_OFFSET
+      let fill         = r.getAttribute('fill')
+      let contribCount = parseInt(r.dataset.count)
       let cubeHeight   = 3
 
       if (maxCount > 0) {
@@ -319,7 +336,7 @@ const renderIsometricChart = () => {
       }
 
       let dimension = new obelisk.CubeDimension(SIZE, SIZE, cubeHeight)
-      let color     = self.getSquareColor(fill)
+      let color     = getSquareColor(fill)
       let cube      = new obelisk.Cube(dimension, color, false)
       let p3d       = new obelisk.Point3D(SIZE * x, SIZE * y, 0)
       pixelView.renderObject(cube, p3d)
@@ -445,21 +462,3 @@ if (calendarGraph) {
   let settingsPromise = getSettings()
   settingsPromise.then(generateIsometricChart)
 }
-
-/*
-class Iso
-  renderIsometricChart: ->
-
-  getSquareColor: (fill) ->
-    color = switch fill.toLowerCase()
-      when '#ebedf0' then COLORS[0]
-      when '#c6e48b' then COLORS[1]
-      when '#7bc96f' then COLORS[2]
-      when '#239a3b' then COLORS[3]
-      when '#196127' then COLORS[4]
-      else
-        if (fill.indexOf('#') != -1)
-          new obelisk.CubeColor().getByHorizontalColor(parseInt('0x'+fill.replace("#", "")))
-
-
-  */
