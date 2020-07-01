@@ -5,20 +5,10 @@
 }
 
 /* Isometric cube display */
-.ic-cubes .contrib-details,
-.ic-cubes .contrib-footer {
+.ic-cubes .contrib-details {
   display: none;
 }
 
 .ic-cubes .calendar-graph {
   display: none ! important;
 }
-
-.ic-cubes.show-2d .contrib-footer {
-  display: block;
-}
-
-.ic-cubes.show-2d .calendar-graph {
-  display: block ! important;
-}
-
