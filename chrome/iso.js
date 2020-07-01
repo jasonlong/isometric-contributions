@@ -298,7 +298,7 @@ const renderStats = () => {
   const topMarkup = `
     <div class="position-absolute top-0 right-0 mt-3 mr-5">
       <h5 class="mb-1">Contributions</h5>
-      <div class="d-flex flex-justify-between rounded-2 border px-1 px-md-2 px-lg-3">
+      <div class="d-flex flex-justify-between rounded-2 border px-1 px-md-2" style="background-color:rgba(255, 255, 255, 0.8);">
         <div class="p-2 p-lg-3">
           <h1 class="f1 text-green lh-condensed">${countTotal}</h1>
           <span class="d-block text-small text-bold">Total</span>
@@ -319,7 +319,7 @@ const renderStats = () => {
   const bottomMarkup = `
     <div class="position-absolute bottom-0 left-0 ml-5 mb-6">
       <h5 class="mb-1">Streaks</h5>
-      <div class="d-flex flex-justify-around rounded-2 border px-1 px-md-2 px-lg-3">
+      <div class="d-flex flex-justify-between rounded-2 border px-1 px-md-2" style="background-color:rgba(255, 255, 255, 0.8);">
         <div class="p-2 p-lg-3">
           <h1 class="f1 text-green lh-condensed">${streakLongest} <span class="f4">days</span></h1>
           <span class="d-block text-small text-bold">Longest</span>
