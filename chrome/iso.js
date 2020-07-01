@@ -1,7 +1,3 @@
-const calendarGraph = document.querySelector('.js-calendar-graph')
-const contributionsBox = document.querySelector('.js-yearly-contributions')
-const observedContainer = document.getElementById('js-contribution-activity')
-
 const COLORS = [
   new obelisk.CubeColor().getByHorizontalColor(0xebedf0),
   new obelisk.CubeColor().getByHorizontalColor(0x9be9a8),
@@ -12,6 +8,9 @@ const COLORS = [
 
 const dateOptions         = {month: "short", day: "numeric"}
 const dateWithYearOptions = {month: "short", day: "numeric", year: "numeric"}
+
+let calendarGraph
+let contributionsBox
 
 let yearTotal           = 0
 let averageCount        = 0
@@ -68,6 +67,8 @@ const persistSetting = (key, value) => {
 }
 
 const initUI = () => {
+  console.log("initUI")
+
   const contributionsWrapper = document.createElement("div")
   contributionsWrapper.className = "ic-contributions-wrapper position-relative"
   calendarGraph.before(contributionsWrapper)
@@ -295,6 +296,7 @@ const renderIsometricChart = () => {
 }
 
 const renderStats = () => {
+  console.log('renderStats')
   const topMarkup = `
     <div class="position-absolute top-0 right-0 mt-3 mr-5">
       <h5 class="mb-1">Contributions</h5>
@@ -327,7 +329,7 @@ const renderStats = () => {
         </div>
         <div class="p-2 p-lg-3">
           <h1 class="f1 text-green lh-condensed">${streakCurrent} <span class="f4">days</span></h1>
-          <span class="d-block text-small text-bold">Best day</span>
+          <span class="d-block text-small text-bold">Current</span>
           <span class="d-none d-sm-block text-small text-gray-light">${datesCurrent}</span>
         </div>
       </div>
@@ -335,6 +337,7 @@ const renderStats = () => {
   `
   const icStatsBlockTop = document.createElement("div")
   icStatsBlockTop.innerHTML = topMarkup
+  debugger
   document.querySelector('.ic-contributions-wrapper').appendChild(icStatsBlockTop)
 
   const icStatsBlockBottom = document.createElement("div")
@@ -343,6 +346,11 @@ const renderStats = () => {
 }
 
 const generateIsometricChart = () => {
+  console.log('generateIsometricChart')
+
+  calendarGraph = document.querySelector('.js-calendar-graph')
+  contributionsBox = document.querySelector('.js-yearly-contributions')
+
   resetValues()
   initUI()
   loadStats()
@@ -387,16 +395,22 @@ const formatDateString = (dateStr, options) => {
   return date
 }
 
-if (calendarGraph) {
-  const graphContainer = calendarGraph.parentElement
-
-  if (graphContainer) {
-    // Watch for changes to the activity overview section
-    let config = { attributes: false, childList: true, subtree: true }
-    observer = new MutationObserver(renderIsometricChart)
-    observer.observe(observedContainer, config)
-  }
-
+if (document.querySelector('.js-calendar-graph')) {
   let settingsPromise = getSettings()
   settingsPromise.then(generateIsometricChart)
+
+  let config = { attributes: false, childList: true, subtree: true }
+  let callback = (mutationsList) => {
+    mutationsList.forEach(mutation => {
+      if (mutation.type === 'childList') {
+        mutation.addedNodes.forEach(node => {
+          if (node.classList && node.classList.contains('js-yearly-contributions'))
+            generateIsometricChart()
+        })
+      }
+    })
+  }
+  observedContainer = document.getElementById('js-pjax-container')
+  observer = new MutationObserver(callback)
+  observer.observe(observedContainer, config)
 }
