@@ -297,7 +297,7 @@ const getSquareColor = (fill) => {
       return COLORS[4]
     default:
       if (fill.indexOf('#') != -1)
-        new obelisk.CubeColor().getByHorizontalColor(parseInt('0x'+fill.replace("#", "")))
+        return new obelisk.CubeColor().getByHorizontalColor(parseInt('0x'+fill.replace("#", "")))
   }
 }
 
@@ -326,19 +326,20 @@ const renderIsometricChart = () => {
   weeks.forEach(w => {
     let x = parseInt(((w.getAttribute('transform')).match(/(\d+)/))[0]) / (GH_OFFSET + 1)
     w.querySelectorAll('rect').forEach (r => {
-      let y            = parseInt(r.getAttribute('y')) / GH_OFFSET
-      let fill         = r.getAttribute('fill')
+      let y = parseInt(r.getAttribute('y')) / GH_OFFSET
+      let fill = r.getAttribute('fill')
       let contribCount = parseInt(r.dataset.count)
-      let cubeHeight   = 3
+      let cubeHeight = 3
 
       if (maxCount > 0) {
         cubeHeight += parseInt(MAX_HEIGHT / maxCount * contribCount)
       }
 
       let dimension = new obelisk.CubeDimension(SIZE, SIZE, cubeHeight)
-      let color     = getSquareColor(fill)
-      let cube      = new obelisk.Cube(dimension, color, false)
-      let p3d       = new obelisk.Point3D(SIZE * x, SIZE * y, 0)
+      debugger
+      let color = getSquareColor(fill)
+      let cube = new obelisk.Cube(dimension, color, false)
+      let p3d = new obelisk.Point3D(SIZE * x, SIZE * y, 0)
       pixelView.renderObject(cube, p3d)
     })
   })
