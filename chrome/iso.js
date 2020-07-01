@@ -32,9 +32,13 @@ const resetValues = () => {
   yearTotal           = 0
   averageCount        = 0
   maxCount            = 0
+  streakLongest       = 0
+  streakCurrent       = 0
   bestDay             = null
   firstDay            = null
   lastDay             = null
+  datesLongest        = null
+  datesCurrent        = null
 }
 
 const getSettings = () => {
@@ -67,8 +71,6 @@ const persistSetting = (key, value) => {
 }
 
 const initUI = () => {
-  console.log("initUI")
-
   const contributionsWrapper = document.createElement("div")
   contributionsWrapper.className = "ic-contributions-wrapper position-relative"
   calendarGraph.before(contributionsWrapper)
@@ -296,7 +298,6 @@ const renderIsometricChart = () => {
 }
 
 const renderStats = () => {
-  console.log('renderStats')
   const topMarkup = `
     <div class="position-absolute top-0 right-0 mt-3 mr-5">
       <h5 class="mb-1">Contributions</h5>
@@ -337,7 +338,6 @@ const renderStats = () => {
   `
   const icStatsBlockTop = document.createElement("div")
   icStatsBlockTop.innerHTML = topMarkup
-  debugger
   document.querySelector('.ic-contributions-wrapper').appendChild(icStatsBlockTop)
 
   const icStatsBlockBottom = document.createElement("div")
@@ -346,8 +346,6 @@ const renderStats = () => {
 }
 
 const generateIsometricChart = () => {
-  console.log('generateIsometricChart')
-
   calendarGraph = document.querySelector('.js-calendar-graph')
   contributionsBox = document.querySelector('.js-yearly-contributions')
 
