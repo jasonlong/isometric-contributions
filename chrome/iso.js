@@ -210,7 +210,7 @@ const loadStats = () => {
   if (streakCurrent > 0) {
     currentStreakStart = formatDateString(currentStreakStart, dateOptions)
     currentStreakEnd   = formatDateString(currentStreakEnd, dateOptions)
-    datesCurrent       = `${currentStreakStart} — ${currentStreakEnd}`
+    datesCurrent       = `${currentStreakStart} → ${currentStreakEnd}`
   }
   else {
     datesCurrent = "No current streak"
@@ -220,11 +220,11 @@ const loadStats = () => {
   countTotal = yearTotal.toLocaleString()
   let dateFirst  = formatDateString(firstDay, dateOptions)
   let dateLast   = formatDateString(lastDay, dateOptions)
-  datesTotal = `${dateFirst} — ${dateLast}`
+  datesTotal = `${dateFirst} → ${dateLast}`
 
   // Average contributions per day
   let dayDifference = datesDayDifference(firstDay, lastDay)
-  let averageCount = precisionRound((yearTotal / dayDifference), 2)
+  averageCount = precisionRound((yearTotal / dayDifference), 2)
 
   // Best day
   dateBest  = formatDateString(bestDay, dateOptions)
@@ -236,7 +236,7 @@ const loadStats = () => {
   if (streakLongest > 0) {
     longestStreakStart = formatDateString(longestStreakStart, dateOptions)
     longestStreakEnd   = formatDateString(longestStreakEnd, dateOptions)
-    datesLongest       = `${longestStreakStart} — ${longestStreakEnd}`
+    datesLongest       = `${longestStreakStart} → ${longestStreakEnd}`
   }
   else {
     datesLongest = "No longest streak"
@@ -310,6 +310,9 @@ const renderStats = () => {
           <span class="d-block text-small text-gray-light">${dateBest}</span>
         </div>
       </div>
+      <p class="mt-1 text-right text-small">
+        Average: <span class="text-bold text-green">${averageCount}</span> <span class="text-gray-light">/ day</span>
+        </p>
     </div>
   `
 
