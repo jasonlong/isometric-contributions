@@ -185,7 +185,7 @@ const loadStats = () => {
 
   let days = document.querySelectorAll(".js-calendar-graph rect.day")
   days.forEach(d => {
-    currentDayCount = d.dataset.count
+    currentDayCount = parseInt(d.dataset.count)
     yearTotal += parseInt(currentDayCount)
 
     if (days[0] === d) {
@@ -336,7 +336,6 @@ const renderIsometricChart = () => {
       }
 
       let dimension = new obelisk.CubeDimension(SIZE, SIZE, cubeHeight)
-      debugger
       let color = getSquareColor(fill)
       let cube = new obelisk.Cube(dimension, color, false)
       let p3d = new obelisk.Point3D(SIZE * x, SIZE * y, 0)
