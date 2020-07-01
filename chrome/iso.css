@@ -11,7 +11,7 @@
 }
 
 .ic-cubes .calendar-graph {
-  display: none !important;
+  display: none ! important;
 }
 
 .ic-cubes.show-2d .contrib-footer {
@@ -19,75 +19,6 @@
 }
 
 .ic-cubes.show-2d .calendar-graph {
-  display: block !important;
-}
-
-.ic-cubes #contributions-calendar {
-  min-height: 3px;
-  border-top: 0;
-}
-
-.ic-contributions-wrapper {
-  position: relative;
-}
-
-/* Stats display */
-.ic-stats-block {
-  position: absolute;
-}
-
-.ic-stats-top {
-  top: 8px;
-  right: 20px;
-}
-
-.ic-stats-bottom {
-  top: 225px;
-  left: 20px;
-}
-
-.ic-stats-table {
-  display: table;
-}
-
-.ic-stats-row {
-  display: table-row;
-}
-
-.ic-stats-label {
-  display: table-cell;
-  text-align: right;
-  vertical-align: bottom;
-}
-
-.ic-stats-count {
-  display: block;
-}
-
-.ic-stats-meta {
-  display: table-cell;
-  padding-bottom: 12px;
-  padding-left: 8px;
-  text-align: left;
-  line-height: 1.2;
-  vertical-align: bottom;
-}
-
-.ic-stats-total-meta {
-  vertical-align: middle;
-}
-
-.ic-stats-unit {
-  display: block;
-}
-
-.ic-stats-date {
-  display: block;
-}
-
-.ic-footer {
-  position: absolute;
-  top: 380px;
-  left: 20px;
+  display: block ! important;
 }
 

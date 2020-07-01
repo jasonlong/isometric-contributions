@@ -79,7 +79,7 @@ const initUI = () => {
   }
 
   const contributionsWrapper = document.createElement("div")
-  contributionsWrapper.className = "ic-contributions-wrapper"
+  contributionsWrapper.className = "ic-contributions-wrapper position-relative"
   calendarGraph.before(contributionsWrapper)
 
   const canvas = document.createElement("canvas")
@@ -259,8 +259,8 @@ const loadStats = () => {
 
   // Year total
   countTotal = yearTotal.toLocaleString()
-  let dateFirst  = formatDateString(firstDay, dateWithYearOptions)
-  let dateLast   = formatDateString(lastDay, dateWithYearOptions)
+  let dateFirst  = formatDateString(firstDay, dateOptions)
+  let dateLast   = formatDateString(lastDay, dateOptions)
   datesTotal = `${dateFirst} — ${dateLast}`
 
   // Average contributions per day
@@ -309,7 +309,7 @@ const renderIsometricChart = () => {
   const canvas = document.getElementById('isometric-contributions')
   const GH_OFFSET = parseInt(firstRect.getAttribute('transform').match(/(\d+)/)[0]) - 1
 
-  let point = new obelisk.Point(130,90)
+  let point= new obelisk.Point(130,90)
   let pixelView = new obelisk.PixelView(canvas, point)
   let contribCount = null
   let weeks = document.querySelectorAll(".js-calendar-graph-svg g > g")
@@ -337,60 +337,45 @@ const renderIsometricChart = () => {
 
 const renderStats = () => {
   const topMarkup = `
-    <span class="ic-stats-table">
-      <span class="ic-stats-row">
-        <span class="ic-stats-label">1 year total
-          <span class="ic-stats-count">${countTotal}</span>
-          <span class="ic-stats-average">${averageCount}</span> per day
-        </span>
-        <span class="ic-stats-meta ic-stats-total-meta">
-          <span class="ic-stats-unit">contributions</span>
-          <span class="ic-stats-date">${datesTotal}</span>
-        </span>
-      </span>
-      <span class="ic-stats-row">
-        <span class="ic-stats-label">Busiest day
-          <span class="ic-stats-count">${maxCount}</span>
-        </span>
-        <span class="ic-stats-meta">
-          <span class="ic-stats-unit">contributions</span>
-            <span class="ic-stats-date">${dateBest}</span>
-          </span>
-        </span>
-      </span>
-    </span>
+    <div class="position-absolute top-0 right-0 mt-3 mr-4" style="width:270px;">
+      <h5 class="mb-1">Contributions</h5>
+      <div class="d-flex flex-justify-around rounded-2 border py-3 px-4">
+        <div class="">
+          <h1 class="text-green lh-condensed">${countTotal}</h1>
+          <span class="d-block text-small text-bold">Total</span>
+          <span class="d-block text-small text-gray-light">${datesTotal}</span>
+        </div>
+        <div class="">
+          <h1 class="text-green lh-condensed">${maxCount}</h1>
+          <span class="d-block text-small text-bold">Best day</span>
+          <span class="d-block text-small text-gray-light">${dateBest}</span>
+        </div>
+      </div>
+    </div>
   `
 
   const bottomMarkup = `
-    <span class="ic-stats-table">
-      <span class="ic-stats-row">
-        <span class="ic-stats-label">Longest streak
-          <span class="ic-stats-count">${streakLongest}</span>
-        </span>
-        <span class="ic-stats-meta">
-          <span class="ic-stats-unit">days</span>
-          <span class="ic-stats-date">${datesLongest}</span>
-        </span>
-      </span>
-      <span class="ic-stats-row">
-        <span class="ic-stats-label">Current streak
-          <span class="ic-stats-count">${streakCurrent}</span>
-        </span>
-        <span class="ic-stats-meta">
-          <span class="ic-stats-unit">days</span>
-          <span class="ic-stats-date">${datesCurrent}</span>
-        </span>
-      </span>
-    </span>
+    <div class="position-absolute bottom-0 left-0 ml-4 mb-6" style="width:270px;">
+      <h5 class="mb-1">Streaks</h5>
+      <div class="d-flex flex-justify-around rounded-2 border py-3 px-4">
+        <div class="">
+          <h1 class="text-green lh-condensed">${streakLongest} <span class="f4">days</span></h1>
+          <span class="d-block text-small text-bold">Longest</span>
+          <span class="d-block text-small text-gray-light">${datesLongest}</span>
+        </div>
+        <div class="">
+          <h1 class="text-green lh-condensed">${streakCurrent} <span class="f4">days</span></h1>
+          <span class="d-block text-small text-bold">Best day</span>
+          <span class="d-block text-small text-gray-light">${datesCurrent}</span>
+        </div>
+      </div>
+    </div>
   `
-
   const icStatsBlockTop = document.createElement("div")
-  icStatsBlockTop.className = "ic-stats-block ic-stats-top"
   icStatsBlockTop.innerHTML = topMarkup
   document.querySelector('.ic-contributions-wrapper').appendChild(icStatsBlockTop)
 
   const icStatsBlockBottom = document.createElement("div")
-  icStatsBlockBottom.className = "ic-stats-block ic-stats-bottom"
   icStatsBlockBottom.innerHTML = bottomMarkup
   document.querySelector('.ic-contributions-wrapper').appendChild(icStatsBlockBottom)
 }
