@@ -28,7 +28,6 @@ let datesCurrent        = null
 let dateBest            = null
 
 let toggleSetting = "cubes"
-let show2DSetting = "no"
 
 const resetValues = () => {
   yearTotal           = 0
@@ -45,15 +44,13 @@ const getSettings = () => {
     // The storage API is not supported in content scripts.
     // https://developer.mozilla.org/Add-ons/WebExtensions/Chrome_incompatibilities#storage
     if (chrome && chrome.storage) {
-      chrome.storage.local.get(["toggleSetting", "show2DSetting"], (settings) => {
+      chrome.storage.local.get(["toggleSetting"], (settings) => {
         toggleSetting = settings.toggleSetting ? settings.toggleSetting : "cubes"
-        show2DSetting = settings.show2DSetting ? settings.show2DSetting : "no"
         resolve('Settings loaded')
       })
     }
     else {
       toggleSetting = localStorage.toggleSetting ? localStorage.toggleSetting : "cubes"
-      show2DSetting = localStorage.show2DSetting ? localStorage.show2DSetting : "no"
       resolve('Settings loaded')
     }
   })
@@ -71,13 +68,6 @@ const persistSetting = (key, value) => {
 }
 
 const initUI = () => {
-  if (show2DSetting === "yes") {
-    contributionsBox.classList.add("show-2d")
-  }
-  else {
-    contributionsBox.classList.remove("show-2d")
-  }
-
   const contributionsWrapper = document.createElement("div")
   contributionsWrapper.className = "ic-contributions-wrapper position-relative"
   calendarGraph.before(contributionsWrapper)
@@ -117,22 +107,6 @@ const initUI = () => {
   btnGroup.appendChild(squaresButton)
   btnGroup.appendChild(cubesButton)
 
-  // Inject footer w/ toggle for showing 2D chart
-  const htmlFooter = document.createElement("span")
-  htmlFooter.className = "ic-footer"
-
-  const standardChartToggle = document.createElement("button")
-  standardChartToggle.className = "ic-2d-toggle text-small btn-link muted-link"
-  if (show2DSetting === "yes") {
-    standardChartToggle.innerHTML = "Hide standard chart"
-  }
-  else {
-    standardChartToggle.innerHTML = "Show standard chart"
-  }
-  standardChartToggle.addEventListener("click", handle2DToggle);
-
-  contributionsWrapper.append(htmlFooter)
-  htmlFooter.append(standardChartToggle)
   setContainerViewType(toggleSetting)
 }
 
@@ -158,21 +132,6 @@ const setContainerViewType = (type) => {
   else {
     contributionsBox.classList.remove("ic-squares")
     contributionsBox.classList.add("ic-cubes")
-  }
-}
-
-const handle2DToggle = (e) => {
-  if (contributionsBox.classList.contains("show-2d")) {
-    e.target.innerHTML = "Show standard chart"
-    contributionsBox.classList.remove("show-2d")
-    persistSetting("show2DSetting", "no")
-    show2DSetting = "no"
-  }
-  else {
-    e.target.innerHTML = "Hide standard chart"
-    contributionsBox.classList.add("show-2d")
-    persistSetting("show2DSetting", "yes")
-    show2DSetting = "yes"
   }
 }
 
