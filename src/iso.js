@@ -1,7 +1,3 @@
-const calendarGraph = document.querySelector('.js-calendar-graph')
-const contributionsBox = document.querySelector('.js-yearly-contributions')
-const observedContainer = document.getElementById('js-contribution-activity')
-
 const COLORS = [
   new obelisk.CubeColor().getByHorizontalColor(0xebedf0),
   new obelisk.CubeColor().getByHorizontalColor(0x9be9a8),
@@ -12,6 +8,9 @@ const COLORS = [
 
 const dateOptions         = {month: "short", day: "numeric"}
 const dateWithYearOptions = {month: "short", day: "numeric", year: "numeric"}
+
+let calendarGraph
+let contributionsBox
 
 let yearTotal           = 0
 let averageCount        = 0
@@ -28,15 +27,18 @@ let datesCurrent        = null
 let dateBest            = null
 
 let toggleSetting = "cubes"
-let show2DSetting = "no"
 
 const resetValues = () => {
   yearTotal           = 0
   averageCount        = 0
   maxCount            = 0
+  streakLongest       = 0
+  streakCurrent       = 0
   bestDay             = null
   firstDay            = null
   lastDay             = null
+  datesLongest        = null
+  datesCurrent        = null
 }
 
 const getSettings = () => {
@@ -45,17 +47,13 @@ const getSettings = () => {
     // The storage API is not supported in content scripts.
     // https://developer.mozilla.org/Add-ons/WebExtensions/Chrome_incompatibilities#storage
     if (chrome && chrome.storage) {
-      chrome.storage.local.get(["toggleSetting", "show2DSetting"], (settings) => {
+      chrome.storage.local.get(["toggleSetting"], (settings) => {
         toggleSetting = settings.toggleSetting ? settings.toggleSetting : "cubes"
-        show2DSetting = settings.show2DSetting ? settings.show2DSetting : "no"
-        console.log(`toggleSetting: ${toggleSetting}`)
-        console.log(`show2DSetting: ${show2DSetting}`)
         resolve('Settings loaded')
       })
     }
     else {
       toggleSetting = localStorage.toggleSetting ? localStorage.toggleSetting : "cubes"
-      show2DSetting = localStorage.show2DSetting ? localStorage.show2DSetting : "no"
       resolve('Settings loaded')
     }
   })
@@ -73,22 +71,15 @@ const persistSetting = (key, value) => {
 }
 
 const initUI = () => {
-  console.log("initUI")
-  if (show2DSetting === "yes") {
-    contributionsBox.classList.add("show-2d")
-  }
-  else {
-    contributionsBox.classList.remove("show-2d")
-  }
-
   const contributionsWrapper = document.createElement("div")
-  contributionsWrapper.className = "ic-contributions-wrapper"
+  contributionsWrapper.className = "ic-contributions-wrapper position-relative"
   calendarGraph.before(contributionsWrapper)
 
   const canvas = document.createElement("canvas")
   canvas.id = "isometric-contributions"
-  canvas.width = 720
-  canvas.height = 410
+  canvas.width = 1000
+  canvas.height = 600
+  canvas.style.width = "100%"
   contributionsWrapper.appendChild(canvas)
 
   // Inject toggle
@@ -119,22 +110,6 @@ const initUI = () => {
   btnGroup.appendChild(squaresButton)
   btnGroup.appendChild(cubesButton)
 
-  // Inject footer w/ toggle for showing 2D chart
-  const htmlFooter = document.createElement("span")
-  htmlFooter.className = "ic-footer"
-
-  const standardChartToggle = document.createElement("button")
-  standardChartToggle.className = "ic-2d-toggle text-small btn-link muted-link"
-  if (show2DSetting === "yes") {
-    standardChartToggle.innerHTML = "Hide standard chart"
-  }
-  else {
-    standardChartToggle.innerHTML = "Show standard chart"
-  }
-  standardChartToggle.addEventListener("click", handle2DToggle);
-
-  contributionsWrapper.append(htmlFooter)
-  htmlFooter.append(standardChartToggle)
   setContainerViewType(toggleSetting)
 }
 
@@ -163,21 +138,6 @@ const setContainerViewType = (type) => {
   }
 }
 
-const handle2DToggle = (e) => {
-  if (contributionsBox.classList.contains("show-2d")) {
-    e.target.innerHTML = "Show standard chart"
-    contributionsBox.classList.remove("show-2d")
-    persistSetting("show2DSetting", "no")
-    show2DSetting = "no"
-  }
-  else {
-    e.target.innerHTML = "Hide standard chart"
-    contributionsBox.classList.add("show-2d")
-    persistSetting("show2DSetting", "yes")
-    show2DSetting = "yes"
-  }
-}
-
 const loadStats = () => {
   let tempStreak         = 0
   let tempStreakStart    = null
@@ -188,7 +148,7 @@ const loadStats = () => {
 
   let days = document.querySelectorAll(".js-calendar-graph rect.day")
   days.forEach(d => {
-    currentDayCount = d.dataset.count
+    currentDayCount = parseInt(d.dataset.count)
     yearTotal += parseInt(currentDayCount)
 
     if (days[0] === d) {
@@ -233,8 +193,8 @@ const loadStats = () => {
   currentStreakEnd = daysArray[0].dataset.date
 
   for (let i=0; i < daysArray.length; i++) {
-    currentDayCount = parseInt(daysArray[i].dataset.count, 10)
 
+    currentDayCount = parseInt(daysArray[i].dataset.count, 10)
     // If there's no activity today, continue on to yesterday
     if (i === 0 && currentDayCount === 0) {
       currentStreakEnd = daysArray[1].dataset.date
@@ -253,7 +213,7 @@ const loadStats = () => {
   if (streakCurrent > 0) {
     currentStreakStart = formatDateString(currentStreakStart, dateOptions)
     currentStreakEnd   = formatDateString(currentStreakEnd, dateOptions)
-    datesCurrent       = `${currentStreakStart} — ${currentStreakEnd}`
+    datesCurrent       = `${currentStreakStart} → ${currentStreakEnd}`
   }
   else {
     datesCurrent = "No current streak"
@@ -261,13 +221,13 @@ const loadStats = () => {
 
   // Year total
   countTotal = yearTotal.toLocaleString()
-  let dateFirst  = formatDateString(firstDay, dateWithYearOptions)
-  let dateLast   = formatDateString(lastDay, dateWithYearOptions)
-  datesTotal = `${dateFirst} — ${dateLast}`
+  let dateFirst  = formatDateString(firstDay, dateOptions)
+  let dateLast   = formatDateString(lastDay, dateOptions)
+  datesTotal = `${dateFirst} → ${dateLast}`
 
   // Average contributions per day
   let dayDifference = datesDayDifference(firstDay, lastDay)
-  let averageCount = precisionRound((yearTotal / dayDifference), 2)
+  averageCount = precisionRound((yearTotal / dayDifference), 2)
 
   // Best day
   dateBest  = formatDateString(bestDay, dateOptions)
@@ -279,78 +239,116 @@ const loadStats = () => {
   if (streakLongest > 0) {
     longestStreakStart = formatDateString(longestStreakStart, dateOptions)
     longestStreakEnd   = formatDateString(longestStreakEnd, dateOptions)
-    datesLongest       = `${longestStreakStart} — ${longestStreakEnd}`
+    datesLongest       = `${longestStreakStart} → ${longestStreakEnd}`
   }
   else {
     datesLongest = "No longest streak"
   }
 }
 
+const getSquareColor = (fill) => {
+  switch (fill.toLowerCase()) {
+    case '#ebedf0':
+      return COLORS[0]
+    case '#c6e48b':
+      return COLORS[1]
+    case '#7bc96f':
+      return COLORS[2]
+    case '#239a3b':
+      return COLORS[3]
+    case '#196127':
+      return COLORS[4]
+    default:
+      if (fill.indexOf('#') != -1)
+        return new obelisk.CubeColor().getByHorizontalColor(parseInt('0x'+fill.replace("#", "")))
+  }
+}
+
 const renderIsometricChart = () => {
-  console.log("renderIsometricChart")
+  const SIZE = 16
+  const MAX_HEIGHT = 100
+  const firstRect = document.querySelectorAll('.js-calendar-graph-svg g > g')[1]
+  const canvas = document.getElementById('isometric-contributions')
+  const GH_OFFSET = parseInt(firstRect.getAttribute('transform').match(/(\d+)/)[0]) - 1
+
+  let point= new obelisk.Point(130,90)
+  let pixelView = new obelisk.PixelView(canvas, point)
+  let contribCount = null
+  let weeks = document.querySelectorAll(".js-calendar-graph-svg g > g")
+
+  weeks.forEach(w => {
+    let x = parseInt(((w.getAttribute('transform')).match(/(\d+)/))[0]) / (GH_OFFSET + 1)
+    w.querySelectorAll('rect').forEach (r => {
+      let y = parseInt(r.getAttribute('y')) / GH_OFFSET
+      let fill = r.getAttribute('fill')
+      let contribCount = parseInt(r.dataset.count)
+      let cubeHeight = 3
+
+      if (maxCount > 0) {
+        cubeHeight += parseInt(MAX_HEIGHT / maxCount * contribCount)
+      }
+
+      let dimension = new obelisk.CubeDimension(SIZE, SIZE, cubeHeight)
+      let color = getSquareColor(fill)
+      let cube = new obelisk.Cube(dimension, color, false)
+      let p3d = new obelisk.Point3D(SIZE * x, SIZE * y, 0)
+      pixelView.renderObject(cube, p3d)
+    })
+  })
 }
 
 const renderStats = () => {
   const topMarkup = `
-    <span class="ic-stats-table">
-      <span class="ic-stats-row">
-        <span class="ic-stats-label">1 year total
-          <span class="ic-stats-count">${countTotal}</span>
-          <span class="ic-stats-average">${averageCount}</span> per day
-        </span>
-        <span class="ic-stats-meta ic-stats-total-meta">
-          <span class="ic-stats-unit">contributions</span>
-          <span class="ic-stats-date">${datesTotal}</span>
-        </span>
-      </span>
-      <span class="ic-stats-row">
-        <span class="ic-stats-label">Busiest day
-          <span class="ic-stats-count">${maxCount}</span>
-        </span>
-        <span class="ic-stats-meta">
-          <span class="ic-stats-unit">contributions</span>
-            <span class="ic-stats-date">${dateBest}</span>
-          </span>
-        </span>
-      </span>
-    </span>
+    <div class="position-absolute top-0 right-0 mt-3 mr-5">
+      <h5 class="mb-1">Contributions</h5>
+      <div class="d-flex flex-justify-between rounded-2 border px-1 px-md-2" style="background-color:rgba(255, 255, 255, 0.8);">
+        <div class="p-2">
+          <span class="d-block f2 text-bold text-green lh-condensed">${countTotal}</span>
+          <span class="d-block text-small text-bold">Total</span>
+          <span class="d-none d-sm-block text-small text-gray-light">${datesTotal}</span>
+        </div>
+        <div class="p-2">
+          <span class="d-block f2 text-bold text-green lh-condensed">${maxCount}</span>
+          <span class="d-block text-small text-bold">Best day</span>
+          <span class="d-none d-sm-block text-small text-gray-light">${dateBest}</span>
+        </div>
+      </div>
+      <p class="mt-1 text-right text-small">
+        Average: <span class="text-bold text-green">${averageCount}</span> <span class="text-gray-light">/ day</span>
+        </p>
+    </div>
   `
 
   const bottomMarkup = `
-    <span class="ic-stats-table">
-      <span class="ic-stats-row">
-        <span class="ic-stats-label">Longest streak
-          <span class="ic-stats-count">${streakLongest}</span>
-        </span>
-        <span class="ic-stats-meta">
-          <span class="ic-stats-unit">days</span>
-          <span class="ic-stats-date">${datesLongest}</span>
-        </span>
-      </span>
-      <span class="ic-stats-row">
-        <span class="ic-stats-label">Current streak
-          <span class="ic-stats-count">${streakCurrent}</span>
-        </span>
-        <span class="ic-stats-meta">
-          <span class="ic-stats-unit">days</span>
-          <span class="ic-stats-date">${datesCurrent}</span>
-        </span>
-      </span>
-    </span>
+    <div class="position-absolute bottom-0 left-0 ml-5 mb-6">
+      <h5 class="mb-1">Streaks</h5>
+      <div class="d-flex flex-justify-between rounded-2 border px-1 px-md-2" style="background-color:rgba(255, 255, 255, 0.8);">
+        <div class="p-2">
+          <span class="d-block f2 text-bold text-green lh-condensed">${streakLongest} <span class="f4">days</span></span>
+          <span class="d-block text-small text-bold">Longest</span>
+          <span class="d-none d-sm-block text-small text-gray-light">${datesLongest}</span>
+        </div>
+        <div class="p-2">
+          <span class="d-block f2 text-bold text-green lh-condensed">${streakCurrent} <span class="f4">days</span></span>
+          <span class="d-block text-small text-bold">Current</span>
+          <span class="d-none d-sm-block text-small text-gray-light">${datesCurrent}</span>
+        </div>
+      </div>
+    </div>
   `
-
   const icStatsBlockTop = document.createElement("div")
-  icStatsBlockTop.className = "ic-stats-block ic-stats-top"
   icStatsBlockTop.innerHTML = topMarkup
-  document.querySelectorAll('.ic-contributions-wrapper')[0].appendChild(icStatsBlockTop)
+  document.querySelector('.ic-contributions-wrapper').appendChild(icStatsBlockTop)
 
   const icStatsBlockBottom = document.createElement("div")
-  icStatsBlockBottom.className = "ic-stats-block ic-stats-bottom"
   icStatsBlockBottom.innerHTML = bottomMarkup
-  document.querySelectorAll('.ic-contributions-wrapper')[0].appendChild(icStatsBlockBottom)
+  document.querySelector('.ic-contributions-wrapper').appendChild(icStatsBlockBottom)
 }
 
 const generateIsometricChart = () => {
+  calendarGraph = document.querySelector('.js-calendar-graph')
+  contributionsBox = document.querySelector('.js-yearly-contributions')
+
   resetValues()
   initUI()
   loadStats()
@@ -395,68 +393,22 @@ const formatDateString = (dateStr, options) => {
   return date
 }
 
-if (calendarGraph) {
-  const graphContainer = calendarGraph.parentElement
-
-  if (graphContainer) {
-    // Watch for changes to the activity overview section
-    let config = { attributes: false, childList: true, subtree: true }
-    observer = new MutationObserver(renderIsometricChart)
-    observer.observe(observedContainer, config)
-  }
-
+if (document.querySelector('.js-calendar-graph')) {
   let settingsPromise = getSettings()
   settingsPromise.then(generateIsometricChart)
+
+  let config = { attributes: false, childList: true, subtree: true }
+  let callback = (mutationsList) => {
+    mutationsList.forEach(mutation => {
+      if (mutation.type === 'childList') {
+        mutation.addedNodes.forEach(node => {
+          if (node.classList && node.classList.contains('js-yearly-contributions'))
+            generateIsometricChart()
+        })
+      }
+    })
+  }
+  observedContainer = document.getElementById('js-pjax-container')
+  observer = new MutationObserver(callback)
+  observer.observe(observedContainer, config)
 }
-
-/*
-class Iso
-  renderIsometricChart: ->
-    SIZE       = 10
-    MAX_HEIGHT = 100
-    GH_OFFSET  = parseInt (((($ '.js-calendar-graph-svg g > g')[1].getAttribute 'transform').match /(\d+)/)[0]) - 1
-
-    canvas = document.getElementById 'isometric-contributions'
-
-    # create pixel view container in point
-    if GH_OFFSET == 10
-      point = new obelisk.Point 70,70
-    else
-      point = new obelisk.Point 110,90
-
-    pixelView = new obelisk.PixelView canvas, point
-
-    contribCount = null
-
-    self = this
-    ($ '.js-calendar-graph-svg g > g').each (g) ->
-      x = parseInt (((($ this).attr 'transform').match /(\d+)/)[0]) / (GH_OFFSET + 1)
-      (($ this).find 'rect').each (r) ->
-        r            = ($ this).get 0
-        y            = parseInt (($ this).attr 'y') / GH_OFFSET
-        fill         = ($ this).attr 'fill'
-        contribCount = parseInt ($ this).data 'count'
-        cubeHeight   = 3
-
-        if maxCount > 0
-          cubeHeight += parseInt MAX_HEIGHT / maxCount * contribCount
-
-        dimension = new obelisk.CubeDimension SIZE, SIZE, cubeHeight
-        color     = self.getSquareColor fill
-        cube      = new obelisk.Cube dimension, color, false
-        p3d       = new obelisk.Point3D SIZE * x, SIZE * y, 0
-        pixelView.renderObject cube, p3d
-
-  getSquareColor: (fill) ->
-    color = switch fill.toLowerCase()
-      when '#ebedf0' then COLORS[0]
-      when '#c6e48b' then COLORS[1]
-      when '#7bc96f' then COLORS[2]
-      when '#239a3b' then COLORS[3]
-      when '#196127' then COLORS[4]
-      else
-        if (fill.indexOf('#') != -1)
-          new obelisk.CubeColor().getByHorizontalColor(parseInt('0x'+fill.replace("#", "")))
-
-
-  */

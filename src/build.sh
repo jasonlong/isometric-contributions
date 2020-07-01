@@ -1,10 +1,7 @@
 #!/usr/bin/env sh
 
 cp src/iso.js chrome/
-# Compile coffeescript
-# coffee --compile --bare --output chrome src/iso.coffee
-# coffee --compile --bare --output firefox/isometric-contributions src/iso.coffee
-# coffee --compile --bare --output safari/isometric-contributions.safariextension src/iso.coffee
+cp src/iso.js firefox/isometric-contributions/
 
 # Build .zip for Chrome
 cd chrome
