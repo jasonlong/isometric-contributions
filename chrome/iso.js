@@ -84,8 +84,9 @@ const initUI = () => {
 
   const canvas = document.createElement("canvas")
   canvas.id = "isometric-contributions"
-  canvas.width = 720
-  canvas.height = 410
+  canvas.width = 1000
+  canvas.height = 600
+  canvas.style.width = "100%"
   contributionsWrapper.appendChild(canvas)
 
   // Inject toggle
@@ -302,27 +303,17 @@ const getSquareColor = (fill) => {
 }
 
 const renderIsometricChart = () => {
-  const SIZE = 10
+  const SIZE = 16
   const MAX_HEIGHT = 100
   const firstRect = document.querySelectorAll('.js-calendar-graph-svg g > g')[1]
   const canvas = document.getElementById('isometric-contributions')
   const GH_OFFSET = parseInt(firstRect.getAttribute('transform').match(/(\d+)/)[0]) - 1
 
-  let point
-
-  // create pixel view container in point
-  if (GH_OFFSET === 10) {
-    point = new obelisk.Point(70, 70)
-  }
-  else {
-    point = new obelisk.Point(110,90)
-  }
-
+  let point = new obelisk.Point(130,90)
   let pixelView = new obelisk.PixelView(canvas, point)
-
   let contribCount = null
-
   let weeks = document.querySelectorAll(".js-calendar-graph-svg g > g")
+
   weeks.forEach(w => {
     let x = parseInt(((w.getAttribute('transform')).match(/(\d+)/))[0]) / (GH_OFFSET + 1)
     w.querySelectorAll('rect').forEach (r => {
