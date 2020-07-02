@@ -41,7 +41,7 @@ const resetValues = () => {
 }
 
 const getSettings = () => {
-  return new Promise(function (resolve) {
+  return new Promise(resolve => {
     // Check for user preference, if chrome.storage is available.
     // The storage API is not supported in content scripts.
     // https://developer.mozilla.org/Add-ons/WebExtensions/Chrome_incompatibilities#storage
@@ -77,7 +77,7 @@ const initUI = () => {
   canvas.width = 1000
   canvas.height = 600
   canvas.style.width = '100%'
-  contributionsWrapper.appendChild(canvas)
+  contributionsWrapper.append(canvas)
 
   // Inject toggle
   const insertLocation = contributionsBox.querySelector('h2').parentElement
@@ -104,8 +104,8 @@ const initUI = () => {
   }
 
   insertLocation.prepend(btnGroup)
-  btnGroup.appendChild(squaresButton)
-  btnGroup.appendChild(cubesButton)
+  btnGroup.append(squaresButton)
+  btnGroup.append(cubesButton)
 
   setContainerViewType(toggleSetting)
 }
@@ -146,8 +146,8 @@ const loadStats = () => {
 
   const days = document.querySelectorAll('.js-calendar-graph rect.day')
   days.forEach(d => {
-    const currentDayCount = parseInt(d.dataset.count)
-    yearTotal += parseInt(currentDayCount)
+    const currentDayCount = Number.parseInt(d.dataset.count, 10)
+    yearTotal += Number.parseInt(currentDayCount, 10)
 
     if (days[0] === d) {
       firstDay = d.dataset.date
@@ -252,8 +252,8 @@ const getSquareColor = fill => {
     case '#196127':
       return COLORS[4]
     default:
-      if (fill.includes('#') !== -1) {
-        return new obelisk.CubeColor().getByHorizontalColor(parseInt('0x' + fill.replace('#', '')))
+      if (fill.includes('#')) {
+        return new obelisk.CubeColor().getByHorizontalColor(Number.parseInt('0x' + fill.replace('#', ''), 16))
       }
   }
 }
@@ -262,22 +262,22 @@ const renderIsometricChart = () => {
   const SIZE = 16
   const MAX_HEIGHT = 100
   const firstRect = document.querySelectorAll('.js-calendar-graph-svg g > g')[1]
-  const canvas = document.getElementById('isometric-contributions')
-  const GH_OFFSET = parseInt(firstRect.getAttribute('transform').match(/(\d+)/)[0]) - 1
-  const point = new obelisk.Point(130,90)
+  const canvas = document.querySelector('#isometric-contributions')
+  const GH_OFFSET = Number.parseInt(firstRect.getAttribute('transform').match(/(\d+)/)[0], 10) - 1
+  const point = new obelisk.Point(130, 90)
   const pixelView = new obelisk.PixelView(canvas, point)
   const weeks = document.querySelectorAll('.js-calendar-graph-svg g > g')
 
   weeks.forEach(w => {
-    const x = parseInt(((w.getAttribute('transform')).match(/(\d+)/))[0]) / (GH_OFFSET + 1)
+    const x = Number.parseInt(((w.getAttribute('transform')).match(/(\d+)/))[0], 10) / (GH_OFFSET + 1)
     w.querySelectorAll('rect').forEach(r => {
-      const y = parseInt(r.getAttribute('y')) / GH_OFFSET
+      const y = Number.parseInt(r.getAttribute('y'), 10) / GH_OFFSET
       const fill = r.getAttribute('fill')
-      const contribCount = parseInt(r.dataset.count)
+      const contribCount = Number.parseInt(r.dataset.count, 10)
       let cubeHeight = 3
 
       if (maxCount > 0) {
-        cubeHeight += parseInt(MAX_HEIGHT / maxCount * contribCount)
+        cubeHeight += Number.parseInt(MAX_HEIGHT / maxCount * contribCount, 10)
       }
 
       const dimension = new obelisk.CubeDimension(SIZE, SIZE, cubeHeight)
@@ -330,11 +330,11 @@ const renderStats = () => {
   `
   const icStatsBlockTop = document.createElement('div')
   icStatsBlockTop.innerHTML = topMarkup
-  document.querySelector('.ic-contributions-wrapper').appendChild(icStatsBlockTop)
+  document.querySelector('.ic-contributions-wrapper').append(icStatsBlockTop)
 
   const icStatsBlockBottom = document.createElement('div')
   icStatsBlockBottom.innerHTML = bottomMarkup
-  document.querySelector('.ic-contributions-wrapper').appendChild(icStatsBlockBottom)
+  document.querySelector('.ic-contributions-wrapper').append(icStatsBlockBottom)
 }
 
 const generateIsometricChart = () => {
@@ -349,7 +349,7 @@ const generateIsometricChart = () => {
 }
 
 const precisionRound = (number, precision) => {
-  const factor = Math.pow(10, precision)
+  const factor = 10 ** precision
   return Math.round(number * factor) / factor
 }
 
@@ -404,7 +404,7 @@ if (document.querySelector('.js-calendar-graph')) {
     })
   }
 
-  const observedContainer = document.getElementById('js-pjax-container')
+  const observedContainer = document.querySelector('#js-pjax-container')
   const observer = new MutationObserver(callback)
   observer.observe(observedContainer, config)
 }
