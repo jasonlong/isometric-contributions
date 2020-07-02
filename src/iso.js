@@ -6,39 +6,38 @@ const COLORS = [
   new obelisk.CubeColor().getByHorizontalColor(0x216e39)
 ]
 
-const dateOptions         = {month: "short", day: "numeric"}
-const dateWithYearOptions = {month: "short", day: "numeric", year: "numeric"}
+const dateOptions = {month: 'short', day: 'numeric'}
 
 let calendarGraph
 let contributionsBox
 
-let yearTotal           = 0
-let averageCount        = 0
-let maxCount            = 0
-let countTotal          = 0
-let streakLongest       = 0
-let streakCurrent       = 0
-let bestDay             = null
-let firstDay            = null
-let lastDay             = null
-let datesTotal          = null
-let datesLongest        = null
-let datesCurrent        = null
-let dateBest            = null
+let yearTotal = 0
+let averageCount = 0
+let maxCount = 0
+let countTotal = 0
+let streakLongest = 0
+let streakCurrent = 0
+let bestDay = null
+let firstDay = null
+let lastDay = null
+let datesTotal = null
+let datesLongest = null
+let datesCurrent = null
+let dateBest = null
 
-let toggleSetting = "cubes"
+let toggleSetting = 'cubes'
 
 const resetValues = () => {
-  yearTotal           = 0
-  averageCount        = 0
-  maxCount            = 0
-  streakLongest       = 0
-  streakCurrent       = 0
-  bestDay             = null
-  firstDay            = null
-  lastDay             = null
-  datesLongest        = null
-  datesCurrent        = null
+  yearTotal = 0
+  averageCount = 0
+  maxCount = 0
+  streakLongest = 0
+  streakCurrent = 0
+  bestDay = null
+  firstDay = null
+  lastDay = null
+  datesLongest = null
+  datesCurrent = null
 }
 
 const getSettings = () => {
@@ -47,13 +46,12 @@ const getSettings = () => {
     // The storage API is not supported in content scripts.
     // https://developer.mozilla.org/Add-ons/WebExtensions/Chrome_incompatibilities#storage
     if (chrome && chrome.storage) {
-      chrome.storage.local.get(["toggleSetting"], (settings) => {
-        toggleSetting = settings.toggleSetting ? settings.toggleSetting : "cubes"
+      chrome.storage.local.get(['toggleSetting'], (settings) => {
+        toggleSetting = settings.toggleSetting ? settings.toggleSetting : 'cubes'
         resolve('Settings loaded')
       })
-    }
-    else {
-      toggleSetting = localStorage.toggleSetting ? localStorage.toggleSetting : "cubes"
+    } else {
+      toggleSetting = localStorage.toggleSetting ? localStorage.toggleSetting : 'cubes'
       resolve('Settings loaded')
     }
   })
@@ -64,46 +62,45 @@ const persistSetting = (key, value) => {
     let obj = {}
     obj[key] = value
     chrome.storage.local.set(obj)
-  }
-  else {
+  } else {
     localStorage[key] = value
   }
 }
 
 const initUI = () => {
-  const contributionsWrapper = document.createElement("div")
-  contributionsWrapper.className = "ic-contributions-wrapper position-relative"
+  const contributionsWrapper = document.createElement('div')
+  contributionsWrapper.className = 'ic-contributions-wrapper position-relative'
   calendarGraph.before(contributionsWrapper)
 
-  const canvas = document.createElement("canvas")
-  canvas.id = "isometric-contributions"
+  const canvas = document.createElement('canvas')
+  canvas.id = 'isometric-contributions'
   canvas.width = 1000
   canvas.height = 600
-  canvas.style.width = "100%"
+  canvas.style.width = '100%'
   contributionsWrapper.appendChild(canvas)
 
   // Inject toggle
-  const insertLocation = contributionsBox.querySelector("h2").parentElement
+  const insertLocation = contributionsBox.querySelector('h2').parentElement
 
-  const btnGroup = document.createElement("div")
-  btnGroup.className = "BtnGroup mt-1 ml-3 position-relative top-0 float-right"
+  const btnGroup = document.createElement('div')
+  btnGroup.className = 'BtnGroup mt-1 ml-3 position-relative top-0 float-right'
 
-  const squaresButton = document.createElement("button")
-  squaresButton.innerHTML = "2D"
-  squaresButton.className = "ic-toggle-option squares btn BtnGroup-item btn-sm py-0 px-1"
-  squaresButton.setAttribute("data-ic-option", "squares")
-  squaresButton.addEventListener("click", handleViewToggle);
-  if (toggleSetting === "squares") {
-    squaresButton.classList.add("selected")
+  const squaresButton = document.createElement('button')
+  squaresButton.innerHTML = '2D'
+  squaresButton.className = 'ic-toggle-option squares btn BtnGroup-item btn-sm py-0 px-1'
+  squaresButton.dataset.icOption = 'squares'
+  squaresButton.addEventListener('click', handleViewToggle)
+  if (toggleSetting === 'squares') {
+    squaresButton.classList.add('selected')
   }
 
-  const cubesButton = document.createElement("button")
-  cubesButton.innerHTML = "3D"
-  cubesButton.className = "ic-toggle-option cubes btn BtnGroup-item btn-sm py-0 px-1"
-  cubesButton.setAttribute("data-ic-option", "cubes")
-  cubesButton.addEventListener("click", handleViewToggle);
-  if (toggleSetting === "cubes") {
-    cubesButton.classList.add("selected")
+  const cubesButton = document.createElement('button')
+  cubesButton.innerHTML = '3D'
+  cubesButton.className = 'ic-toggle-option cubes btn BtnGroup-item btn-sm py-0 px-1'
+  cubesButton.dataset.icOption = 'cubes'
+  cubesButton.addEventListener('click', handleViewToggle)
+  if (toggleSetting === 'cubes') {
+    cubesButton.classList.add('selected')
   }
 
   insertLocation.prepend(btnGroup)
@@ -113,47 +110,47 @@ const initUI = () => {
   setContainerViewType(toggleSetting)
 }
 
-const handleViewToggle = (e) => {
-  setContainerViewType(e.target.dataset.icOption)
+const handleViewToggle = (event) => {
+  setContainerViewType(event.target.dataset.icOption)
 
-  document.querySelectorAll(".ic-toggle-option").forEach(toggle => { toggle.classList.remove("selected") })
-  e.target.classList.add("selected")
+  document.querySelectorAll('.ic-toggle-option').forEach(toggle => { toggle.classList.remove('selected') })
+  event.target.classList.add('selected')
 
-  persistSetting("toggleSetting", e.target.dataset.icOption)
-  toggleSetting = e.target.dataset.icOption
+  persistSetting('toggleSetting', event.target.dataset.icOption)
+  toggleSetting = event.target.dataset.icOption
 
   // Apply user preference
-  document.querySelector(`.ic-toggle-option.${toggleSetting}`).classList.add("selected")
+  document.querySelector(`.ic-toggle-option.${toggleSetting}`).classList.add('selected')
   contributionsBox.classList.add(`ic-${toggleSetting}`)
 }
 
-const setContainerViewType = (type) => {
-  if (type === "squares") {
-    contributionsBox.classList.remove("ic-cubes")
-    contributionsBox.classList.add("ic-squares")
-  }
-  else {
-    contributionsBox.classList.remove("ic-squares")
-    contributionsBox.classList.add("ic-cubes")
+const setContainerViewType = type => {
+  if (type === 'squares') {
+    contributionsBox.classList.remove('ic-cubes')
+    contributionsBox.classList.add('ic-squares')
+  } else {
+    contributionsBox.classList.remove('ic-squares')
+    contributionsBox.classList.add('ic-cubes')
   }
 }
 
 const loadStats = () => {
-  let tempStreak         = 0
-  let tempStreakStart    = null
+  let tempStreak = 0
+  let tempStreakStart = null
   let longestStreakStart = null
-  let longestStreakEnd   = null
+  let longestStreakEnd = null
   let currentStreakStart = null
-  let currentStreakEnd   = null
+  let currentStreakEnd = null
 
-  let days = document.querySelectorAll(".js-calendar-graph rect.day")
+  let days = document.querySelectorAll('.js-calendar-graph rect.day')
   days.forEach(d => {
-    currentDayCount = parseInt(d.dataset.count)
+    let currentDayCount = parseInt(d.dataset.count)
     yearTotal += parseInt(currentDayCount)
 
     if (days[0] === d) {
       firstDay = d.dataset.date
     }
+
     if (days[days.length - 1] === d) {
       lastDay = d.dataset.date
     }
@@ -166,7 +163,7 @@ const loadStats = () => {
 
     // Check for longest streak
     if (currentDayCount > 0) {
-      if (tempStreak == 0) {
+      if (tempStreak === 0) {
         tempStreakStart = d.dataset.date
       }
 
@@ -174,27 +171,25 @@ const loadStats = () => {
 
       if (tempStreak >= streakLongest) {
         longestStreakStart = tempStreakStart
-        longestStreakEnd   = d.dataset.date
-        streakLongest      = tempStreak
+        longestStreakEnd = d.dataset.date
+        streakLongest = tempStreak
       }
-    }
-    else {
-      tempStreak         = 0
-      tempStreakStart    = null
-      tempStreakEnd      = null
+    } else {
+      tempStreak = 0
+      tempStreakStart = null
+      tempStreakEnd = null
     }
   })
 
   // Check for current streak
   // Convert days NodeList to Array so we can reverse it
-  let daysArray = Array.prototype.slice.call(days);
+  const daysArray = Array.prototype.slice.call(days)
   daysArray.reverse()
 
   currentStreakEnd = daysArray[0].dataset.date
 
-  for (let i=0; i < daysArray.length; i++) {
-
-    currentDayCount = parseInt(daysArray[i].dataset.count, 10)
+  for (let i = 0; i < daysArray.length; i++) {
+    const currentDayCount = Number.parseInt(daysArray[i].dataset.count, 10)
     // If there's no activity today, continue on to yesterday
     if (i === 0 && currentDayCount === 0) {
       currentStreakEnd = daysArray[1].dataset.date
@@ -204,33 +199,31 @@ const loadStats = () => {
     if (currentDayCount > 0) {
       streakCurrent++
       currentStreakStart = daysArray[i].dataset.date
-    }
-    else {
+    } else {
       break
     }
   }
 
   if (streakCurrent > 0) {
     currentStreakStart = formatDateString(currentStreakStart, dateOptions)
-    currentStreakEnd   = formatDateString(currentStreakEnd, dateOptions)
-    datesCurrent       = `${currentStreakStart} → ${currentStreakEnd}`
-  }
-  else {
-    datesCurrent = "No current streak"
+    currentStreakEnd = formatDateString(currentStreakEnd, dateOptions)
+    datesCurrent = `${currentStreakStart} → ${currentStreakEnd}`
+  } else {
+    datesCurrent = 'No current streak'
   }
 
   // Year total
   countTotal = yearTotal.toLocaleString()
-  let dateFirst  = formatDateString(firstDay, dateOptions)
-  let dateLast   = formatDateString(lastDay, dateOptions)
+  const dateFirst = formatDateString(firstDay, dateOptions)
+  const dateLast = formatDateString(lastDay, dateOptions)
   datesTotal = `${dateFirst} → ${dateLast}`
 
   // Average contributions per day
-  let dayDifference = datesDayDifference(firstDay, lastDay)
+  const dayDifference = datesDayDifference(firstDay, lastDay)
   averageCount = precisionRound((yearTotal / dayDifference), 2)
 
   // Best day
-  dateBest  = formatDateString(bestDay, dateOptions)
+  dateBest = formatDateString(bestDay, dateOptions)
   if (!dateBest) {
     dateBest = 'No activity found'
   }
@@ -238,15 +231,14 @@ const loadStats = () => {
   // Longest streak
   if (streakLongest > 0) {
     longestStreakStart = formatDateString(longestStreakStart, dateOptions)
-    longestStreakEnd   = formatDateString(longestStreakEnd, dateOptions)
-    datesLongest       = `${longestStreakStart} → ${longestStreakEnd}`
-  }
-  else {
-    datesLongest = "No longest streak"
+    longestStreakEnd = formatDateString(longestStreakEnd, dateOptions)
+    datesLongest = `${longestStreakStart} → ${longestStreakEnd}`
+  } else {
+    datesLongest = 'No longest streak'
   }
 }
 
-const getSquareColor = (fill) => {
+const getSquareColor = fill => {
   switch (fill.toLowerCase()) {
     case '#ebedf0':
       return COLORS[0]
@@ -259,8 +251,9 @@ const getSquareColor = (fill) => {
     case '#196127':
       return COLORS[4]
     default:
-      if (fill.indexOf('#') != -1)
-        return new obelisk.CubeColor().getByHorizontalColor(parseInt('0x'+fill.replace("#", "")))
+      if (fill.includes('#') !== -1) {
+        return new obelisk.CubeColor().getByHorizontalColor(parseInt('0x'+fill.replace('#', '')))
+      }
   }
 }
 
@@ -270,28 +263,26 @@ const renderIsometricChart = () => {
   const firstRect = document.querySelectorAll('.js-calendar-graph-svg g > g')[1]
   const canvas = document.getElementById('isometric-contributions')
   const GH_OFFSET = parseInt(firstRect.getAttribute('transform').match(/(\d+)/)[0]) - 1
-
-  let point= new obelisk.Point(130,90)
-  let pixelView = new obelisk.PixelView(canvas, point)
-  let contribCount = null
-  let weeks = document.querySelectorAll(".js-calendar-graph-svg g > g")
+  const point = new obelisk.Point(130,90)
+  const pixelView = new obelisk.PixelView(canvas, point)
+  const weeks = document.querySelectorAll('.js-calendar-graph-svg g > g')
 
   weeks.forEach(w => {
-    let x = parseInt(((w.getAttribute('transform')).match(/(\d+)/))[0]) / (GH_OFFSET + 1)
+    const x = parseInt(((w.getAttribute('transform')).match(/(\d+)/))[0]) / (GH_OFFSET + 1)
     w.querySelectorAll('rect').forEach (r => {
-      let y = parseInt(r.getAttribute('y')) / GH_OFFSET
-      let fill = r.getAttribute('fill')
-      let contribCount = parseInt(r.dataset.count)
+      const y = parseInt(r.getAttribute('y')) / GH_OFFSET
+      const fill = r.getAttribute('fill')
+      const contribCount = parseInt(r.dataset.count)
       let cubeHeight = 3
 
       if (maxCount > 0) {
         cubeHeight += parseInt(MAX_HEIGHT / maxCount * contribCount)
       }
 
-      let dimension = new obelisk.CubeDimension(SIZE, SIZE, cubeHeight)
-      let color = getSquareColor(fill)
-      let cube = new obelisk.Cube(dimension, color, false)
-      let p3d = new obelisk.Point3D(SIZE * x, SIZE * y, 0)
+      const dimension = new obelisk.CubeDimension(SIZE, SIZE, cubeHeight)
+      const color = getSquareColor(fill)
+      const cube = new obelisk.Cube(dimension, color, false)
+      const p3d = new obelisk.Point3D(SIZE * x, SIZE * y, 0)
       pixelView.renderObject(cube, p3d)
     })
   })
@@ -336,11 +327,11 @@ const renderStats = () => {
       </div>
     </div>
   `
-  const icStatsBlockTop = document.createElement("div")
+  const icStatsBlockTop = document.createElement('div')
   icStatsBlockTop.innerHTML = topMarkup
   document.querySelector('.ic-contributions-wrapper').appendChild(icStatsBlockTop)
 
-  const icStatsBlockBottom = document.createElement("div")
+  const icStatsBlockBottom = document.createElement('div')
   icStatsBlockBottom.innerHTML = bottomMarkup
   document.querySelector('.ic-contributions-wrapper').appendChild(icStatsBlockBottom)
 }
@@ -357,36 +348,38 @@ const generateIsometricChart = () => {
 }
 
 const precisionRound = (number, precision) => {
-  let factor = Math.pow(10, precision)
+  const factor = Math.pow(10, precision)
   return Math.round(number * factor) / factor
 }
 
-const datesDayDifference = (dateStr1, dateStr2) => {
+const datesDayDifference = (dateString1, dateString2) => {
   let diffDays = null
   let date1 = null
   let date2 = null
 
-  if (dateStr1) {
-    dateParts = dateStr1.split('-')
+  if (dateString1) {
+    const dateParts = dateString1.split('-')
     date1 = new Date(dateParts[0], dateParts[1] - 1, dateParts[2], 0, 0, 0)
   }
-  if (dateStr2) {
-    dateParts = dateStr2.split('-')
+
+  if (dateString2) {
+    const dateParts = dateString2.split('-')
     date2 = new Date(dateParts[0], dateParts[1] - 1, dateParts[2], 0, 0, 0)
   }
-  if (dateStr1 && dateStr2) {
-    timeDiff = Math.abs(date2.getTime() - date1.getTime())
+
+  if (dateString1 && dateString2) {
+    const timeDiff = Math.abs(date2.getTime() - date1.getTime())
     diffDays = Math.ceil(timeDiff / (1000 * 3600 * 24))
   }
 
   return diffDays
 }
 
-const formatDateString = (dateStr, options) => {
+const formatDateString = (dateString, options) => {
   let date = null
 
-  if (dateStr) {
-    let dateParts = dateStr.split('-')
+  if (dateString) {
+    const dateParts = dateString.split('-')
     date = new Date(dateParts[0], dateParts[1] - 1, dateParts[2], 0, 0, 0).toLocaleDateString('en-US', options)
   }
 
@@ -394,21 +387,23 @@ const formatDateString = (dateStr, options) => {
 }
 
 if (document.querySelector('.js-calendar-graph')) {
-  let settingsPromise = getSettings()
+  const settingsPromise = getSettings()
   settingsPromise.then(generateIsometricChart)
 
-  let config = { attributes: false, childList: true, subtree: true }
-  let callback = (mutationsList) => {
+  const config = {attributes: false, childList: true, subtree: true}
+  const callback = mutationsList => {
     mutationsList.forEach(mutation => {
       if (mutation.type === 'childList') {
         mutation.addedNodes.forEach(node => {
-          if (node.classList && node.classList.contains('js-yearly-contributions'))
+          if (node.classList && node.classList.contains('js-yearly-contributions')) {
             generateIsometricChart()
+          }
         })
       }
     })
   }
-  observedContainer = document.getElementById('js-pjax-container')
-  observer = new MutationObserver(callback)
+
+  const observedContainer = document.getElementById('js-pjax-container')
+  const observer = new MutationObserver(callback)
   observer.observe(observedContainer, config)
 }

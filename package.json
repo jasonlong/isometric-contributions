@@ -1,0 +1,12 @@
+{
+	"scripts": {
+		"test": "xo"
+	},
+	"devDependencies": {
+		"xo": "^0.32.0"
+	},
+  "xo": {
+    "semicolon": false,
+    "space": true
+  }
+}
