@@ -1,8 +1,5 @@
 #!/usr/bin/env sh
 
-cp src/iso.js chrome/
-cp src/iso.js firefox/isometric-contributions/
-
 # Build .zip for Chrome
 cd chrome
 rm ../chrome.zip

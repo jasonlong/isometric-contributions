@@ -1,0 +1,14 @@
+/* Normal chart display */
+.ic-squares #isometric-contributions,
+.ic-squares .ic-contributions-wrapper {
+  display: none;
+}
+
+/* Isometric cube display */
+.ic-cubes .contrib-details {
+  display: none;
+}
+
+.ic-cubes .calendar-graph {
+  display: none ! important;
+}
