@@ -1,9 +1,9 @@
 const COLORS = [
-  new obelisk.CubeColor().getByHorizontalColor(0xebedf0),
-  new obelisk.CubeColor().getByHorizontalColor(0x9be9a8),
-  new obelisk.CubeColor().getByHorizontalColor(0x40c463),
-  new obelisk.CubeColor().getByHorizontalColor(0x30a14e),
-  new obelisk.CubeColor().getByHorizontalColor(0x216e39)
+  new obelisk.CubeColor().getByHorizontalColor(0xEBEDF0),
+  new obelisk.CubeColor().getByHorizontalColor(0x9BE9A8),
+  new obelisk.CubeColor().getByHorizontalColor(0x40C463),
+  new obelisk.CubeColor().getByHorizontalColor(0x30A14E),
+  new obelisk.CubeColor().getByHorizontalColor(0x216E39)
 ]
 
 const dateOptions = {month: 'short', day: 'numeric'}
@@ -41,12 +41,12 @@ const resetValues = () => {
 }
 
 const getSettings = () => {
-  return new Promise(function(resolve, reject) {
+  return new Promise(function (resolve) {
     // Check for user preference, if chrome.storage is available.
     // The storage API is not supported in content scripts.
     // https://developer.mozilla.org/Add-ons/WebExtensions/Chrome_incompatibilities#storage
     if (chrome && chrome.storage) {
-      chrome.storage.local.get(['toggleSetting'], (settings) => {
+      chrome.storage.local.get(['toggleSetting'], settings => {
         toggleSetting = settings.toggleSetting ? settings.toggleSetting : 'cubes'
         resolve('Settings loaded')
       })
@@ -59,9 +59,9 @@ const getSettings = () => {
 
 const persistSetting = (key, value) => {
   if (chrome && chrome.storage) {
-    let obj = {}
-    obj[key] = value
-    chrome.storage.local.set(obj)
+    const object = {}
+    object[key] = value
+    chrome.storage.local.set(object)
   } else {
     localStorage[key] = value
   }
@@ -110,10 +110,12 @@ const initUI = () => {
   setContainerViewType(toggleSetting)
 }
 
-const handleViewToggle = (event) => {
+const handleViewToggle = event => {
   setContainerViewType(event.target.dataset.icOption)
 
-  document.querySelectorAll('.ic-toggle-option').forEach(toggle => { toggle.classList.remove('selected') })
+  document.querySelectorAll('.ic-toggle-option').forEach(toggle => {
+    toggle.classList.remove('selected')
+  })
   event.target.classList.add('selected')
 
   persistSetting('toggleSetting', event.target.dataset.icOption)
@@ -135,16 +137,16 @@ const setContainerViewType = type => {
 }
 
 const loadStats = () => {
-  let tempStreak = 0
-  let tempStreakStart = null
+  let temporaryStreak = 0
+  let temporaryStreakStart = null
   let longestStreakStart = null
   let longestStreakEnd = null
   let currentStreakStart = null
   let currentStreakEnd = null
 
-  let days = document.querySelectorAll('.js-calendar-graph rect.day')
+  const days = document.querySelectorAll('.js-calendar-graph rect.day')
   days.forEach(d => {
-    let currentDayCount = parseInt(d.dataset.count)
+    const currentDayCount = parseInt(d.dataset.count)
     yearTotal += parseInt(currentDayCount)
 
     if (days[0] === d) {
@@ -163,21 +165,20 @@ const loadStats = () => {
 
     // Check for longest streak
     if (currentDayCount > 0) {
-      if (tempStreak === 0) {
-        tempStreakStart = d.dataset.date
+      if (temporaryStreak === 0) {
+        temporaryStreakStart = d.dataset.date
       }
 
-      tempStreak++
+      temporaryStreak++
 
-      if (tempStreak >= streakLongest) {
-        longestStreakStart = tempStreakStart
+      if (temporaryStreak >= streakLongest) {
+        longestStreakStart = temporaryStreakStart
         longestStreakEnd = d.dataset.date
-        streakLongest = tempStreak
+        streakLongest = temporaryStreak
       }
     } else {
-      tempStreak = 0
-      tempStreakStart = null
-      tempStreakEnd = null
+      temporaryStreak = 0
+      temporaryStreakStart = null
     }
   })
 
@@ -252,7 +253,7 @@ const getSquareColor = fill => {
       return COLORS[4]
     default:
       if (fill.includes('#') !== -1) {
-        return new obelisk.CubeColor().getByHorizontalColor(parseInt('0x'+fill.replace('#', '')))
+        return new obelisk.CubeColor().getByHorizontalColor(parseInt('0x' + fill.replace('#', '')))
       }
   }
 }
@@ -269,7 +270,7 @@ const renderIsometricChart = () => {
 
   weeks.forEach(w => {
     const x = parseInt(((w.getAttribute('transform')).match(/(\d+)/))[0]) / (GH_OFFSET + 1)
-    w.querySelectorAll('rect').forEach (r => {
+    w.querySelectorAll('rect').forEach(r => {
       const y = parseInt(r.getAttribute('y')) / GH_OFFSET
       const fill = r.getAttribute('fill')
       const contribCount = parseInt(r.dataset.count)

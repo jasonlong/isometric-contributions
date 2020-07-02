@@ -7,6 +7,18 @@
 	},
   "xo": {
     "semicolon": false,
-    "space": true
+    "space": true,
+    "global": [
+      "obelisk",
+      "chrome"
+    ],
+    "env": [
+      "browser"
+    ],
+    "ignores": [
+			"chrome/**",
+      "firefox/**",
+      "safari/**"
+		]
   }
 }
