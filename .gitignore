@@ -2,3 +2,5 @@ chrome*.zip
 .DS_Store
 *.un~
 node_modules
+.direnv
+.envrc

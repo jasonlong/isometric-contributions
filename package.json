@@ -1,10 +1,15 @@
 {
-	"scripts": {
-		"test": "xo"
-	},
-	"devDependencies": {
-		"xo": "^0.32.0"
-	},
+  "scripts": {
+    "test": "xo",
+    "release": "release:*",
+    "release:amo": "web-ext-submit --source-dir firefox/isometric-contributions",
+    "release:cws": "npx webstore upload --source=chrome.zip --auto-publish"
+  },
+  "devDependencies": {
+    "chrome-webstore-upload-cli": "^1.2.0",
+    "web-ext-submit": "^4.3.0",
+    "xo": "^0.32.0"
+  },
   "xo": {
     "semicolon": false,
     "space": true,
@@ -16,9 +21,9 @@
       "browser"
     ],
     "ignores": [
-			"chrome/**",
+      "chrome/**",
       "firefox/**",
       "safari/**"
-		]
+    ]
   }
 }
