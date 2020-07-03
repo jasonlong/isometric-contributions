@@ -5,14 +5,26 @@
   "content_scripts": [ {
     "css": [ "iso.css" ],
     "js": [ "obelisk.min.js", "iso.js" ],
-    "matches": [ "http://github.com/*" ]
+    "matches": [ "https://github.com/*" ]
   }],
   "permissions": [
-    "storage"
+    "storage",
+    "contextMenus",
+		"activeTab"
   ],
+  "optional_permissions": [
+    "http://*/*",
+		"https://*/*"
+	],
   "icons" : {
     "48" : "icon-48.png",
     "128" : "icon-128.png"
   },
-  "manifest_version": 2
+  "manifest_version": 2,
+  "background": {
+		"scripts": [
+			"webext-domain-permission-toggle.js",
+			"background.js"
+		]
+	}
 }
