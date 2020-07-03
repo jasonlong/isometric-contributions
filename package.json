@@ -21,9 +21,8 @@
       "browser"
     ],
     "ignores": [
-      "chrome/**",
-      "firefox/**",
-      "safari/**"
+      "src/webext-domain-permission-toggle.js",
+      "src/background.js"
     ]
   }
 }
