@@ -8,7 +8,7 @@ This is a browser extension for Chrome/Brave and Firefox that lets you toggle be
 
 Besides being sort of neat looking, this view is interesting in that it highlights the differences between the number of contributions with more granularity. This isn't meant to completely replace the standard 2D graph though, because in most ways it is actually less useful. For example, there are no axis labels, shorter bars can be hidden behind taller ones, you can't hover over a bar to see the day and count, etc.
 
-![Preview](img/preview.png)
+<img src="img/preview.png" width="1052" />
 
 ## Installation
 
