@@ -18,7 +18,7 @@ Besides being sort of neat looking, this view is interesting in that it highligh
 
 ### Firefox
 
-_Current awaiting approval from Mozilla Developer Hub_
+[Install from Mozilla Add-ons site](https://addons.mozilla.org/en-US/firefox/addon/github-isometric-contributions/)
 
 #### GitHub Enterprise
 
