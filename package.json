@@ -2,8 +2,8 @@
   "scripts": {
     "test": "xo",
     "release": "release:*",
-    "release:amo": "web-ext-submit --source-dir firefox/isometric-contributions",
-    "release:cws": "npx webstore upload --source=chrome.zip --auto-publish"
+    "release:amo": "web-ext-submit --source-dir src",
+    "release:cws": "npx webstore upload --source=isometric-contributions.zip --auto-publish"
   },
   "devDependencies": {
     "chrome-webstore-upload-cli": "^1.2.0",
