@@ -1,4 +1,4 @@
-This is an extension for Chrome, ~~Safari~~ (see note below), and Firefox (beta) that lets you toggle between your regular GitHub contribution chart and an isometric pixel art version. It uses [obelisk.js](https://github.com/nosir/obelisk.js) for the isometric graphics.
+This is a browser extension for Chrome/Brave and Firefox that lets you toggle between your regular GitHub contribution chart and an isometric pixel art version. It uses [obelisk.js](https://github.com/nosir/obelisk.js) for the isometric graphics.
 
 Besides being sort of neat looking, this view is interesting in that it highlights the differences between the number of contributions with more granularity. This isn't meant to completely replace the standard 2D graph though, because in most ways it is actually less useful. For example, there are no axis labels, shorter bars can be hidden behind taller ones, you can't hover over a bar to see the day and count, etc.
 
@@ -6,23 +6,22 @@ Besides being sort of neat looking, this view is interesting in that it highligh
 
 ## Installation
 
-**NOTE: When installing this extension, you will likely see a warning about it needing access to all domains, not just github.com. This is required for people who are using GitHub Enterprise since it can be installed on any domain name.**
+### Chrome/Brave
 
-### Chrome
-
-The easiest way to install the extension is through the Chrome Web Store:
-
-https://chrome.google.com/webstore/detail/isometric-contributions/mjoedlfflcchnleknnceiplgaeoegien?hl=en&gl=US
+[Install from the Chrome Web Store](https://chrome.google.com/webstore/detail/isometric-contributions/mjoedlfflcchnleknnceiplgaeoegien?hl=en&gl=US)
 
 ### Firefox
 
-The Firefox extension has not been verified by Mozilla, so only [Firefox Developer Edition](https://www.mozilla.org/firefox/developer/) is supported at the moment. [Set `xpinstall.signatures.required` to `false`](https://developer.mozilla.org/Add-ons/WebExtensions/Prerequisites) in `about:config`. Download the [isometric-contributions.zip](https://github.com/jasonlong/isometric-contributions/blob/master/firefox/isometric-contributions.zip?raw=true) file and open it in Firefox Developer Edition. Or, in Add-ons Manager, choose "Install Add-on From File" under the wrench icon and choose the zip file you downloaded.
+_Current awaiting approval from Mozilla Developer Hub_
 
-### Safari
+| I'm no longer able to build Safari extensions because you now need a paid Apple Developer account to do so. I've decided not to spend the $99 for an account since this is the only thing I'd use it for. |
+| --- |
 
-~~Download the [isometric-contributions.safariextz](https://github.com/jasonlong/isometric-contributions/blob/master/safari/isometric-contributions.safariextz?raw=true) and then double-click the file to install it.~~
+## GitHub Enterprise
 
-I'm no longer able to build Safari extensions because you now need a paid Apple Developer account to do so. I've decided not to spend the $99 for an account since this is the only thing I'd use it for.
+By default, the extension only loads on `github.com`. You can manually enable the extension for your Enterprise domain by clicking the extension icon and choosing `Enable Isometric Contributions on this domain`.
+
+![](img/enterprise.png)
 
 ### Developer mode
 
@@ -30,16 +29,11 @@ If you want to hack on the extension, you'll need to install it manually. First 
 
 ![](img/dev-mode.png)
 
-## Hacking
+## Contributing
 
 To hack on the extension, you'll first need to make sure you've installed it in Developer mode (see above). Once you've made changes to the extension, go back to the Extensions page and click the Reload link under the extension entry.
 
 ![](img/reload-link.png)
-
-As of `v0.8.3`, this project uses CoffeeScript. To compile the `iso.coffee` file to all extensions:
-
-    src/build.sh
-
 
 Feel free to send a pull request if you've made an improvement.
 
