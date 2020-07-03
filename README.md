@@ -20,19 +20,17 @@ Besides being sort of neat looking, this view is interesting in that it highligh
 
 _Current awaiting approval from Mozilla Developer Hub_
 
-## GitHub Enterprise
+#### GitHub Enterprise
 
 By default, the extension only loads on `github.com`. You can manually enable the extension for your Enterprise domain by clicking the extension icon and choosing `Enable Isometric Contributions on this domain`.
 
 <img src="img/enterprise.png" width="396" />
 
-### Developer mode
+## Contributing
 
 If you want to hack on the extension, you'll need to install it manually. First clone or fork this repo. Then, on your Chrome Extensions page, make sure "Developer mode" is checked. You can then click the "Load unpacked extension..." button and browse to the `chrome` directory of this repo.
 
 <img src="img/dev-mode.png" width="981" />
-
-## Contributing
 
 To hack on the extension, you'll first need to make sure you've installed it in Developer mode (see above). Once you've made changes to the extension, go back to the Extensions page and click the Reload link under the extension entry.
 
