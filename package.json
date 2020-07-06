@@ -1,6 +1,7 @@
 {
   "scripts": {
     "test": "xo",
+    "build": "zip -r isometric-contributions.zip src/*",
     "release": "release:*",
     "release:amo": "web-ext-submit --source-dir src",
     "release:cws": "npx webstore upload --source=isometric-contributions.zip --auto-publish"
