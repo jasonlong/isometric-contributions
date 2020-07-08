@@ -3,8 +3,8 @@
     "test": "xo",
     "build": "zip -r isometric-contributions.zip src/*",
     "release": "release:*",
-    "release:amo": "web-ext-submit --source-dir src",
-    "release:cws": "npx webstore upload --source=isometric-contributions.zip --auto-publish"
+    "release:ff": "npx web-ext-submit --source-dir src",
+    "release:chrome": "npx webstore upload --source=isometric-contributions.zip --auto-publish"
   },
   "devDependencies": {
     "chrome-webstore-upload-cli": "^1.2.0",
