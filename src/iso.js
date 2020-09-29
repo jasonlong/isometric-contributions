@@ -316,12 +316,12 @@ const renderStats = () => {
       <h5 class="mb-1">Streaks</h5>
       <div class="d-flex flex-justify-between rounded-2 border px-1 px-md-2">
         <div class="p-2">
-          <span class="d-block f2 text-bold text-green lh-condensed">${streakLongest}<span class="f4">days</span></span>
+          <span class="d-block f2 text-bold text-green lh-condensed">${streakLongest} <span class="f4">days</span></span>
           <span class="d-block text-small text-bold">Longest</span>
           <span class="d-none d-sm-block text-small text-gray-light">${datesLongest}</span>
         </div>
         <div class="p-2">
-          <span class="d-block f2 text-bold text-green lh-condensed">${streakCurrent}<span class="f4">days</span></span>
+          <span class="d-block f2 text-bold text-green lh-condensed">${streakCurrent} <span class="f4">days</span></span>
           <span class="d-block text-small text-bold">Current</span>
           <span class="d-none d-sm-block text-small text-gray-light">${datesCurrent}</span>
         </div>
