@@ -11,3 +11,8 @@ SAFARI:
 
 CHROME:
 ![CHROME](https://github.com/REGATTE/isometric-contributions/blob/main/safari/images/chrome.png)
+
+
+USER: REGATTE
+
+[![Github Badge](https://img.shields.io/badge/-REGATTE-blACK?style=flat-square&logo=Github&logoColor=white&link=https://github.com/REGATTE)](https://github.com/REGATTE)
