@@ -240,16 +240,16 @@ const loadStats = () => {
 }
 
 const getSquareColor = fill => {
-  switch (fill.toLowerCase()) {
-    case '#ebedf0':
+  switch (fill) {
+    case 'var(--color-calendar-graph-day-bg)':
       return COLORS[0]
-    case '#c6e48b':
+    case 'var(--color-calendar-graph-day-L1-bg)':
       return COLORS[1]
-    case '#7bc96f':
+    case 'var(--color-calendar-graph-day-L2-bg)':
       return COLORS[2]
-    case '#239a3b':
+    case 'var(--color-calendar-graph-day-L3-bg)':
       return COLORS[3]
-    case '#196127':
+    case 'var(--color-calendar-graph-day-L4-bg)':
       return COLORS[4]
     default:
       if (fill.includes('#')) {
