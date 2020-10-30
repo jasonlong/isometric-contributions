@@ -24,6 +24,9 @@
     "ignores": [
       "src/webext-domain-permission-toggle.js",
       "src/background.js"
+    ],
+    "rules": [
+      "prefer-numeric-literals": 0
     ]
   }
 }

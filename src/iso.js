@@ -1,16 +1,8 @@
-const COLORS = [
-  new obelisk.CubeColor().getByHorizontalColor(0xEBEDF0),
-  new obelisk.CubeColor().getByHorizontalColor(0x9BE9A8),
-  new obelisk.CubeColor().getByHorizontalColor(0x40C463),
-  new obelisk.CubeColor().getByHorizontalColor(0x30A14E),
-  new obelisk.CubeColor().getByHorizontalColor(0x216E39)
-]
-
 const dateOptions = {month: 'short', day: 'numeric'}
 
 let calendarGraph
 let contributionsBox
-
+let colors = []
 let yearTotal = 0
 let averageCount = 0
 let maxCount = 0
@@ -24,7 +16,6 @@ let datesTotal = null
 let datesLongest = null
 let datesCurrent = null
 let dateBest = null
-
 let toggleSetting = 'cubes'
 
 const resetValues = () => {
@@ -38,6 +29,26 @@ const resetValues = () => {
   lastDay = null
   datesLongest = null
   datesCurrent = null
+}
+
+const loadColors = () => {
+  colors = [
+    new obelisk.CubeColor().getByHorizontalColor(
+      Number.parseInt(getComputedStyle(document.documentElement).getPropertyValue('--color-calendar-graph-day-bg').replace('#', ''), 16)
+    ),
+    new obelisk.CubeColor().getByHorizontalColor(
+      Number.parseInt(getComputedStyle(document.documentElement).getPropertyValue('--color-calendar-graph-day-L1-bg').replace('#', ''), 16)
+    ),
+    new obelisk.CubeColor().getByHorizontalColor(
+      Number.parseInt(getComputedStyle(document.documentElement).getPropertyValue('--color-calendar-graph-day-L2-bg').replace('#', ''), 16)
+    ),
+    new obelisk.CubeColor().getByHorizontalColor(
+      Number.parseInt(getComputedStyle(document.documentElement).getPropertyValue('--color-calendar-graph-day-L3-bg').replace('#', ''), 16)
+    ),
+    new obelisk.CubeColor().getByHorizontalColor(
+      Number.parseInt(getComputedStyle(document.documentElement).getPropertyValue('--color-calendar-graph-day-L4-bg').replace('#', ''), 16)
+    )
+  ]
 }
 
 const getSettings = () => {
@@ -242,15 +253,15 @@ const loadStats = () => {
 const getSquareColor = fill => {
   switch (fill) {
     case 'var(--color-calendar-graph-day-bg)':
-      return COLORS[0]
+      return colors[0]
     case 'var(--color-calendar-graph-day-L1-bg)':
-      return COLORS[1]
+      return colors[1]
     case 'var(--color-calendar-graph-day-L2-bg)':
-      return COLORS[2]
+      return colors[2]
     case 'var(--color-calendar-graph-day-L3-bg)':
-      return COLORS[3]
+      return colors[3]
     case 'var(--color-calendar-graph-day-L4-bg)':
-      return COLORS[4]
+      return colors[4]
     default:
       if (fill.includes('#')) {
         return new obelisk.CubeColor().getByHorizontalColor(Number.parseInt('0x' + fill.replace('#', ''), 16))
@@ -342,6 +353,7 @@ const generateIsometricChart = () => {
   contributionsBox = document.querySelector('.js-yearly-contributions')
 
   resetValues()
+  loadColors()
   initUI()
   loadStats()
   renderStats()
@@ -391,7 +403,7 @@ if (document.querySelector('.js-calendar-graph')) {
   const settingsPromise = getSettings()
   settingsPromise.then(generateIsometricChart)
 
-  const config = {attributes: false, childList: true, subtree: true}
+  const config = {attributes: true, childList: true, subtree: false}
   const callback = mutationsList => {
     mutationsList.forEach(mutation => {
       if (mutation.type === 'childList') {
@@ -401,10 +413,14 @@ if (document.querySelector('.js-calendar-graph')) {
           }
         })
       }
+      else if (mutation.attributeName === 'data-color-mode') {
+        loadColors()
+        renderIsometricChart()
+      }
     })
   }
 
-  const observedContainer = document.querySelector('#js-pjax-container')
+  const observedContainer = document.querySelector('html')
   const observer = new MutationObserver(callback)
   observer.observe(observedContainer, config)
 }
