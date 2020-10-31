@@ -3,6 +3,7 @@ const dateOptions = {month: 'short', day: 'numeric'}
 let calendarGraph
 let contributionsBox
 let colors = []
+let halloweenColors= []
 let yearTotal = 0
 let averageCount = 0
 let maxCount = 0
@@ -50,7 +51,7 @@ const loadColors = () => {
     )
   ]
 
-  halloween_colors = [
+  halloweenColors = [
     new obelisk.CubeColor().getByHorizontalColor(
       Number.parseInt(getComputedStyle(document.documentElement).getPropertyValue('--color-calendar-halloween-graph-day-bg').replace('#', ''), 16)
     ),
@@ -281,15 +282,15 @@ const getSquareColor = fill => {
     case 'var(--color-calendar-graph-day-L4-bg)':
       return colors[4]
     case 'var(--color-calendar-halloween-graph-day-bg)':
-      return halloween_colors[0]
+      return halloweenColors[0]
     case 'var(--color-calendar-halloween-graph-day-L1-bg)':
-      return halloween_colors[1]
+      return halloweenColors[1]
     case 'var(--color-calendar-halloween-graph-day-L2-bg)':
-      return halloween_colors[2]
+      return halloweenColors[2]
     case 'var(--color-calendar-halloween-graph-day-L3-bg)':
-      return halloween_colors[3]
+      return halloweenColors[3]
     case 'var(--color-calendar-halloween-graph-day-L4-bg)':
-      return halloween_colors[4]
+      return halloweenColors[4]
     default:
       if (fill.includes('#')) {
         return new obelisk.CubeColor().getByHorizontalColor(Number.parseInt('0x' + fill.replace('#', ''), 16))
