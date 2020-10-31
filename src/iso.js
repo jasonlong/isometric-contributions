@@ -3,7 +3,7 @@ const dateOptions = {month: 'short', day: 'numeric'}
 let calendarGraph
 let contributionsBox
 let colors = []
-let halloweenColors= []
+let halloweenColors = []
 let yearTotal = 0
 let averageCount = 0
 let maxCount = 0
@@ -441,8 +441,7 @@ if (document.querySelector('.js-calendar-graph')) {
             generateIsometricChart()
           }
         })
-      }
-      else if (mutation.attributeName === 'data-color-mode') {
+      } else if (mutation.attributeName === 'data-color-mode') {
         loadColors()
         renderIsometricChart()
       }
