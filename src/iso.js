@@ -49,6 +49,24 @@ const loadColors = () => {
       Number.parseInt(getComputedStyle(document.documentElement).getPropertyValue('--color-calendar-graph-day-L4-bg').replace('#', ''), 16)
     )
   ]
+
+  halloween_colors = [
+    new obelisk.CubeColor().getByHorizontalColor(
+      Number.parseInt(getComputedStyle(document.documentElement).getPropertyValue('--color-calendar-halloween-graph-day-bg').replace('#', ''), 16)
+    ),
+    new obelisk.CubeColor().getByHorizontalColor(
+      Number.parseInt(getComputedStyle(document.documentElement).getPropertyValue('--color-calendar-halloween-graph-day-L1-bg').replace('#', ''), 16)
+    ),
+    new obelisk.CubeColor().getByHorizontalColor(
+      Number.parseInt(getComputedStyle(document.documentElement).getPropertyValue('--color-calendar-halloween-graph-day-L2-bg').replace('#', ''), 16)
+    ),
+    new obelisk.CubeColor().getByHorizontalColor(
+      Number.parseInt(getComputedStyle(document.documentElement).getPropertyValue('--color-calendar-halloween-graph-day-L3-bg').replace('#', ''), 16)
+    ),
+    new obelisk.CubeColor().getByHorizontalColor(
+      Number.parseInt(getComputedStyle(document.documentElement).getPropertyValue('--color-calendar-halloween-graph-day-L4-bg').replace('#', ''), 16)
+    )
+  ]
 }
 
 const getSettings = () => {
@@ -262,6 +280,16 @@ const getSquareColor = fill => {
       return colors[3]
     case 'var(--color-calendar-graph-day-L4-bg)':
       return colors[4]
+    case 'var(--color-calendar-halloween-graph-day-bg)':
+      return halloween_colors[0]
+    case 'var(--color-calendar-halloween-graph-day-L1-bg)':
+      return halloween_colors[1]
+    case 'var(--color-calendar-halloween-graph-day-L2-bg)':
+      return halloween_colors[2]
+    case 'var(--color-calendar-halloween-graph-day-L3-bg)':
+      return halloween_colors[3]
+    case 'var(--color-calendar-halloween-graph-day-L4-bg)':
+      return halloween_colors[4]
     default:
       if (fill.includes('#')) {
         return new obelisk.CubeColor().getByHorizontalColor(Number.parseInt('0x' + fill.replace('#', ''), 16))
