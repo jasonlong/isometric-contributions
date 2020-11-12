@@ -444,12 +444,14 @@ if (document.querySelector('.js-calendar-graph')) {
             generateIsometricChart()
           }
         })
-      } else if (mutation.attributeName === 'data-color-mode') {
-        loadColors()
-        renderIsometricChart()
       }
     })
   }
+
+  window.matchMedia('(prefers-color-scheme: dark)').addListener(() => {
+    loadColors()
+    renderIsometricChart()
+  })
 
   const observedContainer = document.querySelector('html')
   const observer = new MutationObserver(callback)
