@@ -110,7 +110,10 @@ const initUI = () => {
   contributionsWrapper.append(canvas)
 
   // Inject toggle
-  const insertLocation = contributionsBox.querySelector('h2').parentElement
+  let insertLocation = contributionsBox.querySelector('h2')
+  if (insertLocation.previousElementSibling && insertLocation.previousElementSibling.nodeName === 'DETAILS') {
+    insertLocation = insertLocation.previousElementSibling
+  }
 
   const btnGroup = document.createElement('div')
   btnGroup.className = 'BtnGroup mt-1 ml-3 position-relative top-0 float-right'
@@ -133,9 +136,9 @@ const initUI = () => {
     cubesButton.classList.add('selected')
   }
 
-  insertLocation.prepend(btnGroup)
   btnGroup.append(squaresButton)
   btnGroup.append(cubesButton)
+  insertLocation.before(btnGroup)
 
   setContainerViewType(toggleSetting)
 }
