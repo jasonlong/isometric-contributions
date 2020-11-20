@@ -9,7 +9,7 @@
   "devDependencies": {
     "chrome-webstore-upload-cli": "^1.2.0",
     "web-ext-submit": "^5.3.0",
-    "xo": "^0.34.2"
+    "xo": "^0.35.0"
   },
   "xo": {
     "semicolon": false,
