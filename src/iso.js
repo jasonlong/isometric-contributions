@@ -186,7 +186,7 @@ const loadStats = () => {
   let currentStreakEnd = null
 
   const days = document.querySelectorAll('.js-calendar-graph rect.day')
-  const currentWeekDays =  days[days.length - 1].parentElement.querySelectorAll('.js-calendar-graph rect.day')
+  const currentWeekDays = days[days.length - 1].parentElement.querySelectorAll('.js-calendar-graph rect.day')
   days.forEach(d => {
     const currentDayCount = Number.parseInt(d.dataset.count, 10)
     yearTotal += Number.parseInt(currentDayCount, 10)
