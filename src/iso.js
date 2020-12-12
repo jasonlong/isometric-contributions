@@ -7,15 +7,19 @@ let contributionsBox
 let colors = []
 let halloweenColors = []
 let yearTotal = 0
+let weekTotal = 0
 let averageCount = 0
 let maxCount = 0
 let countTotal = 0
+let weekCountTotal = 0
 let streakLongest = 0
 let streakCurrent = 0
 let bestDay = null
 let firstDay = null
 let lastDay = null
 let datesTotal = null
+let weekStartDay = null
+let weekDatesTotal = null
 let datesLongest = null
 let datesCurrent = null
 let dateBest = null
@@ -27,11 +31,13 @@ const resetValues = () => {
   maxCount = 0
   streakLongest = 0
   streakCurrent = 0
+  weekTotal = 0
   bestDay = null
   firstDay = null
   lastDay = null
   datesLongest = null
   datesCurrent = null
+  weekStartDay = null
 }
 
 const loadColors = () => {
@@ -180,6 +186,7 @@ const loadStats = () => {
   let currentStreakEnd = null
 
   const days = document.querySelectorAll('.js-calendar-graph rect.day')
+  const currentWeekDays =  days[days.length - 1].parentElement.querySelectorAll('.js-calendar-graph rect.day')
   days.forEach(d => {
     const currentDayCount = Number.parseInt(d.dataset.count, 10)
     yearTotal += Number.parseInt(currentDayCount, 10)
@@ -214,6 +221,15 @@ const loadStats = () => {
     } else {
       temporaryStreak = 0
       temporaryStreakStart = null
+    }
+  })
+
+  currentWeekDays.forEach(d => {
+    const currentDayCount = Number.parseInt(d.dataset.count, 10)
+    weekTotal += Number.parseInt(currentDayCount, 10)
+
+    if (currentWeekDays[0] === d) {
+      weekStartDay = d.dataset.date
     }
   })
 
@@ -272,6 +288,11 @@ const loadStats = () => {
   } else {
     datesLongest = 'No longest streak'
   }
+
+  // Week total
+  weekCountTotal = weekTotal.toLocaleString()
+  const weekDateFirst = formatDateString(weekStartDay, dateOptions)
+  weekDatesTotal = `${weekDateFirst} → ${dateLast}`
 }
 
 const getSquareColor = fill => {
@@ -343,6 +364,11 @@ const renderStats = () => {
           <span class="d-block f2 text-bold text-green lh-condensed">${countTotal}</span>
           <span class="d-block text-small text-bold">Total</span>
           <span class="d-none d-sm-block text-small text-gray-light">${datesTotal}</span>
+        </div>
+        <div class="p-2 week-info">
+          <span class="d-block f2 text-bold text-green lh-condensed">${weekCountTotal}</span>
+          <span class="d-block text-small text-bold">This week</span>
+          <span class="d-none d-sm-block text-small text-gray-light">${weekDatesTotal}</span>
         </div>
         <div class="p-2">
           <span class="d-block f2 text-bold text-green lh-condensed">${maxCount}</span>

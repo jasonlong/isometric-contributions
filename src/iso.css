@@ -12,3 +12,9 @@
 .ic-cubes .calendar-graph {
   display: none ! important;
 }
+
+@media screen and (max-width: 1130px) {
+  .week-info {
+      display: none !important;
+  }
+}
