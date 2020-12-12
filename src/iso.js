@@ -365,7 +365,7 @@ const renderStats = () => {
           <span class="d-block text-small text-bold">Total</span>
           <span class="d-none d-sm-block text-small text-gray-light">${datesTotal}</span>
         </div>
-        <div class="p-2 week-info">
+        <div class="p-2 d-none d-xl-block">
           <span class="d-block f2 text-bold text-green lh-condensed">${weekCountTotal}</span>
           <span class="d-block text-small text-bold">This week</span>
           <span class="d-none d-sm-block text-small text-gray-light">${weekDatesTotal}</span>
