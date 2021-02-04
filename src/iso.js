@@ -4,8 +4,6 @@ const dateOptions = {month: 'short', day: 'numeric'}
 
 let calendarGraph
 let contributionsBox
-let colors = []
-let halloweenColors = []
 let yearTotal = 0
 let weekTotal = 0
 let averageCount = 0
@@ -38,44 +36,6 @@ const resetValues = () => {
   datesLongest = null
   datesCurrent = null
   weekStartDay = null
-}
-
-const loadColors = () => {
-  colors = [
-    new obelisk.CubeColor().getByHorizontalColor(
-      Number.parseInt(getComputedStyle(document.documentElement).getPropertyValue('--color-calendar-graph-day-bg').replace('#', ''), 16)
-    ),
-    new obelisk.CubeColor().getByHorizontalColor(
-      Number.parseInt(getComputedStyle(document.documentElement).getPropertyValue('--color-calendar-graph-day-L1-bg').replace('#', ''), 16)
-    ),
-    new obelisk.CubeColor().getByHorizontalColor(
-      Number.parseInt(getComputedStyle(document.documentElement).getPropertyValue('--color-calendar-graph-day-L2-bg').replace('#', ''), 16)
-    ),
-    new obelisk.CubeColor().getByHorizontalColor(
-      Number.parseInt(getComputedStyle(document.documentElement).getPropertyValue('--color-calendar-graph-day-L3-bg').replace('#', ''), 16)
-    ),
-    new obelisk.CubeColor().getByHorizontalColor(
-      Number.parseInt(getComputedStyle(document.documentElement).getPropertyValue('--color-calendar-graph-day-L4-bg').replace('#', ''), 16)
-    )
-  ]
-
-  halloweenColors = [
-    new obelisk.CubeColor().getByHorizontalColor(
-      Number.parseInt(getComputedStyle(document.documentElement).getPropertyValue('--color-calendar-halloween-graph-day-bg').replace('#', ''), 16)
-    ),
-    new obelisk.CubeColor().getByHorizontalColor(
-      Number.parseInt(getComputedStyle(document.documentElement).getPropertyValue('--color-calendar-halloween-graph-day-L1-bg').replace('#', ''), 16)
-    ),
-    new obelisk.CubeColor().getByHorizontalColor(
-      Number.parseInt(getComputedStyle(document.documentElement).getPropertyValue('--color-calendar-halloween-graph-day-L2-bg').replace('#', ''), 16)
-    ),
-    new obelisk.CubeColor().getByHorizontalColor(
-      Number.parseInt(getComputedStyle(document.documentElement).getPropertyValue('--color-calendar-halloween-graph-day-L3-bg').replace('#', ''), 16)
-    ),
-    new obelisk.CubeColor().getByHorizontalColor(
-      Number.parseInt(getComputedStyle(document.documentElement).getPropertyValue('--color-calendar-halloween-graph-day-L4-bg').replace('#', ''), 16)
-    )
-  ]
 }
 
 const getSettings = () => {
@@ -185,8 +145,9 @@ const loadStats = () => {
   let currentStreakStart = null
   let currentStreakEnd = null
 
-  const days = document.querySelectorAll('.js-calendar-graph rect.day')
-  const currentWeekDays = days[days.length - 1].parentElement.querySelectorAll('.js-calendar-graph rect.day')
+  const days = document.querySelectorAll('.js-calendar-graph rect[data-date]')
+  const currentWeekDays = days[days.length - 1].parentElement.querySelectorAll('rect[data-date]')
+
   days.forEach(d => {
     const currentDayCount = Number.parseInt(d.dataset.count, 10)
     yearTotal += Number.parseInt(currentDayCount, 10)
@@ -295,33 +256,33 @@ const loadStats = () => {
   weekDatesTotal = `${weekDateFirst} → ${dateLast}`
 }
 
-const getSquareColor = fill => {
-  switch (fill) {
-    case 'var(--color-calendar-graph-day-bg)':
-      return colors[0]
-    case 'var(--color-calendar-graph-day-L1-bg)':
-      return colors[1]
-    case 'var(--color-calendar-graph-day-L2-bg)':
-      return colors[2]
-    case 'var(--color-calendar-graph-day-L3-bg)':
-      return colors[3]
-    case 'var(--color-calendar-graph-day-L4-bg)':
-      return colors[4]
-    case 'var(--color-calendar-halloween-graph-day-bg)':
-      return halloweenColors[0]
-    case 'var(--color-calendar-halloween-graph-day-L1-bg)':
-      return halloweenColors[1]
-    case 'var(--color-calendar-halloween-graph-day-L2-bg)':
-      return halloweenColors[2]
-    case 'var(--color-calendar-halloween-graph-day-L3-bg)':
-      return halloweenColors[3]
-    case 'var(--color-calendar-halloween-graph-day-L4-bg)':
-      return halloweenColors[4]
-    default:
-      if (fill.includes('#')) {
-        return new obelisk.CubeColor().getByHorizontalColor(Number.parseInt('0x' + fill.replace('#', ''), 16))
-      }
+const rgbToHex = rgb => {
+  const sep = rgb.includes(',') ? ',' : ' '
+  rgb = rgb.slice(4).split(')')[0].split(sep)
+
+  let r = Number(rgb[0]).toString(16)
+  let g = Number(rgb[1]).toString(16)
+  let b = Number(rgb[2]).toString(16)
+
+  if (r.length === 1) {
+    r = '0' + r
   }
+
+  if (g.length === 1) {
+    g = '0' + g
+  }
+
+  if (b.length === 1) {
+    b = '0' + b
+  }
+
+  return r + g + b
+}
+
+const getSquareColor = rect => {
+  const fill = getComputedStyle(rect).getPropertyValue('fill')
+  const rgb = rgbToHex(fill)
+  return new obelisk.CubeColor().getByHorizontalColor(Number.parseInt(rgb, 16))
 }
 
 const renderIsometricChart = () => {
@@ -338,7 +299,6 @@ const renderIsometricChart = () => {
     const x = Number.parseInt(((w.getAttribute('transform')).match(/(\d+)/))[0], 10) / (GH_OFFSET + 1)
     w.querySelectorAll('rect').forEach(r => {
       const y = Number.parseInt(r.getAttribute('y'), 10) / GH_OFFSET
-      const fill = r.getAttribute('fill')
       const contribCount = Number.parseInt(r.dataset.count, 10)
       let cubeHeight = 3
 
@@ -347,7 +307,7 @@ const renderIsometricChart = () => {
       }
 
       const dimension = new obelisk.CubeDimension(SIZE, SIZE, cubeHeight)
-      const color = getSquareColor(fill)
+      const color = getSquareColor(r)
       const cube = new obelisk.Cube(dimension, color, false)
       const p3d = new obelisk.Point3D(SIZE * x, SIZE * y, 0)
       pixelView.renderObject(cube, p3d)
@@ -413,7 +373,6 @@ const generateIsometricChart = () => {
   contributionsBox = document.querySelector('.js-yearly-contributions')
 
   resetValues()
-  loadColors()
   initUI()
   loadStats()
   renderStats()
@@ -477,7 +436,6 @@ if (document.querySelector('.js-calendar-graph')) {
   }
 
   window.matchMedia('(prefers-color-scheme: dark)').addListener(() => {
-    loadColors()
     renderIsometricChart()
   })
 
