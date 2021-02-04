@@ -4,8 +4,6 @@ const dateOptions = {month: 'short', day: 'numeric'}
 
 let calendarGraph
 let contributionsBox
-let colors = []
-let halloweenColors = []
 let yearTotal = 0
 let weekTotal = 0
 let averageCount = 0
@@ -147,8 +145,9 @@ const loadStats = () => {
   let currentStreakStart = null
   let currentStreakEnd = null
 
-  const days = document.querySelectorAll('.js-calendar-graph rect.ContributionCalendar-day')
-  const currentWeekDays = days[days.length - 1].parentElement.querySelectorAll('.js-calendar-graph rect.ContributionCalendar-day')
+  const days = document.querySelectorAll('.js-calendar-graph rect[data-date]')
+  const currentWeekDays = days[days.length - 1].parentElement.querySelectorAll('rect[data-date]')
+
   days.forEach(d => {
     const currentDayCount = Number.parseInt(d.dataset.count, 10)
     yearTotal += Number.parseInt(currentDayCount, 10)
@@ -258,9 +257,7 @@ const loadStats = () => {
 }
 
 const rgbToHex = rgb => {
-  // Choose correct separator
   const sep = rgb.includes(',') ? ',' : ' '
-  // Turn "rgb(r,g,b)" into [r,g,b]
   rgb = rgb.slice(4).split(')')[0].split(sep)
 
   let r = Number(rgb[0]).toString(16)
@@ -285,7 +282,6 @@ const rgbToHex = rgb => {
 const getSquareColor = rect => {
   const fill = getComputedStyle(rect).getPropertyValue('fill')
   const rgb = rgbToHex(fill)
-  debugger
   return new obelisk.CubeColor().getByHorizontalColor(Number.parseInt(rgb, 16))
 }
 
