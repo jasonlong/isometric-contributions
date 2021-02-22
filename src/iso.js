@@ -1,5 +1,3 @@
-/* eslint-disable no-undef */
-
 const dateOptions = {month: 'short', day: 'numeric'}
 
 let calendarGraph
@@ -114,9 +112,10 @@ const initUI = () => {
 const handleViewToggle = event => {
   setContainerViewType(event.target.dataset.icOption)
 
-  document.querySelectorAll('.ic-toggle-option').forEach(toggle => {
+  for (const toggle of document.querySelectorAll('.ic-toggle-option')) {
     toggle.classList.remove('selected')
-  })
+  }
+
   event.target.classList.add('selected')
 
   persistSetting('toggleSetting', event.target.dataset.icOption)
@@ -148,7 +147,7 @@ const loadStats = () => {
   const days = document.querySelectorAll('.js-calendar-graph rect[data-date]')
   const currentWeekDays = days[days.length - 1].parentElement.querySelectorAll('rect[data-date]')
 
-  days.forEach(d => {
+  for (const d of days) {
     const currentDayCount = Number.parseInt(d.dataset.count, 10)
     yearTotal += Number.parseInt(currentDayCount, 10)
 
@@ -183,16 +182,16 @@ const loadStats = () => {
       temporaryStreak = 0
       temporaryStreakStart = null
     }
-  })
+  }
 
-  currentWeekDays.forEach(d => {
+  for (const d of currentWeekDays) {
     const currentDayCount = Number.parseInt(d.dataset.count, 10)
     weekTotal += Number.parseInt(currentDayCount, 10)
 
     if (currentWeekDays[0] === d) {
       weekStartDay = d.dataset.date
     }
-  })
+  }
 
   // Check for current streak
   // Convert days NodeList to Array so we can reverse it
@@ -295,9 +294,9 @@ const renderIsometricChart = () => {
   const pixelView = new obelisk.PixelView(canvas, point)
   const weeks = document.querySelectorAll('.js-calendar-graph-svg g > g')
 
-  weeks.forEach(w => {
+  for (const w of weeks) {
     const x = Number.parseInt(((w.getAttribute('transform')).match(/(\d+)/))[0], 10) / (GH_OFFSET + 1)
-    w.querySelectorAll('rect').forEach(r => {
+    for (const r of w.querySelectorAll('rect')) {
       const y = Number.parseInt(r.getAttribute('y'), 10) / GH_OFFSET
       const contribCount = Number.parseInt(r.dataset.count, 10)
       let cubeHeight = 3
@@ -311,8 +310,8 @@ const renderIsometricChart = () => {
       const cube = new obelisk.Cube(dimension, color, false)
       const p3d = new obelisk.Point3D(SIZE * x, SIZE * y, 0)
       pixelView.renderObject(cube, p3d)
-    })
-  })
+    }
+  }
 }
 
 const renderStats = () => {
@@ -424,15 +423,15 @@ if (document.querySelector('.js-calendar-graph')) {
 
   const config = {attributes: true, childList: true, subtree: false}
   const callback = mutationsList => {
-    mutationsList.forEach(mutation => {
+    for (const mutation of mutationsList) {
       if (mutation.type === 'childList') {
-        mutation.addedNodes.forEach(node => {
+        for (const node of mutation.addedNodes) {
           if (node.classList && node.classList.contains('js-yearly-contributions')) {
             generateIsometricChart()
           }
-        })
+        }
       }
-    })
+    }
   }
 
   window.matchMedia('(prefers-color-scheme: dark)').addListener(() => {
