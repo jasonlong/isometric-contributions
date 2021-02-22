@@ -1,5 +1,3 @@
-/* eslint-disable no-undef */
-
 const dateOptions = {month: 'short', day: 'numeric'}
 
 let calendarGraph
