@@ -8,7 +8,7 @@
   },
   "devDependencies": {
     "chrome-webstore-upload-cli": "^1.2.1",
-    "web-ext-submit": "^5.5.0",
+    "web-ext-submit": "^6.0.0",
     "xo": "^0.38.2"
   },
   "xo": {
