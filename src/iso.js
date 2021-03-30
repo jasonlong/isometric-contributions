@@ -320,23 +320,23 @@ const renderStats = () => {
       <h5 class="mb-1">Contributions</h5>
       <div class="d-flex flex-justify-between rounded-2 border px-1 px-md-2">
         <div class="p-2">
-          <span class="d-block f2 text-bold text-green lh-condensed">${countTotal}</span>
+          <span class="d-block f2 text-bold color-text-success lh-condensed">${countTotal}</span>
           <span class="d-block text-small text-bold">Total</span>
-          <span class="d-none d-sm-block text-small text-gray-light">${datesTotal}</span>
+          <span class="d-none d-sm-block text-small color-text-tertiary">${datesTotal}</span>
         </div>
         <div class="p-2 d-none d-xl-block">
-          <span class="d-block f2 text-bold text-green lh-condensed">${weekCountTotal}</span>
+          <span class="d-block f2 text-bold color-text-success lh-condensed">${weekCountTotal}</span>
           <span class="d-block text-small text-bold">This week</span>
-          <span class="d-none d-sm-block text-small text-gray-light">${weekDatesTotal}</span>
+          <span class="d-none d-sm-block text-small color-text-tertiary">${weekDatesTotal}</span>
         </div>
         <div class="p-2">
-          <span class="d-block f2 text-bold text-green lh-condensed">${maxCount}</span>
+          <span class="d-block f2 text-bold color-text-success lh-condensed">${maxCount}</span>
           <span class="d-block text-small text-bold">Best day</span>
-          <span class="d-none d-sm-block text-small text-gray-light">${dateBest}</span>
+          <span class="d-none d-sm-block text-small color-text-tertiary">${dateBest}</span>
         </div>
       </div>
       <p class="mt-1 text-right text-small">
-        Average: <span class="text-bold text-green">${averageCount}</span> <span class="text-gray-light">/ day</span>
+        Average: <span class="text-bold color-text-success">${averageCount}</span> <span class="color-text-tertiary">/ day</span>
         </p>
     </div>
   `
@@ -346,14 +346,14 @@ const renderStats = () => {
       <h5 class="mb-1">Streaks</h5>
       <div class="d-flex flex-justify-between rounded-2 border px-1 px-md-2">
         <div class="p-2">
-          <span class="d-block f2 text-bold text-green lh-condensed">${streakLongest} <span class="f4">days</span></span>
+          <span class="d-block f2 text-bold color-text-success lh-condensed">${streakLongest} <span class="f4">days</span></span>
           <span class="d-block text-small text-bold">Longest</span>
-          <span class="d-none d-sm-block text-small text-gray-light">${datesLongest}</span>
+          <span class="d-none d-sm-block text-small color-text-tertiary">${datesLongest}</span>
         </div>
         <div class="p-2">
-          <span class="d-block f2 text-bold text-green lh-condensed">${streakCurrent} <span class="f4">days</span></span>
+          <span class="d-block f2 text-bold color-text-success lh-condensed">${streakCurrent} <span class="f4">days</span></span>
           <span class="d-block text-small text-bold">Current</span>
-          <span class="d-none d-sm-block text-small text-gray-light">${datesCurrent}</span>
+          <span class="d-none d-sm-block text-small color-text-tertiary">${datesCurrent}</span>
         </div>
       </div>
     </div>
