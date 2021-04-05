@@ -421,7 +421,7 @@ if (document.querySelector('.js-calendar-graph')) {
   const settingsPromise = getSettings()
   settingsPromise.then(generateIsometricChart)
 
-  const config = {attributes: true, childList: true, subtree: false}
+  const config = {attributes: true, childList: true, subtree: true}
   const callback = mutationsList => {
     for (const mutation of mutationsList) {
       if (mutation.type === 'childList') {
