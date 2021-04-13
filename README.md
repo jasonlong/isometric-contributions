@@ -27,6 +27,8 @@ By default, the extension only loads on `github.com`. You can manually enable th
 
 ## Contributing
 
+**_Note that I don't currently have any plans for adding new features to the extension. Please contact me before submitting a PR with new functionality._**
+
 If you want to hack on the extension, you'll need to install it manually. First clone or fork this repo. Then, on your Chrome Extensions page, make sure "Developer mode" is checked. You can then click the "Load unpacked extension..." button and browse to the `src` directory of this repo.
 
 <img src="img/dev-mode.png" width="981" />
