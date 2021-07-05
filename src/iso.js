@@ -36,6 +36,7 @@ const resetValues = () => {
   weekStartDay = null
 }
 
+/* eslint-disable arrow-body-style */
 const getSettings = () => {
   return new Promise(resolve => {
     // Check for user preference, if chrome.storage is available.
@@ -52,6 +53,7 @@ const getSettings = () => {
     }
   })
 }
+/* eslint-enable arrow-body-style */
 
 const persistSetting = (key, value) => {
   if (chrome && chrome.storage) {
