@@ -1,4 +1,4 @@
-const dateOptions = {month: 'short', day: 'numeric'}
+const dateOptions = { month: 'short', day: 'numeric' }
 
 let calendarGraph
 let contributionsBox
@@ -38,12 +38,12 @@ const resetValues = () => {
 
 /* eslint-disable arrow-body-style */
 const getSettings = () => {
-  return new Promise(resolve => {
+  return new Promise((resolve) => {
     // Check for user preference, if chrome.storage is available.
     // The storage API is not supported in content scripts.
     // https://developer.mozilla.org/Add-ons/WebExtensions/Chrome_incompatibilities#storage
     if (chrome && chrome.storage) {
-      chrome.storage.local.get(['toggleSetting'], settings => {
+      chrome.storage.local.get(['toggleSetting'], (settings) => {
         toggleSetting = settings.toggleSetting ? settings.toggleSetting : 'cubes'
         resolve('Settings loaded')
       })
@@ -111,7 +111,7 @@ const initUI = () => {
   setContainerViewType(toggleSetting)
 }
 
-const handleViewToggle = event => {
+const handleViewToggle = (event) => {
   setContainerViewType(event.target.dataset.icOption)
 
   for (const toggle of document.querySelectorAll('.ic-toggle-option')) {
@@ -128,7 +128,7 @@ const handleViewToggle = event => {
   contributionsBox.classList.add(`ic-${toggleSetting}`)
 }
 
-const setContainerViewType = type => {
+const setContainerViewType = (type) => {
   if (type === 'squares') {
     contributionsBox.classList.remove('ic-cubes')
     contributionsBox.classList.add('ic-squares')
@@ -234,7 +234,7 @@ const loadStats = () => {
 
   // Average contributions per day
   const dayDifference = datesDayDifference(firstDay, lastDay)
-  averageCount = precisionRound((yearTotal / dayDifference), 2)
+  averageCount = precisionRound(yearTotal / dayDifference, 2)
 
   // Best day
   dateBest = formatDateString(bestDay, dateOptions)
@@ -257,7 +257,7 @@ const loadStats = () => {
   weekDatesTotal = `${weekDateFirst} → ${dateLast}`
 }
 
-const rgbToHex = rgb => {
+const rgbToHex = (rgb) => {
   const sep = rgb.includes(',') ? ',' : ' '
   rgb = rgb.slice(4).split(')')[0].split(sep)
 
@@ -280,7 +280,7 @@ const rgbToHex = rgb => {
   return r + g + b
 }
 
-const getSquareColor = rect => {
+const getSquareColor = (rect) => {
   const fill = getComputedStyle(rect).getPropertyValue('fill')
   const rgb = rgbToHex(fill)
   return new obelisk.CubeColor().getByHorizontalColor(Number.parseInt(rgb, 16))
@@ -297,14 +297,14 @@ const renderIsometricChart = () => {
   const weeks = document.querySelectorAll('.js-calendar-graph-svg g > g')
 
   for (const w of weeks) {
-    const x = Number.parseInt(((w.getAttribute('transform')).match(/(\d+)/))[0], 10) / (GH_OFFSET + 1)
+    const x = Number.parseInt(w.getAttribute('transform').match(/(\d+)/)[0], 10) / (GH_OFFSET + 1)
     for (const r of w.querySelectorAll('rect')) {
       const y = Number.parseInt(r.getAttribute('y'), 10) / GH_OFFSET
       const contribCount = Number.parseInt(r.dataset.count, 10)
       let cubeHeight = 3
 
       if (maxCount > 0) {
-        cubeHeight += Number.parseInt(MAX_HEIGHT / maxCount * contribCount, 10)
+        cubeHeight += Number.parseInt((MAX_HEIGHT / maxCount) * contribCount, 10)
       }
 
       const dimension = new obelisk.CubeDimension(SIZE, SIZE, cubeHeight)
@@ -317,6 +317,11 @@ const renderIsometricChart = () => {
 }
 
 const renderStats = () => {
+  const graphHeaderText =
+    document.querySelector('.ic-contributions-wrapper').parentNode.previousElementSibling.textContent
+  const regex = /in \d{4}/g
+  const viewingYear = graphHeaderText.match(regex) !== null
+
   const topMarkup = `
     <div class="position-absolute top-0 right-0 mt-3 mr-5">
       <h5 class="mb-1">Contributions</h5>
@@ -423,8 +428,8 @@ if (document.querySelector('.js-calendar-graph')) {
   const settingsPromise = getSettings()
   settingsPromise.then(generateIsometricChart)
 
-  const config = {attributes: true, childList: true, subtree: true}
-  const callback = mutationsList => {
+  const config = { attributes: true, childList: true, subtree: true }
+  const callback = (mutationsList) => {
     for (const mutation of mutationsList) {
       if (mutation.type === 'childList') {
         for (const node of mutation.addedNodes) {
