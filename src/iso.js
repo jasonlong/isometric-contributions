@@ -1,4 +1,4 @@
-const dateOptions = {month: 'short', day: 'numeric'}
+const dateOptions = { month: 'short', day: 'numeric' }
 
 let calendarGraph
 let contributionsBox
@@ -38,12 +38,12 @@ const resetValues = () => {
 
 /* eslint-disable arrow-body-style */
 const getSettings = () => {
-  return new Promise(resolve => {
+  return new Promise((resolve) => {
     // Check for user preference, if chrome.storage is available.
     // The storage API is not supported in content scripts.
     // https://developer.mozilla.org/Add-ons/WebExtensions/Chrome_incompatibilities#storage
     if (chrome && chrome.storage) {
-      chrome.storage.local.get(['toggleSetting'], settings => {
+      chrome.storage.local.get(['toggleSetting'], (settings) => {
         toggleSetting = settings.toggleSetting ? settings.toggleSetting : 'cubes'
         resolve('Settings loaded')
       })
@@ -111,7 +111,7 @@ const initUI = () => {
   setContainerViewType(toggleSetting)
 }
 
-const handleViewToggle = event => {
+const handleViewToggle = (event) => {
   setContainerViewType(event.target.dataset.icOption)
 
   for (const toggle of document.querySelectorAll('.ic-toggle-option')) {
@@ -128,7 +128,7 @@ const handleViewToggle = event => {
   contributionsBox.classList.add(`ic-${toggleSetting}`)
 }
 
-const setContainerViewType = type => {
+const setContainerViewType = (type) => {
   if (type === 'squares') {
     contributionsBox.classList.remove('ic-cubes')
     contributionsBox.classList.add('ic-squares')
@@ -234,7 +234,7 @@ const loadStats = () => {
 
   // Average contributions per day
   const dayDifference = datesDayDifference(firstDay, lastDay)
-  averageCount = precisionRound((yearTotal / dayDifference), 2)
+  averageCount = precisionRound(yearTotal / dayDifference, 2)
 
   // Best day
   dateBest = formatDateString(bestDay, dateOptions)
@@ -257,7 +257,7 @@ const loadStats = () => {
   weekDatesTotal = `${weekDateFirst} → ${dateLast}`
 }
 
-const rgbToHex = rgb => {
+const rgbToHex = (rgb) => {
   const sep = rgb.includes(',') ? ',' : ' '
   rgb = rgb.slice(4).split(')')[0].split(sep)
 
@@ -280,7 +280,7 @@ const rgbToHex = rgb => {
   return r + g + b
 }
 
-const getSquareColor = rect => {
+const getSquareColor = (rect) => {
   const fill = getComputedStyle(rect).getPropertyValue('fill')
   const rgb = rgbToHex(fill)
   return new obelisk.CubeColor().getByHorizontalColor(Number.parseInt(rgb, 16))
@@ -297,14 +297,14 @@ const renderIsometricChart = () => {
   const weeks = document.querySelectorAll('.js-calendar-graph-svg g > g')
 
   for (const w of weeks) {
-    const x = Number.parseInt(((w.getAttribute('transform')).match(/(\d+)/))[0], 10) / (GH_OFFSET + 1)
+    const x = Number.parseInt(w.getAttribute('transform').match(/(\d+)/)[0], 10) / (GH_OFFSET + 1)
     for (const r of w.querySelectorAll('rect')) {
       const y = Number.parseInt(r.getAttribute('y'), 10) / GH_OFFSET
       const contribCount = Number.parseInt(r.dataset.count, 10)
       let cubeHeight = 3
 
       if (maxCount > 0) {
-        cubeHeight += Number.parseInt(MAX_HEIGHT / maxCount * contribCount, 10)
+        cubeHeight += Number.parseInt((MAX_HEIGHT / maxCount) * contribCount, 10)
       }
 
       const dimension = new obelisk.CubeDimension(SIZE, SIZE, cubeHeight)
@@ -317,7 +317,11 @@ const renderIsometricChart = () => {
 }
 
 const renderStats = () => {
-  const topMarkup = `
+  const graphHeaderText =
+    document.querySelector('.ic-contributions-wrapper').parentNode.previousElementSibling.textContent
+  const viewingYear = graphHeaderText.match(/in \d{4}/g) !== null
+
+  let topMarkup = `
     <div class="position-absolute top-0 right-0 mt-3 mr-5">
       <h5 class="mb-1">Contributions</h5>
       <div class="d-flex flex-justify-between rounded-2 border px-1 px-md-2">
@@ -326,24 +330,31 @@ const renderStats = () => {
           <span class="d-block text-small text-bold">Total</span>
           <span class="d-none d-sm-block text-small color-text-tertiary">${datesTotal}</span>
         </div>
-        <div class="p-2 d-none d-xl-block">
-          <span class="d-block f2 text-bold color-text-success lh-condensed">${weekCountTotal}</span>
-          <span class="d-block text-small text-bold">This week</span>
-          <span class="d-none d-sm-block text-small color-text-tertiary">${weekDatesTotal}</span>
-        </div>
-        <div class="p-2">
-          <span class="d-block f2 text-bold color-text-success lh-condensed">${maxCount}</span>
-          <span class="d-block text-small text-bold">Best day</span>
-          <span class="d-none d-sm-block text-small color-text-tertiary">${dateBest}</span>
-        </div>
+    `
+  if (!viewingYear) {
+    topMarkup += `
+      <div class="p-2 d-none d-xl-block">
+        <span class="d-block f2 text-bold color-text-success lh-condensed">${weekCountTotal}</span>
+        <span class="d-block text-small text-bold">This week</span>
+        <span class="d-none d-sm-block text-small color-text-tertiary">${weekDatesTotal}</span>
       </div>
-      <p class="mt-1 text-right text-small">
-        Average: <span class="text-bold color-text-success">${averageCount}</span> <span class="color-text-tertiary">/ day</span>
-        </p>
+    `
+  }
+
+  topMarkup += `
+      <div class="p-2">
+        <span class="d-block f2 text-bold color-text-success lh-condensed">${maxCount}</span>
+        <span class="d-block text-small text-bold">Best day</span>
+        <span class="d-none d-sm-block text-small color-text-tertiary">${dateBest}</span>
+      </div>
+    </div>
+    <p class="mt-1 text-right text-small">
+      Average: <span class="text-bold color-text-success">${averageCount}</span> <span class="color-text-tertiary">/ day</span>
+      </p>
     </div>
   `
 
-  const bottomMarkup = `
+  let bottomMarkup = `
     <div class="position-absolute bottom-0 left-0 ml-5 mb-6">
       <h5 class="mb-1">Streaks</h5>
       <div class="d-flex flex-justify-between rounded-2 border px-1 px-md-2">
@@ -352,14 +363,19 @@ const renderStats = () => {
           <span class="d-block text-small text-bold">Longest</span>
           <span class="d-none d-sm-block text-small color-text-tertiary">${datesLongest}</span>
         </div>
-        <div class="p-2">
-          <span class="d-block f2 text-bold color-text-success lh-condensed">${streakCurrent} <span class="f4">days</span></span>
-          <span class="d-block text-small text-bold">Current</span>
-          <span class="d-none d-sm-block text-small color-text-tertiary">${datesCurrent}</span>
+    `
+  if (!viewingYear) {
+    bottomMarkup += `
+          <div class="p-2">
+            <span class="d-block f2 text-bold color-text-success lh-condensed">${streakCurrent} <span class="f4">days</span></span>
+            <span class="d-block text-small text-bold">Current</span>
+            <span class="d-none d-sm-block text-small color-text-tertiary">${datesCurrent}</span>
+          </div>
         </div>
       </div>
-    </div>
-  `
+    `
+  }
+
   const icStatsBlockTop = document.createElement('div')
   icStatsBlockTop.innerHTML = topMarkup
   document.querySelector('.ic-contributions-wrapper').append(icStatsBlockTop)
@@ -423,8 +439,8 @@ if (document.querySelector('.js-calendar-graph')) {
   const settingsPromise = getSettings()
   settingsPromise.then(generateIsometricChart)
 
-  const config = {attributes: true, childList: true, subtree: true}
-  const callback = mutationsList => {
+  const config = { attributes: true, childList: true, subtree: true }
+  const callback = (mutationsList) => {
     for (const mutation of mutationsList) {
       if (mutation.type === 'childList') {
         for (const node of mutation.addedNodes) {
