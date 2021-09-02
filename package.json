@@ -12,6 +12,7 @@
     "xo": "^0.44.0"
   },
   "xo": {
+    "prettier": true,
     "semicolon": false,
     "space": true,
     "prefer-numeric-literals": 0,
