@@ -319,10 +319,9 @@ const renderIsometricChart = () => {
 const renderStats = () => {
   const graphHeaderText =
     document.querySelector('.ic-contributions-wrapper').parentNode.previousElementSibling.textContent
-  const regex = /in \d{4}/g
-  const viewingYear = graphHeaderText.match(regex) !== null
+  const viewingYear = graphHeaderText.match(/in \d{4}/g) !== null
 
-  const topMarkup = `
+  let topMarkup = `
     <div class="position-absolute top-0 right-0 mt-3 mr-5">
       <h5 class="mb-1">Contributions</h5>
       <div class="d-flex flex-justify-between rounded-2 border px-1 px-md-2">
@@ -331,24 +330,31 @@ const renderStats = () => {
           <span class="d-block text-small text-bold">Total</span>
           <span class="d-none d-sm-block text-small color-text-tertiary">${datesTotal}</span>
         </div>
-        <div class="p-2 d-none d-xl-block">
-          <span class="d-block f2 text-bold color-text-success lh-condensed">${weekCountTotal}</span>
-          <span class="d-block text-small text-bold">This week</span>
-          <span class="d-none d-sm-block text-small color-text-tertiary">${weekDatesTotal}</span>
-        </div>
-        <div class="p-2">
-          <span class="d-block f2 text-bold color-text-success lh-condensed">${maxCount}</span>
-          <span class="d-block text-small text-bold">Best day</span>
-          <span class="d-none d-sm-block text-small color-text-tertiary">${dateBest}</span>
-        </div>
+    `
+  if (!viewingYear) {
+    topMarkup += `
+      <div class="p-2 d-none d-xl-block">
+        <span class="d-block f2 text-bold color-text-success lh-condensed">${weekCountTotal}</span>
+        <span class="d-block text-small text-bold">This week</span>
+        <span class="d-none d-sm-block text-small color-text-tertiary">${weekDatesTotal}</span>
       </div>
-      <p class="mt-1 text-right text-small">
-        Average: <span class="text-bold color-text-success">${averageCount}</span> <span class="color-text-tertiary">/ day</span>
-        </p>
+    `
+  }
+
+  topMarkup += `
+      <div class="p-2">
+        <span class="d-block f2 text-bold color-text-success lh-condensed">${maxCount}</span>
+        <span class="d-block text-small text-bold">Best day</span>
+        <span class="d-none d-sm-block text-small color-text-tertiary">${dateBest}</span>
+      </div>
+    </div>
+    <p class="mt-1 text-right text-small">
+      Average: <span class="text-bold color-text-success">${averageCount}</span> <span class="color-text-tertiary">/ day</span>
+      </p>
     </div>
   `
 
-  const bottomMarkup = `
+  let bottomMarkup = `
     <div class="position-absolute bottom-0 left-0 ml-5 mb-6">
       <h5 class="mb-1">Streaks</h5>
       <div class="d-flex flex-justify-between rounded-2 border px-1 px-md-2">
@@ -357,14 +363,19 @@ const renderStats = () => {
           <span class="d-block text-small text-bold">Longest</span>
           <span class="d-none d-sm-block text-small color-text-tertiary">${datesLongest}</span>
         </div>
-        <div class="p-2">
-          <span class="d-block f2 text-bold color-text-success lh-condensed">${streakCurrent} <span class="f4">days</span></span>
-          <span class="d-block text-small text-bold">Current</span>
-          <span class="d-none d-sm-block text-small color-text-tertiary">${datesCurrent}</span>
+    `
+  if (!viewingYear) {
+    bottomMarkup += `
+          <div class="p-2">
+            <span class="d-block f2 text-bold color-text-success lh-condensed">${streakCurrent} <span class="f4">days</span></span>
+            <span class="d-block text-small text-bold">Current</span>
+            <span class="d-none d-sm-block text-small color-text-tertiary">${datesCurrent}</span>
+          </div>
         </div>
       </div>
-    </div>
-  `
+    `
+  }
+
   const icStatsBlockTop = document.createElement('div')
   icStatsBlockTop.innerHTML = topMarkup
   document.querySelector('.ic-contributions-wrapper').append(icStatsBlockTop)
