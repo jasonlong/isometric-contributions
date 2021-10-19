@@ -22,10 +22,6 @@
     ],
     "env": [
       "browser"
-    ],
-    "ignores": [
-      "src/webext-domain-permission-toggle.js",
-      "src/background.js"
     ]
   }
 }

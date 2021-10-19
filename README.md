@@ -19,12 +19,6 @@ Besides being sort of neat looking, this view is interesting in that it highligh
 
 [Install from Mozilla Add-ons site](https://addons.mozilla.org/en-US/firefox/addon/github-isometric-contributions/)
 
-#### GitHub Enterprise
-
-By default, the extension only loads on `github.com`. You can manually enable the extension for your Enterprise domain by clicking the extension icon and choosing `Enable Isometric Contributions on this domain`.
-
-<img src="img/enterprise.png" width="396" />
-
 ## Contributing
 
 **_Note that I don't currently have any plans for adding new features to the extension. Please contact me before submitting a PR with new functionality._**
