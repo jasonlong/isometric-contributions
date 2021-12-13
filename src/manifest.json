@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "GitHub Isometric Contributions",
-  "version": "1.1.16",
+  "version": "1.1.17",
   "description": "Renders an isometric pixel view of GitHub contribution graphs.",
   "content_scripts": [
     {
@@ -11,7 +11,7 @@
     }
   ],
   "permissions": ["storage", "contextMenus", "activeTab"],
-  "host_permissions": ["http://*/*", "https://*/*"],
+  "host_permissions": ["https://github.com/"],
   "icons": {
     "48": "icon-48.png",
     "128": "icon-128.png"
