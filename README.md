@@ -31,8 +31,6 @@ To hack on the extension, you'll first need to make sure you've installed it in 
 
 <img src="img/reload-link.png" width="410" />
 
-Feel free to send a pull request if you've made an improvement.
-
 ## License
 
 This project is licensed under the [MIT License](http://opensource.org/licenses/MIT).
