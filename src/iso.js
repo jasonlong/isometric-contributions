@@ -324,30 +324,30 @@ const renderStats = () => {
       <h5 class="mb-1">Contributions</h5>
       <div class="d-flex flex-justify-between rounded-2 border px-1 px-md-2">
         <div class="p-2">
-          <span class="d-block f2 text-bold color-text-success lh-condensed">${countTotal}</span>
+          <span class="d-block f2 text-bold color-fg-success lh-condensed">${countTotal}</span>
           <span class="d-block text-small text-bold">Total</span>
-          <span class="d-none d-sm-block text-small color-text-tertiary">${datesTotal}</span>
+          <span class="d-none d-sm-block text-small color-fg-subtlcolor-fg-subtle">${datesTotal}</span>
         </div>
     `
   if (!viewingYear) {
     topMarkup += `
       <div class="p-2 d-none d-xl-block">
-        <span class="d-block f2 text-bold color-text-success lh-condensed">${weekCountTotal}</span>
+        <span class="d-block f2 text-bold color-fg-success lh-condensed">${weekCountTotal}</span>
         <span class="d-block text-small text-bold">This week</span>
-        <span class="d-none d-sm-block text-small color-text-tertiary">${weekDatesTotal}</span>
+        <span class="d-none d-sm-block text-small color-fg-subtle">${weekDatesTotal}</span>
       </div>
     `
   }
 
   topMarkup += `
       <div class="p-2">
-        <span class="d-block f2 text-bold color-text-success lh-condensed">${maxCount}</span>
+        <span class="d-block f2 text-bold color-fg-success lh-condensed">${maxCount}</span>
         <span class="d-block text-small text-bold">Best day</span>
-        <span class="d-none d-sm-block text-small color-text-tertiary">${dateBest}</span>
+        <span class="d-none d-sm-block text-small color-fg-subtle">${dateBest}</span>
       </div>
     </div>
     <p class="mt-1 text-right text-small">
-      Average: <span class="text-bold color-text-success">${averageCount}</span> <span class="color-text-tertiary">/ day</span>
+      Average: <span class="text-bold color-fg-success">${averageCount}</span> <span class="color-fg-subtle">/ day</span>
       </p>
     </div>
   `
@@ -357,17 +357,17 @@ const renderStats = () => {
       <h5 class="mb-1">Streaks</h5>
       <div class="d-flex flex-justify-between rounded-2 border px-1 px-md-2">
         <div class="p-2">
-          <span class="d-block f2 text-bold color-text-success lh-condensed">${streakLongest} <span class="f4">days</span></span>
+          <span class="d-block f2 text-bold color-fg-success lh-condensed">${streakLongest} <span class="f4">days</span></span>
           <span class="d-block text-small text-bold">Longest</span>
-          <span class="d-none d-sm-block text-small color-text-tertiary">${datesLongest}</span>
+          <span class="d-none d-sm-block text-small color-fg-subtle">${datesLongest}</span>
         </div>
     `
   if (!viewingYear) {
     bottomMarkup += `
           <div class="p-2">
-            <span class="d-block f2 text-bold color-text-success lh-condensed">${streakCurrent} <span class="f4">days</span></span>
+            <span class="d-block f2 text-bold color-fg-success lh-condensed">${streakCurrent} <span class="f4">days</span></span>
             <span class="d-block text-small text-bold">Current</span>
-            <span class="d-none d-sm-block text-small color-text-tertiary">${datesCurrent}</span>
+            <span class="d-none d-sm-block text-small color-fg-subtle">${datesCurrent}</span>
           </div>
         </div>
       </div>
