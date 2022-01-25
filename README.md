@@ -19,6 +19,10 @@ Besides being sort of neat looking, this view is interesting in that it highligh
 
 [Install from Mozilla Add-ons site](https://addons.mozilla.org/en-US/firefox/addon/github-isometric-contributions/)
 
+### Microsoft Edge
+
+[Install from Microsoft Edge Add-ons site](https://microsoftedge.microsoft.com/addons/detail/github-isometric-contribu/hcicbpfcbdpfgibhlbphodkcbojakpej)
+
 ## Contributing
 
 **_Note that I don't currently have any plans for adding new features to the extension. Please contact me before submitting a PR with new functionality._**
