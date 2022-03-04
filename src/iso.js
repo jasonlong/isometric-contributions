@@ -326,7 +326,7 @@ const renderStats = () => {
         <div class="p-2">
           <span class="d-block f2 text-bold color-fg-success lh-condensed">${countTotal}</span>
           <span class="d-block text-small text-bold">Total</span>
-          <span class="d-none d-sm-block text-small color-fg-subtlcolor-fg-subtle">${datesTotal}</span>
+          <span class="d-none d-sm-block text-small color-fg-muted">${datesTotal}</span>
         </div>
     `
   if (!viewingYear) {
@@ -334,7 +334,7 @@ const renderStats = () => {
       <div class="p-2 d-none d-xl-block">
         <span class="d-block f2 text-bold color-fg-success lh-condensed">${weekCountTotal}</span>
         <span class="d-block text-small text-bold">This week</span>
-        <span class="d-none d-sm-block text-small color-fg-subtle">${weekDatesTotal}</span>
+        <span class="d-none d-sm-block text-small color-fg-muted">${weekDatesTotal}</span>
       </div>
     `
   }
@@ -343,11 +343,11 @@ const renderStats = () => {
       <div class="p-2">
         <span class="d-block f2 text-bold color-fg-success lh-condensed">${maxCount}</span>
         <span class="d-block text-small text-bold">Best day</span>
-        <span class="d-none d-sm-block text-small color-fg-subtle">${dateBest}</span>
+        <span class="d-none d-sm-block text-small color-fg-muted">${dateBest}</span>
       </div>
     </div>
     <p class="mt-1 text-right text-small">
-      Average: <span class="text-bold color-fg-success">${averageCount}</span> <span class="color-fg-subtle">/ day</span>
+      Average: <span class="text-bold color-fg-success">${averageCount}</span> <span class="color-fg-muted">/ day</span>
       </p>
     </div>
   `
@@ -359,7 +359,7 @@ const renderStats = () => {
         <div class="p-2">
           <span class="d-block f2 text-bold color-fg-success lh-condensed">${streakLongest} <span class="f4">days</span></span>
           <span class="d-block text-small text-bold">Longest</span>
-          <span class="d-none d-sm-block text-small color-fg-subtle">${datesLongest}</span>
+          <span class="d-none d-sm-block text-small color-fg-muted">${datesLongest}</span>
         </div>
     `
   if (!viewingYear) {
@@ -367,7 +367,7 @@ const renderStats = () => {
           <div class="p-2">
             <span class="d-block f2 text-bold color-fg-success lh-condensed">${streakCurrent} <span class="f4">days</span></span>
             <span class="d-block text-small text-bold">Current</span>
-            <span class="d-none d-sm-block text-small color-fg-subtle">${datesCurrent}</span>
+            <span class="d-none d-sm-block text-small color-fg-muted">${datesCurrent}</span>
           </div>
         </div>
       </div>
