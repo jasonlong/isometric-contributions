@@ -7,7 +7,7 @@
     "release:chrome": "npx webstore upload --source=isometric-contributions.zip --auto-publish"
   },
   "devDependencies": {
-    "chrome-webstore-upload-cli": "^2.0.1",
+    "chrome-webstore-upload-cli": "^2.1.0",
     "web-ext-submit": "^6.8.0",
     "xo": "^0.48.0"
   },
