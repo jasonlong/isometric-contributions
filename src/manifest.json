@@ -10,7 +10,7 @@
       "matches": ["https://github.com/*"]
     }
   ],
-  "permissions": ["storage", "contextMenus", "activeTab"],
+  "permissions": ["storage"],
   "host_permissions": ["https://github.com/"],
   "icons": {
     "48": "icon-48.png",
