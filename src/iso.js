@@ -137,13 +137,12 @@ const setContainerViewType = (type) => {
 }
 
 const getCountFromNode = (node) => {
-  // Contributions descriptions are like:
-  // * No contributions on January 9, 2023
-  // * 1 contribution on January 10, 2023
-  // * 2 contributions on January 11, 2023
+  // Contribution label formats:
+  // No contributions on January 9, 2023
+  // 1 contribution on January 10, 2023
   const contributionMatches = node.innerHTML.match(/(\d*|No) contributions? on ((.*) (\d{1,2}), (\d{4,}))/)
   const dataCount = contributionMatches[1]
-  return dataCount === "No" ? 0 : Number.parseInt(dataCount, 10)
+  return dataCount === 'No' ? 0 : Number.parseInt(dataCount, 10)
 }
 
 const loadStats = () => {
