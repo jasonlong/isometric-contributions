@@ -136,6 +136,16 @@ const setContainerViewType = (type) => {
   }
 }
 
+const getCountFromNode = (node) => {
+  // Contributions descriptions are like:
+  // * No contributions on January 9, 2023
+  // * 1 contribution on January 10, 2023
+  // * 2 contributions on January 11, 2023
+  const contributionMatches = node.innerHTML.match(/(\d*|No) contributions? on ((.*) (\d{1,2}), (\d{4,}))/)
+  const dataCount = contributionMatches[1]
+  return dataCount === "No" ? 0 : Number.parseInt(dataCount, 10)
+}
+
 const loadStats = () => {
   let temporaryStreak = 0
   let temporaryStreakStart = null
@@ -148,8 +158,8 @@ const loadStats = () => {
   const currentWeekDays = days[days.length - 1].parentElement.querySelectorAll('rect[data-date]')
 
   for (const d of days) {
-    const currentDayCount = Number.parseInt(d.dataset.count, 10)
-    yearTotal += Number.parseInt(currentDayCount, 10)
+    const currentDayCount = getCountFromNode(d)
+    yearTotal += currentDayCount
 
     if (days[0] === d) {
       firstDay = d.dataset.date
@@ -185,8 +195,8 @@ const loadStats = () => {
   }
 
   for (const d of currentWeekDays) {
-    const currentDayCount = Number.parseInt(d.dataset.count, 10)
-    weekTotal += Number.parseInt(currentDayCount, 10)
+    const currentDayCount = getCountFromNode(d)
+    weekTotal += currentDayCount
 
     if (currentWeekDays[0] === d) {
       weekStartDay = d.dataset.date
@@ -201,7 +211,7 @@ const loadStats = () => {
   currentStreakEnd = daysArray[0].dataset.date
 
   for (let i = 0; i < daysArray.length; i++) {
-    const currentDayCount = Number.parseInt(daysArray[i].dataset.count, 10)
+    const currentDayCount = getCountFromNode(daysArray[i])
     // If there's no activity today, continue on to yesterday
     if (i === 0 && currentDayCount === 0) {
       currentStreakEnd = daysArray[1].dataset.date
@@ -298,11 +308,11 @@ const renderIsometricChart = () => {
     const x = Number.parseInt(w.getAttribute('transform').match(/(\d+)/)[0], 10) / (GH_OFFSET + 1)
     for (const r of w.querySelectorAll('rect')) {
       const y = Number.parseInt(r.getAttribute('y'), 10) / GH_OFFSET
-      const contribCount = Number.parseInt(r.dataset.count, 10)
+      const currentDayCount = getCountFromNode(r)
       let cubeHeight = 3
 
       if (maxCount > 0) {
-        cubeHeight += Number.parseInt((MAX_HEIGHT / maxCount) * contribCount, 10)
+        cubeHeight += Number.parseInt((MAX_HEIGHT / maxCount) * currentDayCount, 10)
       }
 
       const dimension = new obelisk.CubeDimension(SIZE, SIZE, cubeHeight)
