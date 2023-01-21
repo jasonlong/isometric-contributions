@@ -43,11 +43,11 @@ const getSettings = () => {
     // https://developer.mozilla.org/Add-ons/WebExtensions/Chrome_incompatibilities#storage
     if (chrome && chrome.storage) {
       chrome.storage.local.get(['toggleSetting'], (settings) => {
-        toggleSetting = settings.toggleSetting ? settings.toggleSetting : 'cubes'
+        toggleSetting = settings.toggleSetting ?? 'cubes'
         resolve('Settings loaded')
       })
     } else {
-      toggleSetting = localStorage.toggleSetting ? localStorage.toggleSetting : 'cubes'
+      toggleSetting = localStorage.toggleSetting ?? 'cubes'
       resolve('Settings loaded')
     }
   })
