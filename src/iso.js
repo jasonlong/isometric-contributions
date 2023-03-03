@@ -141,6 +141,11 @@ const getCountFromNode = (node) => {
   // No contributions on January 9, 2023
   // 1 contribution on January 10, 2023
   const contributionMatches = node.innerHTML.match(/(\d*|No) contributions? on ((.*) (\d{1,2}), (\d{4,}))/)
+
+  if (!contributionMatches) {
+    return 0
+  }
+
   const dataCount = contributionMatches[1]
   return dataCount === 'No' ? 0 : Number.parseInt(dataCount, 10)
 }
@@ -153,8 +158,8 @@ const loadStats = () => {
   let currentStreakStart = null
   let currentStreakEnd = null
 
-  const days = document.querySelectorAll('.js-calendar-graph rect[data-date]')
-  const currentWeekDays = days[days.length - 1].parentElement.querySelectorAll('rect[data-date]')
+  const days = document.querySelectorAll('.js-calendar-graph-table tbody td.ContributionCalendar-day')
+  const currentWeekDays = document.querySelectorAll('.js-calendar-graph-table tbody tr td:last-child')
 
   for (const d of days) {
     const currentDayCount = getCountFromNode(d)
@@ -296,17 +301,35 @@ const getSquareColor = (rect) => {
 const renderIsometricChart = () => {
   const SIZE = 16
   const MAX_HEIGHT = 100
-  const firstRect = document.querySelectorAll('.js-calendar-graph-svg g > g')[1]
   const canvas = document.querySelector('#isometric-contributions')
-  const GH_OFFSET = Number.parseInt(firstRect.getAttribute('transform').match(/(\d+)/)[0], 10) - 1
+  /**
+   * Refer to the old svg graph, hardcode the `GH_OFFSET` to 14:
+   *
+   * <g transform="translate(0, 0)"></g> // week1
+   * <g transform="translate(14, 0)"></g> // week2
+   * <g transform="translate(28, 0)"></g>
+   * <g transform="translate(42, 0)"></g>
+   *
+   */
+  const GH_OFFSET = 14
   const point = new obelisk.Point(130, 90)
   const pixelView = new obelisk.PixelView(canvas, point)
-  const weeks = document.querySelectorAll('.js-calendar-graph-svg g > g')
+  // Get all weeks by data-ix attribute.
+  const weeks = Array(52)
+    .fill()
+    .map((_, i) => i + 1)
+    .map((i) => document.querySelectorAll(`.js-calendar-graph-table tbody td.ContributionCalendar-day[data-ix="${i}"]`))
+
+  // Hardcode the old translateX value to 14.
+  let transform = 14
 
   for (const w of weeks) {
-    const x = Number.parseInt(w.getAttribute('transform').match(/(\d+)/)[0], 10) / (GH_OFFSET + 1)
-    for (const r of w.querySelectorAll('rect')) {
-      const y = Number.parseInt(r.getAttribute('y'), 10) / GH_OFFSET
+    const x = transform / (GH_OFFSET + 1)
+    transform += GH_OFFSET
+    let offsetY = 0 // Hardcode the old y of rect value.
+    for (const r of w) {
+      const y = offsetY / GH_OFFSET
+      offsetY += 13
       const currentDayCount = getCountFromNode(r)
       let cubeHeight = 3
 
