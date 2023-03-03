@@ -302,19 +302,31 @@ const renderIsometricChart = () => {
   const SIZE = 16
   const MAX_HEIGHT = 100
   const canvas = document.querySelector('#isometric-contributions')
+  /**
+   * Refer to the old svg graph, hardcode the `GH_OFFSET` to 14:
+   *
+   * <g transform="translate(0, 0)"></g> // week1
+   * <g transform="translate(14, 0)"></g> // week2
+   * <g transform="translate(28, 0)"></g>
+   * <g transform="translate(42, 0)"></g>
+   *
+   */
   const GH_OFFSET = 14
   const point = new obelisk.Point(130, 90)
   const pixelView = new obelisk.PixelView(canvas, point)
+  // Get all weeks by data-ix attribute.
   const weeks = Array(52)
     .fill()
-    .map((_, i) => i + 1).map(i => document.querySelectorAll(`.js-calendar-graph-table tbody td.ContributionCalendar-day[data-ix="${i}"]`))
-      
+    .map((_, i) => i + 1)
+    .map((i) => document.querySelectorAll(`.js-calendar-graph-table tbody td.ContributionCalendar-day[data-ix="${i}"]`))
+
+  // Hardcode the old translateX value to 14.
   let transform = 14
 
   for (const w of weeks) {
     const x = transform / (GH_OFFSET + 1)
     transform += GH_OFFSET
-    let offsetY = 0
+    let offsetY = 0 // Hardcode the old y of rect value.
     for (const r of w) {
       const y = offsetY / GH_OFFSET
       offsetY += 13
