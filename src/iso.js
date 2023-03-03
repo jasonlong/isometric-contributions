@@ -315,7 +315,7 @@ const renderIsometricChart = () => {
   const point = new obelisk.Point(130, 90)
   const pixelView = new obelisk.PixelView(canvas, point)
   // Get all weeks by data-ix attribute.
-  const weeks = Array(52)
+  const weeks = Array.from({ length: 52 })
     .fill()
     .map((_, i) => i + 1)
     .map((i) => document.querySelectorAll(`.js-calendar-graph-table tbody td.ContributionCalendar-day[data-ix="${i}"]`))
