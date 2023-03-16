@@ -472,10 +472,12 @@ if (document.querySelector('.js-calendar-graph')) {
   const config = { attributes: true, childList: true, subtree: true }
   const callback = (mutationsList) => {
     for (const mutation of mutationsList) {
-      if (mutation.type === 'childList') {
-        if (document.querySelector('.js-calendar-graph') && !document.querySelector('.ic-contributions-wrapper')) {
-          generateIsometricChart()
-        }
+      if (
+        mutation.type === 'childList' &&
+        document.querySelector('.js-calendar-graph') &&
+        !document.querySelector('.ic-contributions-wrapper')
+      ) {
+        generateIsometricChart()
       }
     }
   }
