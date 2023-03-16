@@ -473,10 +473,9 @@ if (document.querySelector('.js-calendar-graph')) {
   const callback = (mutationsList) => {
     for (const mutation of mutationsList) {
       if (mutation.type === 'childList') {
-        for (const node of mutation.addedNodes) {
-          if (node.classList && node.classList.contains('js-yearly-contributions')) {
-            generateIsometricChart()
-          }
+        if (document.querySelector('.js-calendar-graph') && !document.querySelector('.ic-contributions-wrapper')) {
+          console.log('generateIsometricChart')
+          generateIsometricChart()
         }
       }
     }
