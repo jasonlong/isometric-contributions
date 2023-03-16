@@ -1,13 +1,16 @@
 {
   "scripts": {
+    "start": "parcel watch src/manifest.json --host localhost",
+    "build": "parcel build src/manifest.json",
     "test": "xo",
-    "build": "zip -r isometric-contributions.zip src/*",
     "release": "release:*",
     "release:ff": "npx web-ext-submit --source-dir src",
     "release:chrome": "npx webstore upload --source=isometric-contributions.zip --auto-publish"
   },
   "devDependencies": {
+    "@parcel/config-webextension": "^2.8.3",
     "chrome-webstore-upload-cli": "^2.2.0",
+    "parcel": "^2.8.3",
     "web-ext-submit": "^7.5.0",
     "xo": "^0.53.1"
   },

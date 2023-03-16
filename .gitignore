@@ -5,3 +5,6 @@ node_modules
 .direnv
 .envrc
 src/Archive.zip
+.do_tasks
+dist
+.parcel-cache
