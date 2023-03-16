@@ -6,3 +6,5 @@ node_modules
 .envrc
 src/Archive.zip
 .do_tasks
+dist
+.parcel-cache
