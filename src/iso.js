@@ -465,7 +465,7 @@ const formatDateString = (dateString, options) => {
   return date
 }
 
-(async function() {
+;(async function () {
   if (document.querySelector('.js-calendar-graph')) {
     await getSettings()
     generateIsometricChart()
@@ -491,5 +491,4 @@ const formatDateString = (dateString, options) => {
     const observer = new MutationObserver(callback)
     observer.observe(observedContainer, config)
   }
-}())
-
+})()
