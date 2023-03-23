@@ -465,28 +465,31 @@ const formatDateString = (dateString, options) => {
   return date
 }
 
-if (document.querySelector('.js-calendar-graph')) {
-  const settingsPromise = getSettings()
-  settingsPromise.then(generateIsometricChart)
+(async function() {
+  if (document.querySelector('.js-calendar-graph')) {
+    await getSettings()
+    generateIsometricChart()
 
-  const config = { attributes: true, childList: true, subtree: true }
-  const callback = (mutationsList) => {
-    for (const mutation of mutationsList) {
-      if (
-        mutation.type === 'childList' &&
-        document.querySelector('.js-calendar-graph') &&
-        !document.querySelector('.ic-contributions-wrapper')
-      ) {
-        generateIsometricChart()
+    const config = { attributes: true, childList: true, subtree: true }
+    const callback = (mutationsList) => {
+      for (const mutation of mutationsList) {
+        if (
+          mutation.type === 'childList' &&
+          document.querySelector('.js-calendar-graph') &&
+          !document.querySelector('.ic-contributions-wrapper')
+        ) {
+          generateIsometricChart()
+        }
       }
     }
+
+    window.matchMedia('(prefers-color-scheme: dark)').addListener(() => {
+      renderIsometricChart()
+    })
+
+    const observedContainer = document.querySelector('html')
+    const observer = new MutationObserver(callback)
+    observer.observe(observedContainer, config)
   }
+}())
 
-  window.matchMedia('(prefers-color-scheme: dark)').addListener(() => {
-    renderIsometricChart()
-  })
-
-  const observedContainer = document.querySelector('html')
-  const observer = new MutationObserver(callback)
-  observer.observe(observedContainer, config)
-}
