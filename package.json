@@ -11,7 +11,7 @@
     "@parcel/config-webextension": "^2.8.3",
     "chrome-webstore-upload-cli": "^2.2.0",
     "parcel": "^2.8.3",
-    "web-ext-submit": "^7.6.0",
+    "web-ext-submit": "^7.6.1",
     "xo": "^0.54.1"
   },
   "xo": {
