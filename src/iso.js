@@ -2,6 +2,8 @@ import _ from 'lodash'
 
 const dateFormat = new Intl.DateTimeFormat('en-US', { month: 'short', day: 'numeric', timeZone: 'UTC' })
 
+let days
+let weeks
 let calendarGraph
 let contributionsBox
 let yearTotal = 0
@@ -152,6 +154,10 @@ const getCountFromNode = (node) => {
   return dataCount === 'No' ? 0 : Number.parseInt(dataCount, 10)
 }
 
+const getSquareColor = (rect) => {
+  return rgbToHex(getComputedStyle(rect).getPropertyValue('fill'))
+}
+
 const loadStats = () => {
   let temporaryStreak = 0
   let temporaryStreakStart = null
@@ -159,10 +165,6 @@ const loadStats = () => {
   let longestStreakEnd = null
   let currentStreakStart = null
   let currentStreakEnd = null
-
-  const getSquareColor = (rect) => {
-    return rgbToHex(getComputedStyle(rect).getPropertyValue('fill'))
-  }
 
   const data = Array.from(document.querySelectorAll('.js-calendar-graph-table tbody td.ContributionCalendar-day')).map(d => {
     return {
@@ -173,8 +175,8 @@ const loadStats = () => {
     }
   })
   
-  const days = data.sort((a, b) => a.date.getTime() - b.date.getTime())
-  const weeks = _.toArray(_.groupBy(days, 'week'))
+  days = data.sort((a, b) => a.date.getTime() - b.date.getTime())
+  weeks = _.toArray(_.groupBy(days, 'week'))
   const currentWeekDays = _.last(weeks)
 
   for (const d of days) {
@@ -305,45 +307,24 @@ const rgbToHex = (rgb) => {
   return r + g + b
 }
 
-const getSquareColor = (rect) => {
-  const fill = getComputedStyle(rect).getPropertyValue('fill')
-  const rgb = rgbToHex(fill)
-  return new obelisk.CubeColor().getByHorizontalColor(Number.parseInt(rgb, 16))
-}
-
 const renderIsometricChart = () => {
   const SIZE = 16
   const MAX_HEIGHT = 100
-  const canvas = document.querySelector('#isometric-contributions')
-  /**
-   * Refer to the old svg graph, hardcode the `GH_OFFSET` to 14:
-   *
-   * <g transform="translate(0, 0)"></g> // week1
-   * <g transform="translate(14, 0)"></g> // week2
-   * <g transform="translate(28, 0)"></g>
-   * <g transform="translate(42, 0)"></g>
-   *
-   */
   const GH_OFFSET = 14
+  const canvas = document.querySelector('#isometric-contributions')
   const point = new obelisk.Point(130, 90)
   const pixelView = new obelisk.PixelView(canvas, point)
-  // Get all weeks by data-ix attribute.
-  const weeks = Array.from({ length: 52 })
-    .fill()
-    .map((_, i) => i + 1)
-    .map((i) => document.querySelectorAll(`.js-calendar-graph-table tbody td.ContributionCalendar-day[data-ix="${i}"]`))
 
-  // Hardcode the old translateX value to 14.
-  let transform = 14
+  let transform = GH_OFFSET
 
   for (const w of weeks) {
     const x = transform / (GH_OFFSET + 1)
     transform += GH_OFFSET
     let offsetY = 0 // Hardcode the old y of rect value.
-    for (const r of w) {
+    for (const d of w) {
       const y = offsetY / GH_OFFSET
       offsetY += 13
-      const currentDayCount = getCountFromNode(r)
+      const currentDayCount = d.count
       let cubeHeight = 3
 
       if (maxCount > 0) {
@@ -351,7 +332,7 @@ const renderIsometricChart = () => {
       }
 
       const dimension = new obelisk.CubeDimension(SIZE, SIZE, cubeHeight)
-      const color = getSquareColor(r)
+      const color = new obelisk.CubeColor().getByHorizontalColor(Number.parseInt(d.color, 16))
       const cube = new obelisk.Cube(dimension, color, false)
       const p3d = new obelisk.Point3D(SIZE * x, SIZE * y, 0)
       pixelView.renderObject(cube, p3d)
