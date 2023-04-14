@@ -1,3 +1,5 @@
+import group from 'core-js-pure/actual/array/group'
+
 const dateFormat = new Intl.DateTimeFormat('en-US', { month: 'short', day: 'numeric', timeZone: 'UTC' })
 
 let calendarGraph
@@ -167,16 +169,16 @@ const loadStats = () => {
     return {
       'count': getCountFromNode(d),
       'date': new Date(d.dataset.date),
+      'week': d.dataset.ix,
       'color': getSquareColor2(d)
     }
   })
-
+  
   const days = data.sort((a, b) => a.date.getTime() - b.date.getTime())
-  //--------------------------
-
+  const weeks = days.sort((a, b) => a.week - b.week)
+  console.log(weeks)
   // const currentWeekDays = document.querySelectorAll('.js-calendar-graph-table tbody tr td:last-child')
 
-  // for (const d of days) {
   for (const d of days) {
     const currentDayCount = d.count
     yearTotal += currentDayCount
