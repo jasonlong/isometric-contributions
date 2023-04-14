@@ -1,4 +1,4 @@
-const dateOptions = { month: 'short', day: 'numeric' }
+const dateFormat = new Intl.DateTimeFormat('en-US', { month: 'short', day: 'numeric', timeZone: 'UTC' })
 
 let calendarGraph
 let contributionsBox
@@ -158,38 +158,54 @@ const loadStats = () => {
   let currentStreakStart = null
   let currentStreakEnd = null
 
-  const days = document.querySelectorAll('.js-calendar-graph-table tbody td.ContributionCalendar-day')
-  const currentWeekDays = document.querySelectorAll('.js-calendar-graph-table tbody tr td:last-child')
+  //--------------------------
+  const getSquareColor2 = (rect) => {
+    return rgbToHex(getComputedStyle(rect).getPropertyValue('fill'))
+  }
 
+  const data = Array.from(document.querySelectorAll('.js-calendar-graph-table tbody td.ContributionCalendar-day')).map(d => {
+    return {
+      'count': getCountFromNode(d),
+      'date': new Date(d.dataset.date),
+      'color': getSquareColor2(d)
+    }
+  })
+
+  const days = data.sort((a, b) => a.date.getTime() - b.date.getTime())
+  //--------------------------
+
+  // const currentWeekDays = document.querySelectorAll('.js-calendar-graph-table tbody tr td:last-child')
+
+  // for (const d of days) {
   for (const d of days) {
-    const currentDayCount = getCountFromNode(d)
+    const currentDayCount = d.count
     yearTotal += currentDayCount
 
     if (days[0] === d) {
-      firstDay = d.dataset.date
+      firstDay = d.date
     }
 
     if (days[days.length - 1] === d) {
-      lastDay = d.dataset.date
+      lastDay = d.date
     }
 
     // Check for best day
     if (currentDayCount > maxCount) {
-      bestDay = d.dataset.date
+      bestDay = d.date
       maxCount = currentDayCount
     }
 
     // Check for longest streak
     if (currentDayCount > 0) {
       if (temporaryStreak === 0) {
-        temporaryStreakStart = d.dataset.date
+        temporaryStreakStart = d.date
       }
 
       temporaryStreak++
 
       if (temporaryStreak >= streakLongest) {
         longestStreakStart = temporaryStreakStart
-        longestStreakEnd = d.dataset.date
+        longestStreakEnd = d.date
         streakLongest = temporaryStreak
       }
     } else {
@@ -198,41 +214,39 @@ const loadStats = () => {
     }
   }
 
-  for (const d of currentWeekDays) {
-    const currentDayCount = getCountFromNode(d)
-    weekTotal += currentDayCount
-
-    if (currentWeekDays[0] === d) {
-      weekStartDay = d.dataset.date
-    }
-  }
+  // for (const d of currentWeekDays) {
+  //   const currentDayCount = getCountFromNode(d)
+  //   weekTotal += currentDayCount
+  //
+  //   if (currentWeekDays[0] === d) {
+  //     weekStartDay = d.date
+  //   }
+  // }
 
   // Check for current streak
-  // Convert days NodeList to Array so we can reverse it
-  const daysArray = Array.prototype.slice.call(days)
-  daysArray.reverse()
+  const reversedDays = days.toReversed()
+  currentStreakEnd = reversedDays[0].date
 
-  currentStreakEnd = daysArray[0].dataset.date
-
-  for (let i = 0; i < daysArray.length; i++) {
-    const currentDayCount = getCountFromNode(daysArray[i])
+  for (let i = 0; i < reversedDays.length; i++) {
+    // const currentDayCount = getCountFromNode(daysArray[i])
+    const currentDayCount = reversedDays[i].count
     // If there's no activity today, continue on to yesterday
     if (i === 0 && currentDayCount === 0) {
-      currentStreakEnd = daysArray[1].dataset.date
+      currentStreakEnd = reversedDays[1].date
       continue
     }
 
     if (currentDayCount > 0) {
       streakCurrent++
-      currentStreakStart = daysArray[i].dataset.date
+      currentStreakStart = reversedDays[i].date
     } else {
       break
     }
   }
 
   if (streakCurrent > 0) {
-    currentStreakStart = formatDateString(currentStreakStart, dateOptions)
-    currentStreakEnd = formatDateString(currentStreakEnd, dateOptions)
+    currentStreakStart = dateFormat.format(currentStreakStart)
+    currentStreakEnd = dateFormat.format(currentStreakEnd)
     datesCurrent = `${currentStreakStart} → ${currentStreakEnd}`
   } else {
     datesCurrent = 'No current streak'
@@ -240,8 +254,8 @@ const loadStats = () => {
 
   // Year total
   countTotal = yearTotal.toLocaleString()
-  const dateFirst = formatDateString(firstDay, dateOptions)
-  const dateLast = formatDateString(lastDay, dateOptions)
+  const dateFirst = dateFormat.format(firstDay)
+  const dateLast = dateFormat.format(lastDay)
   datesTotal = `${dateFirst} → ${dateLast}`
 
   // Average contributions per day
@@ -249,24 +263,24 @@ const loadStats = () => {
   averageCount = precisionRound(yearTotal / dayDifference, 2)
 
   // Best day
-  dateBest = formatDateString(bestDay, dateOptions)
+  dateBest = dateFormat.format(bestDay)
   if (!dateBest) {
     dateBest = 'No activity found'
   }
 
   // Longest streak
   if (streakLongest > 0) {
-    longestStreakStart = formatDateString(longestStreakStart, dateOptions)
-    longestStreakEnd = formatDateString(longestStreakEnd, dateOptions)
+    longestStreakStart = dateFormat.format(longestStreakStart)
+    longestStreakEnd = dateFormat.format(longestStreakEnd)
     datesLongest = `${longestStreakStart} → ${longestStreakEnd}`
   } else {
     datesLongest = 'No longest streak'
   }
 
   // Week total
-  weekCountTotal = weekTotal.toLocaleString()
-  const weekDateFirst = formatDateString(weekStartDay, dateOptions)
-  weekDatesTotal = `${weekDateFirst} → ${dateLast}`
+  // weekCountTotal = weekTotal.toLocaleString()
+  // const weekDateFirst = dateFormat.format(weekStartDay)
+  // weekDatesTotal = `${weekDateFirst} → ${dateLast}`
 }
 
 const rgbToHex = (rgb) => {
@@ -431,38 +445,15 @@ const precisionRound = (number, precision) => {
   return Math.round(number * factor) / factor
 }
 
-const datesDayDifference = (dateString1, dateString2) => {
+const datesDayDifference= (date1, date2) => {
   let diffDays = null
-  let date1 = null
-  let date2 = null
 
-  if (dateString1) {
-    const dateParts = dateString1.split('-')
-    date1 = new Date(dateParts[0], dateParts[1] - 1, dateParts[2], 0, 0, 0)
-  }
-
-  if (dateString2) {
-    const dateParts = dateString2.split('-')
-    date2 = new Date(dateParts[0], dateParts[1] - 1, dateParts[2], 0, 0, 0)
-  }
-
-  if (dateString1 && dateString2) {
+  if (date1 && date2) {
     const timeDiff = Math.abs(date2.getTime() - date1.getTime())
     diffDays = Math.ceil(timeDiff / (1000 * 3600 * 24))
   }
 
   return diffDays
-}
-
-const formatDateString = (dateString, options) => {
-  let date = null
-
-  if (dateString) {
-    const dateParts = dateString.split('-')
-    date = new Date(dateParts[0], dateParts[1] - 1, dateParts[2], 0, 0, 0).toLocaleDateString('en-US', options)
-  }
-
-  return date
 }
 
 ;(async function () {
