@@ -30,5 +30,8 @@
     "rules": {
       "unicorn/prefer-top-level-await": 0
     }
+  },
+  "dependencies": {
+    "lodash": "^4.17.21"
   }
 }

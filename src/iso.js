@@ -1,3 +1,5 @@
+import _ from 'lodash'
+
 const dateFormat = new Intl.DateTimeFormat('en-US', { month: 'short', day: 'numeric', timeZone: 'UTC' })
 
 let calendarGraph
@@ -172,9 +174,8 @@ const loadStats = () => {
   })
   
   const days = data.sort((a, b) => a.date.getTime() - b.date.getTime())
-  const weeks = days.group(({week}) => week)
-  console.log(weeks)
-  // const currentWeekDays = document.querySelectorAll('.js-calendar-graph-table tbody tr td:last-child')
+  const weeks = _.toArray(_.groupBy(days, 'week'))
+  const currentWeekDays = _.last(weeks)
 
   for (const d of days) {
     const currentDayCount = d.count
@@ -213,21 +214,20 @@ const loadStats = () => {
     }
   }
 
-  // for (const d of currentWeekDays) {
-  //   const currentDayCount = getCountFromNode(d)
-  //   weekTotal += currentDayCount
-  //
-  //   if (currentWeekDays[0] === d) {
-  //     weekStartDay = d.date
-  //   }
-  // }
+  for (const d of currentWeekDays) {
+    const currentDayCount = d.count
+    weekTotal += currentDayCount
+
+    if (currentWeekDays[0] === d) {
+      weekStartDay = d.date
+    }
+  }
 
   // Check for current streak
   const reversedDays = days.toReversed()
   currentStreakEnd = reversedDays[0].date
 
   for (let i = 0; i < reversedDays.length; i++) {
-    // const currentDayCount = getCountFromNode(daysArray[i])
     const currentDayCount = reversedDays[i].count
     // If there's no activity today, continue on to yesterday
     if (i === 0 && currentDayCount === 0) {
@@ -277,9 +277,9 @@ const loadStats = () => {
   }
 
   // Week total
-  // weekCountTotal = weekTotal.toLocaleString()
-  // const weekDateFirst = dateFormat.format(weekStartDay)
-  // weekDatesTotal = `${weekDateFirst} → ${dateLast}`
+  weekCountTotal = weekTotal.toLocaleString()
+  const weekDateFirst = dateFormat.format(weekStartDay)
+  weekDatesTotal = `${weekDateFirst} → ${dateLast}`
 }
 
 const rgbToHex = (rgb) => {
