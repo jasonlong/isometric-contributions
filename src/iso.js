@@ -166,15 +166,15 @@ const loadStats = () => {
   let currentStreakStart = null
   let currentStreakEnd = null
 
-  const data = Array.from(document.querySelectorAll('.js-calendar-graph-table tbody td.ContributionCalendar-day')).map(d => {
+  const data = [...document.querySelectorAll('.js-calendar-graph-table tbody td.ContributionCalendar-day')].map((d) => {
     return {
-      'count': getCountFromNode(d),
-      'date': new Date(d.dataset.date),
-      'week': d.dataset.ix,
-      'color': getSquareColor(d)
+      count: getCountFromNode(d),
+      date: new Date(d.dataset.date),
+      week: d.dataset.ix,
+      color: getSquareColor(d)
     }
   })
-  
+
   days = data.sort((a, b) => a.date.getTime() - b.date.getTime())
   weeks = _.toArray(_.groupBy(days, 'week'))
   const currentWeekDays = _.last(weeks)
@@ -425,7 +425,7 @@ const precisionRound = (number, precision) => {
   return Math.round(number * factor) / factor
 }
 
-const datesDayDifference= (date1, date2) => {
+const datesDayDifference = (date1, date2) => {
   let diffDays = null
 
   if (date1 && date2) {
