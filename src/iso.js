@@ -1,4 +1,4 @@
-import { toArray, groupBy, last } from "lodash-es"
+import { toArray, groupBy, last } from 'lodash-es'
 
 const dateFormat = new Intl.DateTimeFormat('en-US', { month: 'short', day: 'numeric', timeZone: 'UTC' })
 
