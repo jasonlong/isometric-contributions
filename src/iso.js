@@ -1,5 +1,9 @@
-const dateOptions = { month: 'short', day: 'numeric' }
+import { toArray, groupBy, last } from 'lodash-es'
 
+const dateFormat = new Intl.DateTimeFormat('en-US', { month: 'short', day: 'numeric', timeZone: 'UTC' })
+
+let days
+let weeks
 let calendarGraph
 let contributionsBox
 let yearTotal = 0
@@ -150,6 +154,10 @@ const getCountFromNode = (node) => {
   return dataCount === 'No' ? 0 : Number.parseInt(dataCount, 10)
 }
 
+const getSquareColor = (rect) => {
+  return rgbToHex(getComputedStyle(rect).getPropertyValue('fill'))
+}
+
 const loadStats = () => {
   let temporaryStreak = 0
   let temporaryStreakStart = null
@@ -158,38 +166,48 @@ const loadStats = () => {
   let currentStreakStart = null
   let currentStreakEnd = null
 
-  const days = document.querySelectorAll('.js-calendar-graph-table tbody td.ContributionCalendar-day')
-  const currentWeekDays = document.querySelectorAll('.js-calendar-graph-table tbody tr td:last-child')
+  const data = [...document.querySelectorAll('.js-calendar-graph-table tbody td.ContributionCalendar-day')].map((d) => {
+    return {
+      count: getCountFromNode(d),
+      date: new Date(d.dataset.date),
+      week: d.dataset.ix,
+      color: getSquareColor(d)
+    }
+  })
+
+  days = data.sort((a, b) => a.date.getTime() - b.date.getTime())
+  weeks = toArray(groupBy(days, 'week'))
+  const currentWeekDays = last(weeks)
 
   for (const d of days) {
-    const currentDayCount = getCountFromNode(d)
+    const currentDayCount = d.count
     yearTotal += currentDayCount
 
     if (days[0] === d) {
-      firstDay = d.dataset.date
+      firstDay = d.date
     }
 
     if (days[days.length - 1] === d) {
-      lastDay = d.dataset.date
+      lastDay = d.date
     }
 
     // Check for best day
     if (currentDayCount > maxCount) {
-      bestDay = d.dataset.date
+      bestDay = d.date
       maxCount = currentDayCount
     }
 
     // Check for longest streak
     if (currentDayCount > 0) {
       if (temporaryStreak === 0) {
-        temporaryStreakStart = d.dataset.date
+        temporaryStreakStart = d.date
       }
 
       temporaryStreak++
 
       if (temporaryStreak >= streakLongest) {
         longestStreakStart = temporaryStreakStart
-        longestStreakEnd = d.dataset.date
+        longestStreakEnd = d.date
         streakLongest = temporaryStreak
       }
     } else {
@@ -199,40 +217,37 @@ const loadStats = () => {
   }
 
   for (const d of currentWeekDays) {
-    const currentDayCount = getCountFromNode(d)
+    const currentDayCount = d.count
     weekTotal += currentDayCount
 
     if (currentWeekDays[0] === d) {
-      weekStartDay = d.dataset.date
+      weekStartDay = d.date
     }
   }
 
   // Check for current streak
-  // Convert days NodeList to Array so we can reverse it
-  const daysArray = Array.prototype.slice.call(days)
-  daysArray.reverse()
+  const reversedDays = days.toReversed()
+  currentStreakEnd = reversedDays[0].date
 
-  currentStreakEnd = daysArray[0].dataset.date
-
-  for (let i = 0; i < daysArray.length; i++) {
-    const currentDayCount = getCountFromNode(daysArray[i])
+  for (let i = 0; i < reversedDays.length; i++) {
+    const currentDayCount = reversedDays[i].count
     // If there's no activity today, continue on to yesterday
     if (i === 0 && currentDayCount === 0) {
-      currentStreakEnd = daysArray[1].dataset.date
+      currentStreakEnd = reversedDays[1].date
       continue
     }
 
     if (currentDayCount > 0) {
       streakCurrent++
-      currentStreakStart = daysArray[i].dataset.date
+      currentStreakStart = reversedDays[i].date
     } else {
       break
     }
   }
 
   if (streakCurrent > 0) {
-    currentStreakStart = formatDateString(currentStreakStart, dateOptions)
-    currentStreakEnd = formatDateString(currentStreakEnd, dateOptions)
+    currentStreakStart = dateFormat.format(currentStreakStart)
+    currentStreakEnd = dateFormat.format(currentStreakEnd)
     datesCurrent = `${currentStreakStart} → ${currentStreakEnd}`
   } else {
     datesCurrent = 'No current streak'
@@ -240,8 +255,8 @@ const loadStats = () => {
 
   // Year total
   countTotal = yearTotal.toLocaleString()
-  const dateFirst = formatDateString(firstDay, dateOptions)
-  const dateLast = formatDateString(lastDay, dateOptions)
+  const dateFirst = dateFormat.format(firstDay)
+  const dateLast = dateFormat.format(lastDay)
   datesTotal = `${dateFirst} → ${dateLast}`
 
   // Average contributions per day
@@ -249,15 +264,15 @@ const loadStats = () => {
   averageCount = precisionRound(yearTotal / dayDifference, 2)
 
   // Best day
-  dateBest = formatDateString(bestDay, dateOptions)
+  dateBest = dateFormat.format(bestDay)
   if (!dateBest) {
     dateBest = 'No activity found'
   }
 
   // Longest streak
   if (streakLongest > 0) {
-    longestStreakStart = formatDateString(longestStreakStart, dateOptions)
-    longestStreakEnd = formatDateString(longestStreakEnd, dateOptions)
+    longestStreakStart = dateFormat.format(longestStreakStart)
+    longestStreakEnd = dateFormat.format(longestStreakEnd)
     datesLongest = `${longestStreakStart} → ${longestStreakEnd}`
   } else {
     datesLongest = 'No longest streak'
@@ -265,7 +280,7 @@ const loadStats = () => {
 
   // Week total
   weekCountTotal = weekTotal.toLocaleString()
-  const weekDateFirst = formatDateString(weekStartDay, dateOptions)
+  const weekDateFirst = dateFormat.format(weekStartDay)
   weekDatesTotal = `${weekDateFirst} → ${dateLast}`
 }
 
@@ -292,45 +307,24 @@ const rgbToHex = (rgb) => {
   return r + g + b
 }
 
-const getSquareColor = (rect) => {
-  const fill = getComputedStyle(rect).getPropertyValue('fill')
-  const rgb = rgbToHex(fill)
-  return new obelisk.CubeColor().getByHorizontalColor(Number.parseInt(rgb, 16))
-}
-
 const renderIsometricChart = () => {
   const SIZE = 16
   const MAX_HEIGHT = 100
-  const canvas = document.querySelector('#isometric-contributions')
-  /**
-   * Refer to the old svg graph, hardcode the `GH_OFFSET` to 14:
-   *
-   * <g transform="translate(0, 0)"></g> // week1
-   * <g transform="translate(14, 0)"></g> // week2
-   * <g transform="translate(28, 0)"></g>
-   * <g transform="translate(42, 0)"></g>
-   *
-   */
   const GH_OFFSET = 14
+  const canvas = document.querySelector('#isometric-contributions')
   const point = new obelisk.Point(130, 90)
   const pixelView = new obelisk.PixelView(canvas, point)
-  // Get all weeks by data-ix attribute.
-  const weeks = Array.from({ length: 52 })
-    .fill()
-    .map((_, i) => i + 1)
-    .map((i) => document.querySelectorAll(`.js-calendar-graph-table tbody td.ContributionCalendar-day[data-ix="${i}"]`))
 
-  // Hardcode the old translateX value to 14.
-  let transform = 14
+  let transform = GH_OFFSET
 
   for (const w of weeks) {
     const x = transform / (GH_OFFSET + 1)
     transform += GH_OFFSET
     let offsetY = 0 // Hardcode the old y of rect value.
-    for (const r of w) {
+    for (const d of w) {
       const y = offsetY / GH_OFFSET
       offsetY += 13
-      const currentDayCount = getCountFromNode(r)
+      const currentDayCount = d.count
       let cubeHeight = 3
 
       if (maxCount > 0) {
@@ -338,7 +332,7 @@ const renderIsometricChart = () => {
       }
 
       const dimension = new obelisk.CubeDimension(SIZE, SIZE, cubeHeight)
-      const color = getSquareColor(r)
+      const color = new obelisk.CubeColor().getByHorizontalColor(Number.parseInt(d.color, 16))
       const cube = new obelisk.Cube(dimension, color, false)
       const p3d = new obelisk.Point3D(SIZE * x, SIZE * y, 0)
       pixelView.renderObject(cube, p3d)
@@ -431,38 +425,15 @@ const precisionRound = (number, precision) => {
   return Math.round(number * factor) / factor
 }
 
-const datesDayDifference = (dateString1, dateString2) => {
+const datesDayDifference = (date1, date2) => {
   let diffDays = null
-  let date1 = null
-  let date2 = null
 
-  if (dateString1) {
-    const dateParts = dateString1.split('-')
-    date1 = new Date(dateParts[0], dateParts[1] - 1, dateParts[2], 0, 0, 0)
-  }
-
-  if (dateString2) {
-    const dateParts = dateString2.split('-')
-    date2 = new Date(dateParts[0], dateParts[1] - 1, dateParts[2], 0, 0, 0)
-  }
-
-  if (dateString1 && dateString2) {
+  if (date1 && date2) {
     const timeDiff = Math.abs(date2.getTime() - date1.getTime())
     diffDays = Math.ceil(timeDiff / (1000 * 3600 * 24))
   }
 
   return diffDays
-}
-
-const formatDateString = (dateString, options) => {
-  let date = null
-
-  if (dateString) {
-    const dateParts = dateString.split('-')
-    date = new Date(dateParts[0], dateParts[1] - 1, dateParts[2], 0, 0, 0).toLocaleDateString('en-US', options)
-  }
-
-  return date
 }
 
 ;(async function () {
