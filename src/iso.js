@@ -1,4 +1,4 @@
-import _ from 'lodash'
+import { toArray, groupBy, last } from "lodash-es"
 
 const dateFormat = new Intl.DateTimeFormat('en-US', { month: 'short', day: 'numeric', timeZone: 'UTC' })
 
@@ -176,8 +176,8 @@ const loadStats = () => {
   })
 
   days = data.sort((a, b) => a.date.getTime() - b.date.getTime())
-  weeks = _.toArray(_.groupBy(days, 'week'))
-  const currentWeekDays = _.last(weeks)
+  weeks = toArray(groupBy(days, 'week'))
+  const currentWeekDays = last(weeks)
 
   for (const d of days) {
     const currentDayCount = d.count
