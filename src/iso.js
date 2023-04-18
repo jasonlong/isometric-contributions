@@ -178,7 +178,6 @@ const loadStats = () => {
   days = data.sort((a, b) => a.date.getTime() - b.date.getTime())
   weeks = toArray(groupBy(days, 'week'))
   const currentWeekDays = last(weeks)
-  debugger
 
   for (const d of days) {
     const currentDayCount = d.count
