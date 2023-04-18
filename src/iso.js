@@ -226,7 +226,8 @@ const loadStats = () => {
   }
 
   // Check for current streak
-  const reversedDays = days.toReversed()
+  const reversedDays = days
+  reversedDays.reverse()
   currentStreakEnd = reversedDays[0].date
 
   for (let i = 0; i < reversedDays.length; i++) {
