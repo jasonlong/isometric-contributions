@@ -1,7 +1,7 @@
 <script lang="ts">
-  import Color from "colorjs.io"
-  import { onMount } from "svelte"
-  import tippy from "tippy.js"
+  import Color from 'colorjs.io'
+  import { onMount } from 'svelte'
+  import tippy from 'tippy.js'
 
   export let size: number
   export let height: number
@@ -12,10 +12,10 @@
   export let date: string
   export let busiestDay: boolean
 
-  let colorTop = new Color(`#${color}`).to("oklch")
-  let colorTopHover = new Color(`#${color}`).to("oklch")
-  let colorFront = new Color(`#${color}`).to("oklch")
-  let colorSide = new Color(`#${color}`).to("oklch")
+  let colorTop = new Color(`#${color}`).to('oklch')
+  let colorTopHover = new Color(`#${color}`).to('oklch')
+  let colorFront = new Color(`#${color}`).to('oklch')
+  let colorSide = new Color(`#${color}`).to('oklch')
 
   let currentTopColor = colorTop
 
@@ -44,18 +44,21 @@
   data-animation="top:0"
   data-animation-repeat="1"
   data-animation-duration="800"
-  data-animation-easing="ease-in-out">
+  data-animation-easing="ease-in-out"
+>
   <div
     style="width: {size}px; height: {height}px; background-color: {colorFront}; border: solid 0.1px {colorFront};"
     class="isometric cube-front"
     class:test={busiestDay}
     data-view="front"
-    data-right={size} />
+    data-right={size}
+  />
   <div
     style="width: {size}px; height: {height}px; background-color: {colorSide}; border: solid 0.1px {colorSide};"
     class="isometric cube-side"
     data-view="side"
-    data-left={size} />
+    data-left={size}
+  />
   <div
     on:mouseenter={hover}
     on:mouseleave={mouseleave}
@@ -66,9 +69,10 @@
     data-tippy-content="{contributions} contributions
     · {date}"
     data-view="top"
-    data-top={height}>
+    data-top={height}
+  >
     {#if busiestDay}
-      ⭐
+      <span style="pointer-events: none">⭐</span>
     {/if}
   </div>
 </div>
