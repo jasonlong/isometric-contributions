@@ -1,7 +1,5 @@
 <script lang="ts">
   import Color from 'colorjs.io'
-  import { onMount } from 'svelte'
-  import tippy from 'tippy.js'
 
   export let size: number
   export let height: number
@@ -21,17 +19,16 @@
 
   colorTop.lch.c *= 1.2
   colorTopHover.lch.l *= 1.2
-  // colorTopHover.lch.c *= 1.2
   colorFront.lch.c *= 1.2
   colorSide.lch.c *= 1.2
   colorFront.lch.l -= 8
   colorSide.lch.l -= 16
 
-  function hover(event) {
+  function hover(_e: Event) {
     currentTopColor = colorTopHover
   }
 
-  function mouseleave(event) {
+  function mouseleave(_e: Event) {
     currentTopColor = colorTop
   }
 </script>
