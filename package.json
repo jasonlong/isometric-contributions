@@ -1,49 +1,35 @@
 {
-  "type": "module",
-  "engines": {
-    "node": ">=16.0"
-  },
+  "name": "iso-plasmo",
+  "displayName": "Iso plasmo",
+  "version": "0.0.1",
+  "description": "PoC Isometric Contributions Rewrite",
+  "author": "Jason Long",
   "scripts": {
-    "start": "parcel watch src/manifest.json --host localhost",
-    "build": "parcel build src/manifest.json",
-    "test": "xo",
-    "release": "release:*",
-    "release:ff": "npx web-ext-submit --source-dir src",
-    "release:chrome": "npx webstore upload --source=isometric-contributions.zip --auto-publish"
+    "dev": "plasmo dev",
+    "build": "plasmo build",
+    "package": "plasmo package"
   },
   "dependencies": {
-    "lodash-es": "^4.17.21"
+    "@plasmohq/storage": "^1.5.0",
+    "@types/ramda": "^0.29.0",
+    "colorjs.io": "^0.4.3",
+    "isometric-css": "^2.2.4",
+    "plasmo": "0.68.0",
+    "ramda": "^0.29.0",
+    "svelte": "^3.58.0",
+    "svelte-preprocess": "^5.0.3",
+    "tippy.js": "^6.3.7"
   },
   "devDependencies": {
-    "@parcel/config-webextension": "^2.8.3",
-    "@parcel/reporter-bundle-analyzer": "^2.8.3",
-    "@parcel/reporter-bundle-buddy": "^2.8.3",
-    "chrome-webstore-upload-cli": "^2.2.0",
-    "parcel": "^2.8.3",
-    "web-ext-submit": "^7.6.2",
-    "xo": "^0.54.2"
+    "@plasmohq/prettier-plugin-sort-imports": "3.6.4",
+    "@types/chrome": "0.0.227",
+    "@types/node": "18.15.11",
+    "prettier": "2.8.7",
+    "typescript": "5.0.3"
   },
-  "xo": {
-    "prettier": true,
-    "semicolon": false,
-    "space": true,
-    "prefer-numeric-literals": 0,
-    "global": [
-      "obelisk",
-      "chrome"
-    ],
-    "env": [
-      "browser"
-    ],
-    "rules": {
-      "unicorn/prefer-top-level-await": 0
-    }
-  },
-  "targets": {
-    "default": {
-      "engines": {
-        "browsers": ">= 50%"
-      }
-    }
+  "manifest": {
+    "host_permissions": [
+      "https://github.com/"
+    ]
   }
 }
