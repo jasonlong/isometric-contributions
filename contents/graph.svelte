@@ -1,22 +1,22 @@
 <script context="module" lang="ts">
-  import type { PlasmoCSConfig } from "plasmo"
+  import type { PlasmoCSConfig } from 'plasmo'
 
-  import { Storage } from "@plasmohq/storage"
+  import { Storage } from '@plasmohq/storage'
 
-  import IsoGraph from "../components/IsoGraph.svelte"
-  import Stat from "../components/Stat.svelte"
-  import { formatDate } from "../lib/dates"
-  import type { Day } from "../lib/types"
-  import { getCountFromNode, getSquareColor } from "../lib/utils"
+  import IsoGraph from '../components/IsoGraph.svelte'
+  import Stat from '../components/Stat.svelte'
+  import { formatDate } from '../lib/dates'
+  import type { Day } from '../lib/types'
+  import { getCountFromNode, getSquareColor } from '../lib/utils'
 
   export const config: PlasmoCSConfig = {
-    matches: ["https://github.com/*"]
+    matches: ['https://github.com/*']
   }
 
   export const getRootContainer = async () => {
-    const insertLocation = document.querySelector(".js-calendar-graph")
-    const newNode = document.createElement("div")
-    newNode.className = "ic-contributions-wrapper position-relative"
+    const insertLocation = document.querySelector('.js-calendar-graph')
+    const newNode = document.createElement('div')
+    newNode.className = 'ic-contributions-wrapper position-relative'
     insertLocation.parentNode.insertBefore(newNode, insertLocation)
     return newNode
   }
@@ -37,18 +37,22 @@
     splitWhenever,
     sum,
     whereEq
-  } from "ramda"
+  } from 'ramda'
 
-  const TwoDContainer = document.querySelector(".js-calendar-graph")
-  const ThreeDContainer = document.querySelector(".ic-contributions-wrapper")
+  const TwoDContainer = document.querySelector('.js-calendar-graph')
+  const ThreeDContainer = document.querySelector('.ic-contributions-wrapper')
   const storage = new Storage()
-  let currentMode: string
 
+  let currentMode: string
+  let isViewingYear: boolean
   let countTot: number
   let firstDay: Day
   let lastDay: Day
   let busiestDay: Day
   let weeks: Array<Array<Day>>
+  let currentWeek: Array<Day>
+  let firstDayCurrentWeek: Day
+  let lastDayCurrentWeek: Day
   let thisWeekCount: number
   let longestStreak: Array<Day>
   let currentStreak: Array<Day>
@@ -57,7 +61,7 @@
   let firstDayCurrentStreak: Day
   let lastDayCurrentStreak: Day
 
-  Promise.all([storage.get<string>("mode")]).then(([mode = "3d"]) => {
+  Promise.all([storage.get<string>('mode')]).then(([mode = '3d']) => {
     currentMode = mode
   })
 
@@ -69,22 +73,22 @@
   })
 
   function setContainerVisibilities() {
-    if (currentMode == "3d") {
-      TwoDContainer.classList.add("d-none")
-      ThreeDContainer.classList.remove("d-none")
+    if (currentMode == '3d') {
+      TwoDContainer.classList.add('d-none')
+      ThreeDContainer.classList.remove('d-none')
     } else {
-      TwoDContainer.classList.remove("d-none")
-      ThreeDContainer.classList.add("d-none")
+      TwoDContainer.classList.remove('d-none')
+      ThreeDContainer.classList.add('d-none')
     }
   }
 
-  window.addEventListener("load", () => {
+  window.addEventListener('load', () => {
     setContainerVisibilities()
+    const graphHeaderText = ThreeDContainer.parentElement.previousElementSibling.textContent
+    isViewingYear = graphHeaderText.match(/in \d{4}/g) !== null
 
     const calendarData = [
-      ...document.querySelectorAll<HTMLElement>(
-        ".js-calendar-graph-table tbody td.ContributionCalendar-day"
-      )
+      ...document.querySelectorAll<HTMLElement>('.js-calendar-graph-table tbody td.ContributionCalendar-day')
     ]
 
     let days = []
@@ -101,12 +105,12 @@
     }
 
     const sortByDate = sortBy((d: Day) => d.date)
-    const getContributions = pluck("contributions")<number>
+    const getContributions = pluck('contributions')<number>
     const sumContributions = pipe(getContributions, sum)
     const sortByContributions = sortBy((d: Day) => d.contributions)
     const noContributions = whereEq({ contributions: 0 })
     const continuousContributions = splitWhenever(noContributions)
-    const groupByWeek = collectBy(prop("week")<number>)
+    const groupByWeek = collectBy(prop('week')<number>)
 
     // Put the days in order since we fetched then from a table
     const sortedDays = sortByDate(days)
@@ -116,7 +120,11 @@
     busiestDay = pipe(sortByContributions, last)(days) as Day
     // TODO: fix this unknown
     weeks = groupByWeek(days) as unknown as Array<Array<Day>>
-    thisWeekCount = pipe(groupByWeek, last, sumContributions)(days)
+    currentWeek = last(weeks)
+    firstDayCurrentWeek = head(currentWeek)
+    lastDayCurrentWeek = last(currentWeek)
+    thisWeekCount = pipe(sumContributions)(currentWeek)
+
     firstDay = head(sortedDays)
     lastDay = last(sortedDays)
 
@@ -133,7 +141,7 @@
   })
 </script>
 
-<div class="width-full overflow-hidden" class:d-none={currentMode === "2d"}>
+<div class="width-full overflow-hidden" class:d-none={currentMode === '2d'}>
   {#if weeks}
     <IsoGraph {weeks} {busiestDay} />
   {/if}
@@ -144,11 +152,23 @@
         value={countTot?.toLocaleString()}
         label="Total"
         description={`
-          ${formatDate(firstDay?.date)} – ${formatDate(lastDay?.date)}`} />
+          ${formatDate(firstDay?.date)} – ${formatDate(lastDay?.date)}`}
+      />
+      {#if !isViewingYear}
+        <div class="d-none d-xl-block">
+          <Stat
+            value={thisWeekCount?.toLocaleString()}
+            label="This week"
+            description={`
+          ${formatDate(firstDayCurrentWeek?.date)} – ${formatDate(lastDayCurrentWeek?.date)}`}
+          />
+        </div>
+      {/if}
       <Stat
         value={busiestDay?.contributions.toLocaleString()}
         label="Busiest day"
-        description={formatDate(busiestDay?.date)} />
+        description={formatDate(busiestDay?.date)}
+      />
     </div>
   </div>
 
@@ -159,16 +179,14 @@
         value={longestStreak?.length.toLocaleString()}
         label="Longest"
         description={`
-          ${formatDate(firstDayLongestStreak?.date)} – ${formatDate(
-          lastDayLongestStreak?.date
-        )}`} />
+          ${formatDate(firstDayLongestStreak?.date)} – ${formatDate(lastDayLongestStreak?.date)}`}
+      />
       <Stat
         value={currentStreak?.length.toLocaleString()}
         label="Current"
         description={`
-          ${formatDate(firstDayCurrentStreak?.date)} – ${formatDate(
-          lastDayCurrentStreak?.date
-        )}`} />
+          ${formatDate(firstDayCurrentStreak?.date)} – ${formatDate(lastDayCurrentStreak?.date)}`}
+      />
     </div>
   </div>
 </div>
