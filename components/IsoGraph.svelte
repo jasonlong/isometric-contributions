@@ -1,13 +1,13 @@
 <script lang="ts">
-  import { IsometricCSS } from "isometric-css"
-  import { onMount } from "svelte"
-  import tippy, { roundArrow } from "tippy.js"
+  import { IsometricCSS } from 'isometric-css'
+  import { onMount } from 'svelte'
+  import tippy, { roundArrow } from 'tippy.js'
 
-  import "tippy.js/dist/svg-arrow.css"
+  import 'tippy.js/dist/svg-arrow.css'
 
-  import { formatDate } from "../lib/dates"
-  import type { Day } from "../lib/types"
-  import Cube from "./Cube.svelte"
+  import { formatDate } from '../lib/dates'
+  import type { Day } from '../lib/types'
+  import Cube from './Cube.svelte'
 
   export let weeks: Array<Array<Day>>
   export let busiestDay: Day
@@ -23,14 +23,14 @@
   onMount(() => {
     IsometricCSS.processDOM()
     handleResize()
-    tippy("[data-tippy-content]", {
+    tippy('[data-tippy-content]', {
       arrow: roundArrow,
-      placement: "auto",
-      animation: "fade",
-      theme: "github",
+      placement: 'auto',
+      animation: 'fade',
+      theme: 'github',
       delay: [400, 100]
     })
-    window.addEventListener("resize", handleResize)
+    window.addEventListener('resize', handleResize)
   })
 
   function handleResize() {
@@ -43,8 +43,8 @@
   bind:this={graphContainer}
   on:resize={handleResize}
   class="relative"
-  style="margin-left: 104px; margin-top: 40px; height: {500 *
-    graphScale}px; transform: scale({graphScale});">
+  style="margin-left: 104px; margin-top: 40px; height: {500 * graphScale}px; transform: scale({graphScale});"
+>
   {#each weeks as week, x}
     {#each week as day, y}
       <Cube
@@ -55,7 +55,8 @@
         y={CUBESIZE * y + (y * CUBESIZE) / 3 / 2}
         contributions={day.contributions}
         date={formatDate(day.date)}
-        busiestDay={day == busiestDay} />
+        busiestDay={day == busiestDay}
+      />
     {/each}
   {/each}
   <!-- Surface to block cubes below the ground plane before animating -->
@@ -64,18 +65,19 @@
     class="isometric"
     data-view="side"
     data-top="-108"
-    data-left="114" />
+    data-left="114"
+  />
 </div>
 
 <style>
-  :global(.tippy-box[data-theme~="github"]) {
+  :global(.tippy-box[data-theme~='github']) {
     background-color: #222;
     color: #fff;
     font-size: 12px;
     padding: 4px 8px;
     border-radius: 4px;
   }
-  :global(.tippy-box[data-theme~="github"] > .tippy-svg-arrow) {
+  :global(.tippy-box[data-theme~='github'] > .tippy-svg-arrow) {
     fill: #222;
   }
 </style>
