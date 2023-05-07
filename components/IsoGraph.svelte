@@ -7,7 +7,9 @@
 
   import { formatDate } from '../lib/dates'
   import type { Day } from '../lib/types'
+  import { map } from '../lib/utils'
   import Cube from './Cube.svelte'
+  import Graph from '~contents/graph.svelte'
 
   export let weeks: Array<Array<Day>>
   export let busiestDay: Day
@@ -42,8 +44,9 @@
 <div
   bind:this={graphContainer}
   on:resize={handleResize}
-  class="relative"
-  style="margin-left: 104px; margin-top: 40px; height: {500 * graphScale}px; transform: scale({graphScale});"
+  class="position-relative"
+  style="left: {map(0.6, 1, -50, 120, graphScale)}px; 
+  top: {map(0.6, 1, -20, 90, graphScale)}px; height: {600 * graphScale}px; transform: scale({graphScale});"
 >
   {#each weeks as week, x}
     {#each week as day, y}
@@ -61,8 +64,8 @@
   {/each}
   <!-- Surface to block cubes below the ground plane before animating -->
   <div
-    style="width: 832px; height: 108px; background-color: #fff;"
-    class="isometric"
+    style="width: 870px; height: 108px; background-color: #fff;"
+    class="isometric color-bg-default"
     data-view="side"
     data-top="-108"
     data-left="114"
@@ -71,7 +74,7 @@
 
 <style>
   :global(.tippy-box[data-theme~='github']) {
-    background-color: #222;
+    background-color: var(--color-neutral-emphasis-plus);
     color: #fff;
     font-size: 12px;
     padding: 4px 8px;
