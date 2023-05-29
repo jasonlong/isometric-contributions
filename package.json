@@ -19,7 +19,7 @@
     "@parcel/reporter-bundle-analyzer": "^2.9.0",
     "@parcel/reporter-bundle-buddy": "^2.9.0",
     "chrome-webstore-upload-cli": "^2.2.0",
-    "parcel": "^2.9.0",
+    "parcel": "^2.9.1",
     "web-ext-submit": "^7.6.2",
     "xo": "^0.54.2"
   },
