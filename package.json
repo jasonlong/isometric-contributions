@@ -15,7 +15,7 @@
     "lodash-es": "^4.17.21"
   },
   "devDependencies": {
-    "@parcel/config-webextension": "^2.9.1",
+    "@parcel/config-webextension": "^2.9.2",
     "@parcel/reporter-bundle-analyzer": "^2.9.1",
     "@parcel/reporter-bundle-buddy": "^2.9.1",
     "chrome-webstore-upload-cli": "^2.2.1",
