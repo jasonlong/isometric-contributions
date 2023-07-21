@@ -187,7 +187,7 @@ const loadStats = () => {
       firstDay = d.date
     }
 
-    if (days[days.length - 1] === d) {
+    if (days.at(-1) === d) {
       lastDay = d.date
     }
 
