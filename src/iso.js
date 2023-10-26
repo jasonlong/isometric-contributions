@@ -144,7 +144,7 @@ const getCountFromNode = (node) => {
   // Contribution label formats:
   // No contributions on January 9th
   // 1 contribution on January 10th.
-  // 2 contribution on August 31st.
+  // 2 contributions on August 31st.
   const contributionMatches = node.innerHTML.match(/(\d*|No) contributions? on (.*)./)
 
   if (!contributionMatches) {
