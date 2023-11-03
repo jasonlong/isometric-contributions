@@ -142,9 +142,10 @@ const setContainerViewType = (type) => {
 
 const getCountFromNode = (node) => {
   // Contribution label formats:
-  // No contributions on January 9, 2023
-  // 1 contribution on January 10, 2023
-  const contributionMatches = node.innerHTML.match(/(\d*|No) contributions? on ((.*) (\d{1,2}), (\d{4,}))/)
+  // No contributions on January 9th
+  // 1 contribution on January 10th.
+  // 2 contributions on August 31st.
+  const contributionMatches = node.innerHTML.match(/(\d*|No) contributions? on (.*)./)
 
   if (!contributionMatches) {
     return 0
