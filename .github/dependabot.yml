@@ -3,4 +3,10 @@ updates:
   - package-ecosystem: "npm"
     directory: "/"
     schedule:
-      interval: "daily"
+      interval: "weekly"
+      day: "monday"
+    groups:
+      parcel:
+        patterns:
+          - "@parcel/*"
+          - "parcel"
