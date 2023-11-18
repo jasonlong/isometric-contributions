@@ -167,26 +167,28 @@ const loadStats = () => {
   let currentStreakStart = null
   let currentStreakEnd = null
 
-  const days = [...document.querySelectorAll('.js-calendar-graph-table tbody td.ContributionCalendar-day')].map((d) => {
-    return {
-      date: new Date(d.dataset.date),
-      week: d.dataset.ix,
-      color: getSquareColor(d),
-      tid: d.getAttribute('aria-labelledby')
+  const dayNodes = [...document.querySelectorAll('.js-calendar-graph-table tbody td.ContributionCalendar-day')].map(
+    (d) => {
+      return {
+        date: new Date(d.dataset.date),
+        week: d.dataset.ix,
+        color: getSquareColor(d),
+        tid: d.getAttribute('aria-labelledby')
+      }
     }
-  })
+  )
 
-  const tooltips = [...document.querySelectorAll('.js-calendar-graph tool-tip')].map((t) => {
+  const tooltipNodes = [...document.querySelectorAll('.js-calendar-graph tool-tip')].map((t) => {
     return {
       tid: t.id,
       count: getCountFromNode(t)
     }
   })
 
-  const data = days.map((d) => {
+  const data = dayNodes.map((d) => {
     return {
       ...d,
-      ...(tooltips.find((t) => t.tid === d.tid) || {})
+      ...tooltipNodes.find((t) => t.tid === d.tid)
     }
   })
 
