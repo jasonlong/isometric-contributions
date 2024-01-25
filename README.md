@@ -1,4 +1,4 @@
-# GitHub Isometric Contributions extension
+GitHub Isometric Contributions extension
 
 ![Node.js CI](https://github.com/jasonlong/isometric-contributions/workflows/Node.js%20CI/badge.svg)
 [![XO code style](https://img.shields.io/badge/code_style-XO-5ed9c7.svg)](https://github.com/xojs/xo)
