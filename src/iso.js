@@ -85,8 +85,8 @@ const initUI = () => {
     insertLocation = insertLocation.previousElementSibling
   }
 
-  const btnGroup = document.createElement('div')
-  btnGroup.className = 'BtnGroup mt-1 ml-3 position-relative top-0 float-right'
+  const buttonGroup = document.createElement('div')
+  buttonGroup.className = 'BtnGroup mt-1 ml-3 position-relative top-0 float-right'
 
   const squaresButton = document.createElement('button')
   squaresButton.innerHTML = '2D'
@@ -106,9 +106,9 @@ const initUI = () => {
     cubesButton.classList.add('selected')
   }
 
-  btnGroup.append(squaresButton)
-  btnGroup.append(cubesButton)
-  insertLocation.before(btnGroup)
+  buttonGroup.append(squaresButton)
+  buttonGroup.append(cubesButton)
+  insertLocation.before(buttonGroup)
 
   setContainerViewType(toggleSetting)
 }
@@ -283,9 +283,7 @@ const loadStats = () => {
 
   // Best day
   dateBest = dateFormat.format(bestDay)
-  if (!dateBest) {
-    dateBest = 'No activity found'
-  }
+  dateBest ||= 'No activity found'
 
   // Longest streak
   if (streakLongest > 0) {
@@ -303,8 +301,8 @@ const loadStats = () => {
 }
 
 const rgbToHex = (rgb) => {
-  const sep = rgb.includes(',') ? ',' : ' '
-  rgb = rgb.slice(4).split(')')[0].split(sep)
+  const separator = rgb.includes(',') ? ',' : ' '
+  rgb = rgb.slice(4).split(')')[0].split(separator)
 
   let r = Number(rgb[0]).toString(16)
   let g = Number(rgb[1]).toString(16)
