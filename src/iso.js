@@ -453,9 +453,9 @@ const datesDayDifference = (date1, date2) => {
 }
 
 ;(async function () {
-  if (document.querySelector('.js-calendar-graph')) {
+  // Are we on a profile page?
+  if (document.querySelector('.vcard-names-container')) {
     await getSettings()
-    generateIsometricChart()
 
     const config = { attributes: true, childList: true, subtree: true }
     const callback = (mutationsList) => {
