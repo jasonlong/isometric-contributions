@@ -1,6 +1,7 @@
 import { toArray, groupBy, last } from 'lodash-es'
 
 const dateFormat = new Intl.DateTimeFormat('en-US', { month: 'short', day: 'numeric', timeZone: 'UTC' })
+const sameDay = (d1, d2) => d1.toDateString() === d2.toDateString()
 
 let days
 let weeks
@@ -204,7 +205,9 @@ const loadStats = () => {
       firstDay = d.date
     }
 
-    if (days.at(-1) === d) {
+    if (sameDay(d.date, new Date())) {
+      lastDay = d.date
+    } else if (!lastDay && days.at(-1) === d) {
       lastDay = d.date
     }
 
