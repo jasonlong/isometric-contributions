@@ -46,7 +46,7 @@ const getSettings = () => {
     // Check for user preference, if chrome.storage is available.
     // The storage API is not supported in content scripts.
     // https://developer.mozilla.org/Add-ons/WebExtensions/Chrome_incompatibilities#storage
-    if (chrome && chrome.storage) {
+    if (typeof chrome !== 'undefined' && chrome.storage && chrome.storage.local) {
       chrome.storage.local.get(['toggleSetting'], (settings) => {
         toggleSetting = settings.toggleSetting ?? 'cubes'
         resolve('Settings loaded')
@@ -473,7 +473,7 @@ const datesDayDifference = (date1, date2) => {
       }
     }
 
-    window.matchMedia('(prefers-color-scheme: dark)').addListener(() => {
+    globalThis.matchMedia('(prefers-color-scheme: dark)').addListener(() => {
       renderIsometricChart()
     })
 
