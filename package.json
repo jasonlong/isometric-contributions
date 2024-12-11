@@ -1,7 +1,7 @@
 {
   "type": "module",
   "engines": {
-    "node": ">=16.0"
+    "node": ">=22.0"
   },
   "scripts": {
     "start": "parcel watch src/manifest.json --host localhost",
@@ -36,7 +36,8 @@
       "browser"
     ],
     "rules": {
-      "unicorn/prefer-top-level-await": 0
+      "unicorn/prefer-top-level-await": 0,
+      "n/no-unsupported-features/node-builtins": "off"
     }
   },
   "targets": {
