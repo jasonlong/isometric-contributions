@@ -15,11 +15,11 @@
     "lodash-es": "^4.17.21"
   },
   "devDependencies": {
-    "@parcel/config-webextension": "^2.13.3",
-    "@parcel/reporter-bundle-analyzer": "^2.13.3",
-    "@parcel/reporter-bundle-buddy": "^2.13.3",
+    "@parcel/config-webextension": "^2.14.2",
+    "@parcel/reporter-bundle-analyzer": "^2.14.2",
+    "@parcel/reporter-bundle-buddy": "^2.14.2",
     "chrome-webstore-upload-cli": "^3.3.1",
-    "parcel": "^2.13.3",
+    "parcel": "^2.14.2",
     "web-ext-submit": "^7.8.0",
     "xo": "^0.60.0"
   },
