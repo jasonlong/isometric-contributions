@@ -21,7 +21,7 @@
     "chrome-webstore-upload-cli": "^3.3.2",
     "parcel": "^2.15.1",
     "web-ext-submit": "^7.8.0",
-    "xo": "^0.60.0"
+    "xo": "^1.0.0"
   },
   "xo": {
     "prettier": true,
