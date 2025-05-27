@@ -21,20 +21,24 @@
     "chrome-webstore-upload-cli": "^3.3.2",
     "parcel": "^2.15.1",
     "web-ext-submit": "^7.8.0",
-    "xo": "^0.60.0"
+    "xo": "^1.0.0"
   },
   "xo": {
     "prettier": true,
     "semicolon": false,
     "space": true,
-    "prefer-numeric-literals": 0,
-    "global": [
-      "obelisk",
-      "chrome"
-    ],
-    "env": [
-      "browser"
-    ],
+    "languageOptions": {
+      "globals": {
+        "obelisk": "readonly",
+        "chrome": "readonly",
+        "document": "readonly",
+        "localStorage": "readonly", 
+        "getComputedStyle": "readonly",
+        "MutationObserver": "readonly"
+      },
+      "ecmaVersion": "latest",
+      "sourceType": "module"
+    },
     "rules": {
       "unicorn/prefer-top-level-await": 0,
       "n/no-unsupported-features/node-builtins": "off"
