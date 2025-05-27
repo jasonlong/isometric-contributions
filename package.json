@@ -27,14 +27,18 @@
     "prettier": true,
     "semicolon": false,
     "space": true,
-    "prefer-numeric-literals": 0,
-    "global": [
-      "obelisk",
-      "chrome"
-    ],
-    "env": [
-      "browser"
-    ],
+    "languageOptions": {
+      "globals": {
+        "obelisk": "readonly",
+        "chrome": "readonly",
+        "document": "readonly",
+        "localStorage": "readonly", 
+        "getComputedStyle": "readonly",
+        "MutationObserver": "readonly"
+      },
+      "ecmaVersion": "latest",
+      "sourceType": "module"
+    },
     "rules": {
       "unicorn/prefer-top-level-await": 0,
       "n/no-unsupported-features/node-builtins": "off"

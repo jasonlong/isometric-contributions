@@ -8,3 +8,4 @@ src/Archive.zip
 .do_tasks
 dist
 .parcel-cache
+.claude
