@@ -456,29 +456,41 @@ const datesDayDifference = (date1, date2) => {
 }
 
 ;(async function () {
-  // Are we on a profile page?
-  if (document.querySelector('.vcard-names-container')) {
-    await getSettings()
+  const initIfReady = () => {
+    if (document.querySelector('.js-calendar-graph') && !document.querySelector('.ic-contributions-wrapper')) {
+      generateIsometricChart()
+    }
+  }
 
-    const config = { attributes: true, childList: true, subtree: true }
-    const callback = (mutationsList) => {
-      for (const mutation of mutationsList) {
-        if (
-          mutation.type === 'childList' &&
-          document.querySelector('.js-calendar-graph') &&
-          !document.querySelector('.ic-contributions-wrapper')
-        ) {
-          generateIsometricChart()
-        }
-      }
+  const setupObserver = () => {
+    if (!document.querySelector('.vcard-names-container')) {
+      return
     }
 
-    globalThis.matchMedia('(prefers-color-scheme: dark)').addListener(() => {
-      renderIsometricChart()
-    })
+    // Remove stale elements from Turbo cache restore
+    document.querySelector('.ic-contributions-wrapper')?.remove()
+    document.querySelector('.ic-toggle-option')?.parentElement?.remove()
 
-    const observedContainer = document.querySelector('html')
-    const observer = new MutationObserver(callback)
-    observer.observe(observedContainer, config)
+    initIfReady()
+
+    const target = document.querySelector('main') || document.body
+    const observer = new MutationObserver(() => initIfReady())
+    observer.observe(target, { childList: true, subtree: true })
   }
+
+  await getSettings()
+
+  globalThis.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
+    if (document.querySelector('.ic-contributions-wrapper')) {
+      renderIsometricChart()
+    }
+  })
+
+  setupObserver()
+  document.addEventListener('turbo:load', setupObserver)
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'visible' && document.querySelector('.ic-contributions-wrapper')) {
+      renderIsometricChart()
+    }
+  })
 })()
