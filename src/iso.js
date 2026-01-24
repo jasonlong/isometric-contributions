@@ -58,9 +58,7 @@ const getSettings = () => {
 
 const persistSetting = (key, value) => {
   if (chrome && chrome.storage) {
-    const object = {}
-    object[key] = value
-    chrome.storage.local.set(object)
+    chrome.storage.local.set({ [key]: value })
   } else {
     localStorage[key] = value
   }
@@ -88,7 +86,7 @@ const initUI = () => {
   buttonGroup.className = 'BtnGroup mt-1 ml-3 position-relative top-0 float-right'
 
   const squaresButton = document.createElement('button')
-  squaresButton.innerHTML = '2D'
+  squaresButton.textContent = '2D'
   squaresButton.className = 'ic-toggle-option squares btn BtnGroup-item btn-sm py-0 px-1'
   squaresButton.dataset.icOption = 'squares'
   squaresButton.addEventListener('click', handleViewToggle)
@@ -97,7 +95,7 @@ const initUI = () => {
   }
 
   const cubesButton = document.createElement('button')
-  cubesButton.innerHTML = '3D'
+  cubesButton.textContent = '3D'
   cubesButton.className = 'ic-toggle-option cubes btn BtnGroup-item btn-sm py-0 px-1'
   cubesButton.dataset.icOption = 'cubes'
   cubesButton.addEventListener('click', handleViewToggle)
@@ -126,13 +124,8 @@ const handleViewToggle = (event) => {
 }
 
 const setContainerViewType = (type) => {
-  if (type === 'squares') {
-    contributionsBox.classList.remove('ic-cubes')
-    contributionsBox.classList.add('ic-squares')
-  } else {
-    contributionsBox.classList.remove('ic-squares')
-    contributionsBox.classList.add('ic-cubes')
-  }
+  contributionsBox.classList.toggle('ic-squares', type === 'squares')
+  contributionsBox.classList.toggle('ic-cubes', type !== 'squares')
 }
 
 const getCountFromNode = (node) => {
@@ -140,14 +133,12 @@ const getCountFromNode = (node) => {
   // No contributions on January 9th
   // 1 contribution on January 10th.
   // 2 contributions on August 31st.
-  const contributionMatches = node.innerHTML.match(/(\d*|No) contributions? on (.*)./)
-
+  const contributionMatches = node.textContent.match(/(\d+|No) contributions? on/)
   if (!contributionMatches) {
     return 0
   }
 
-  const dataCount = contributionMatches[1]
-  return dataCount === 'No' ? 0 : Number.parseInt(dataCount, 10)
+  return contributionMatches[1] === 'No' ? 0 : Number.parseInt(contributionMatches[1], 10)
 }
 
 const getSquareColor = (rect) => {
@@ -191,19 +182,12 @@ const loadStats = () => {
   weeks = Object.values(Object.groupBy(days, (d) => d.week))
   const currentWeekDays = weeks.at(-1)
 
+  firstDay = days[0].date
+  lastDay = days.find((d) => sameDay(d.date, new Date()))?.date ?? days.at(-1).date
+
   for (const d of days) {
     const currentDayCount = d.count
     yearTotal += currentDayCount
-
-    if (days[0] === d) {
-      firstDay = d.date
-    }
-
-    if (sameDay(d.date, new Date())) {
-      lastDay = d.date
-    } else if (!lastDay && days.at(-1) === d) {
-      lastDay = d.date
-    }
 
     // Check for best day
     if (currentDayCount > maxCount) {
@@ -230,13 +214,9 @@ const loadStats = () => {
     }
   }
 
+  weekStartDay = currentWeekDays[0].date
   for (const d of currentWeekDays) {
-    const currentDayCount = d.count
-    weekTotal += currentDayCount
-
-    if (currentWeekDays[0] === d) {
-      weekStartDay = d.date
-    }
+    weekTotal += d.count
   }
 
   // Check for current streak
@@ -341,7 +321,7 @@ const renderIsometricChart = () => {
 const renderStats = () => {
   const graphHeaderText =
     document.querySelector('.ic-contributions-wrapper').parentNode.previousElementSibling.textContent
-  const viewingYear = graphHeaderText.match(/in \d{4}/g) !== null
+  const viewingYear = /in \d{4}/.test(graphHeaderText)
 
   let topMarkup = `
     <div class="position-absolute top-0 right-0 mt-3 mr-5">
