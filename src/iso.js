@@ -471,15 +471,14 @@ const datesDayDifference = (date1, date2) => {
     }
 
     // Try immediate init (graph might already be loaded)
-    if (initIfReady()) return
+    initIfReady()
 
     // Observe main content area instead of <html>
+    // Don't disconnect - need to detect year changes which replace the graph
     const target = document.querySelector('main') || document.body
 
     const observer = new MutationObserver(() => {
-      if (initIfReady()) {
-        observer.disconnect()
-      }
+      initIfReady()
     })
 
     observer.observe(target, { childList: true, subtree: true })
