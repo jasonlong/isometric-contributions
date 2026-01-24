@@ -1,5 +1,3 @@
-import { toArray, groupBy, last } from 'lodash-es'
-
 const dateFormat = new Intl.DateTimeFormat('en-US', { month: 'short', day: 'numeric', timeZone: 'UTC' })
 const sameDay = (d1, d2) => d1.toDateString() === d2.toDateString()
 
@@ -60,9 +58,7 @@ const getSettings = () => {
 
 const persistSetting = (key, value) => {
   if (chrome && chrome.storage) {
-    const object = {}
-    object[key] = value
-    chrome.storage.local.set(object)
+    chrome.storage.local.set({ [key]: value })
   } else {
     localStorage[key] = value
   }
@@ -90,7 +86,7 @@ const initUI = () => {
   buttonGroup.className = 'BtnGroup mt-1 ml-3 position-relative top-0 float-right'
 
   const squaresButton = document.createElement('button')
-  squaresButton.innerHTML = '2D'
+  squaresButton.textContent = '2D'
   squaresButton.className = 'ic-toggle-option squares btn BtnGroup-item btn-sm py-0 px-1'
   squaresButton.dataset.icOption = 'squares'
   squaresButton.addEventListener('click', handleViewToggle)
@@ -99,7 +95,7 @@ const initUI = () => {
   }
 
   const cubesButton = document.createElement('button')
-  cubesButton.innerHTML = '3D'
+  cubesButton.textContent = '3D'
   cubesButton.className = 'ic-toggle-option cubes btn BtnGroup-item btn-sm py-0 px-1'
   cubesButton.dataset.icOption = 'cubes'
   cubesButton.addEventListener('click', handleViewToggle)
@@ -125,20 +121,11 @@ const handleViewToggle = (event) => {
 
   persistSetting('toggleSetting', event.target.dataset.icOption)
   toggleSetting = event.target.dataset.icOption
-
-  // Apply user preference
-  document.querySelector(`.ic-toggle-option.${toggleSetting}`).classList.add('selected')
-  contributionsBox.classList.add(`ic-${toggleSetting}`)
 }
 
 const setContainerViewType = (type) => {
-  if (type === 'squares') {
-    contributionsBox.classList.remove('ic-cubes')
-    contributionsBox.classList.add('ic-squares')
-  } else {
-    contributionsBox.classList.remove('ic-squares')
-    contributionsBox.classList.add('ic-cubes')
-  }
+  contributionsBox.classList.toggle('ic-squares', type === 'squares')
+  contributionsBox.classList.toggle('ic-cubes', type !== 'squares')
 }
 
 const getCountFromNode = (node) => {
@@ -146,18 +133,26 @@ const getCountFromNode = (node) => {
   // No contributions on January 9th
   // 1 contribution on January 10th.
   // 2 contributions on August 31st.
-  const contributionMatches = node.innerHTML.match(/(\d*|No) contributions? on (.*)./)
-
+  const contributionMatches = node.textContent.match(/(\d+|No) contributions? on/)
   if (!contributionMatches) {
     return 0
   }
 
-  const dataCount = contributionMatches[1]
-  return dataCount === 'No' ? 0 : Number.parseInt(dataCount, 10)
+  return contributionMatches[1] === 'No' ? 0 : Number.parseInt(contributionMatches[1], 10)
 }
 
 const getSquareColor = (rect) => {
   return rgbToHex(getComputedStyle(rect).getPropertyValue('fill'))
+}
+
+const refreshColors = () => {
+  const dayElements = document.querySelectorAll('.js-calendar-graph-table tbody td.ContributionCalendar-day')
+  for (const d of days) {
+    const element = [...dayElements].find((node) => node.dataset.date === d.date.toISOString().split('T')[0])
+    if (element) {
+      d.color = getSquareColor(element)
+    }
+  }
 }
 
 const loadStats = () => {
@@ -194,22 +189,15 @@ const loadStats = () => {
   })
 
   days = data.sort((a, b) => a.date.getTime() - b.date.getTime())
-  weeks = toArray(groupBy(days, 'week'))
-  const currentWeekDays = last(weeks)
+  weeks = Object.values(Object.groupBy(days, (d) => d.week))
+  const currentWeekDays = weeks.at(-1)
+
+  firstDay = days[0].date
+  lastDay = days.find((d) => sameDay(d.date, new Date()))?.date ?? days.at(-1).date
 
   for (const d of days) {
     const currentDayCount = d.count
     yearTotal += currentDayCount
-
-    if (days[0] === d) {
-      firstDay = d.date
-    }
-
-    if (sameDay(d.date, new Date())) {
-      lastDay = d.date
-    } else if (!lastDay && days.at(-1) === d) {
-      lastDay = d.date
-    }
 
     // Check for best day
     if (currentDayCount > maxCount) {
@@ -236,18 +224,13 @@ const loadStats = () => {
     }
   }
 
+  weekStartDay = currentWeekDays[0].date
   for (const d of currentWeekDays) {
-    const currentDayCount = d.count
-    weekTotal += currentDayCount
-
-    if (currentWeekDays[0] === d) {
-      weekStartDay = d.date
-    }
+    weekTotal += d.count
   }
 
   // Check for current streak
-  const reversedDays = days
-  reversedDays.reverse()
+  const reversedDays = days.toReversed()
   currentStreakEnd = reversedDays[0].date
 
   for (let i = 0; i < reversedDays.length; i++) {
@@ -305,25 +288,11 @@ const loadStats = () => {
 
 const rgbToHex = (rgb) => {
   const separator = rgb.includes(',') ? ',' : ' '
-  rgb = rgb.slice(4).split(')')[0].split(separator)
-
-  let r = Number(rgb[0]).toString(16)
-  let g = Number(rgb[1]).toString(16)
-  let b = Number(rgb[2]).toString(16)
-
-  if (r.length === 1) {
-    r = '0' + r
-  }
-
-  if (g.length === 1) {
-    g = '0' + g
-  }
-
-  if (b.length === 1) {
-    b = '0' + b
-  }
-
-  return r + g + b
+  return rgb
+    .slice(4, -1)
+    .split(separator)
+    .map((n) => Number(n).toString(16).padStart(2, '0'))
+    .join('')
 }
 
 const renderIsometricChart = () => {
@@ -362,7 +331,7 @@ const renderIsometricChart = () => {
 const renderStats = () => {
   const graphHeaderText =
     document.querySelector('.ic-contributions-wrapper').parentNode.previousElementSibling.textContent
-  const viewingYear = graphHeaderText.match(/in \d{4}/g) !== null
+  const viewingYear = /in \d{4}/.test(graphHeaderText)
 
   let topMarkup = `
     <div class="position-absolute top-0 right-0 mt-3 mr-5">
@@ -462,19 +431,21 @@ const datesDayDifference = (date1, date2) => {
     }
   }
 
+  let observer = null
+
   const setupObserver = () => {
     if (!document.querySelector('.vcard-names-container')) {
       return
     }
 
-    // Remove stale elements from Turbo cache restore
     document.querySelector('.ic-contributions-wrapper')?.remove()
     document.querySelector('.ic-toggle-option')?.parentElement?.remove()
 
     initIfReady()
 
+    observer?.disconnect()
     const target = document.querySelector('main') || document.body
-    const observer = new MutationObserver(() => initIfReady())
+    observer = new MutationObserver(() => initIfReady())
     observer.observe(target, { childList: true, subtree: true })
   }
 
@@ -482,6 +453,7 @@ const datesDayDifference = (date1, date2) => {
 
   globalThis.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
     if (document.querySelector('.ic-contributions-wrapper')) {
+      refreshColors()
       renderIsometricChart()
     }
   })
