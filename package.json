@@ -32,7 +32,7 @@
         "obelisk": "readonly",
         "chrome": "readonly",
         "document": "readonly",
-        "localStorage": "readonly", 
+        "localStorage": "readonly",
         "getComputedStyle": "readonly",
         "MutationObserver": "readonly"
       },
@@ -50,5 +50,8 @@
         "browsers": ">= 50%"
       }
     }
+  },
+  "overrides": {
+    "web-ext": "^9.2.0"
   }
 }
