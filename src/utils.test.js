@@ -1,5 +1,12 @@
 import { describe, it, expect } from 'vitest'
-import { precisionRound, rgbToHex, datesDayDifference, sameDay } from './utils.js'
+import {
+  precisionRound,
+  rgbToHex,
+  datesDayDifference,
+  sameDay,
+  getContributionCount,
+  calculateStreaks
+} from './utils.js'
 
 describe('precisionRound', () => {
   it('rounds to 0 decimal places', () => {
@@ -122,5 +129,134 @@ describe('sameDay', () => {
     const d1 = new Date('2023-01-15')
     const d2 = new Date('2024-01-15')
     expect(sameDay(d1, d2)).toBe(false)
+  })
+})
+
+describe('getContributionCount', () => {
+  it('parses "No contributions" as 0', () => {
+    expect(getContributionCount('No contributions on January 9th')).toBe(0)
+  })
+
+  it('parses single contribution', () => {
+    expect(getContributionCount('1 contribution on January 10th.')).toBe(1)
+  })
+
+  it('parses multiple contributions', () => {
+    expect(getContributionCount('2 contributions on August 31st.')).toBe(2)
+    expect(getContributionCount('15 contributions on March 5th.')).toBe(15)
+    expect(getContributionCount('100 contributions on December 25th.')).toBe(100)
+  })
+
+  it('returns 0 for non-matching text', () => {
+    expect(getContributionCount('Some random text')).toBe(0)
+    expect(getContributionCount('')).toBe(0)
+  })
+
+  it('handles text with extra content', () => {
+    expect(getContributionCount('5 contributions on January 1st. More text here')).toBe(5)
+  })
+})
+
+describe('calculateStreaks', () => {
+  const makeDay = (dateString, count) => ({ date: new Date(dateString), count })
+
+  it('calculates year total', () => {
+    const days = [makeDay('2024-01-01', 5), makeDay('2024-01-02', 3), makeDay('2024-01-03', 2)]
+    const result = calculateStreaks(days)
+    expect(result.yearTotal).toBe(10)
+  })
+
+  it('finds best day with max contributions', () => {
+    const days = [makeDay('2024-01-01', 5), makeDay('2024-01-02', 10), makeDay('2024-01-03', 3)]
+    const result = calculateStreaks(days)
+    expect(result.maxCount).toBe(10)
+    expect(result.bestDay.toISOString()).toContain('2024-01-02')
+  })
+
+  it('calculates longest streak', () => {
+    const days = [
+      makeDay('2024-01-01', 1),
+      makeDay('2024-01-02', 2),
+      makeDay('2024-01-03', 3),
+      makeDay('2024-01-04', 0),
+      makeDay('2024-01-05', 1),
+      makeDay('2024-01-06', 1)
+    ]
+    const result = calculateStreaks(days)
+    expect(result.streakLongest).toBe(3)
+    expect(result.longestStreakStart.toISOString()).toContain('2024-01-01')
+    expect(result.longestStreakEnd.toISOString()).toContain('2024-01-03')
+  })
+
+  it('calculates current streak from end of array', () => {
+    const days = [
+      makeDay('2024-01-01', 0),
+      makeDay('2024-01-02', 1),
+      makeDay('2024-01-03', 2),
+      makeDay('2024-01-04', 3)
+    ]
+    const result = calculateStreaks(days)
+    expect(result.streakCurrent).toBe(3)
+    expect(result.currentStreakStart.toISOString()).toContain('2024-01-02')
+    expect(result.currentStreakEnd.toISOString()).toContain('2024-01-04')
+  })
+
+  it('handles current streak when last day has 0 contributions', () => {
+    const days = [
+      makeDay('2024-01-01', 1),
+      makeDay('2024-01-02', 2),
+      makeDay('2024-01-03', 3),
+      makeDay('2024-01-04', 0)
+    ]
+    const result = calculateStreaks(days)
+    expect(result.streakCurrent).toBe(3)
+    expect(result.currentStreakEnd.toISOString()).toContain('2024-01-03')
+  })
+
+  it('returns 0 current streak when no recent activity', () => {
+    const days = [makeDay('2024-01-01', 1), makeDay('2024-01-02', 0), makeDay('2024-01-03', 0)]
+    const result = calculateStreaks(days)
+    expect(result.streakCurrent).toBe(0)
+  })
+
+  it('handles empty array', () => {
+    const result = calculateStreaks([])
+    expect(result.yearTotal).toBe(0)
+    expect(result.maxCount).toBe(0)
+    expect(result.bestDay).toBe(null)
+    expect(result.streakLongest).toBe(0)
+    expect(result.streakCurrent).toBe(0)
+  })
+
+  it('handles single day with contributions', () => {
+    const days = [makeDay('2024-01-01', 5)]
+    const result = calculateStreaks(days)
+    expect(result.yearTotal).toBe(5)
+    expect(result.maxCount).toBe(5)
+    expect(result.streakLongest).toBe(1)
+    expect(result.streakCurrent).toBe(1)
+  })
+
+  it('handles all zero contributions', () => {
+    const days = [makeDay('2024-01-01', 0), makeDay('2024-01-02', 0), makeDay('2024-01-03', 0)]
+    const result = calculateStreaks(days)
+    expect(result.yearTotal).toBe(0)
+    expect(result.maxCount).toBe(0)
+    expect(result.streakLongest).toBe(0)
+    expect(result.streakCurrent).toBe(0)
+  })
+
+  it('handles multiple equal-length streaks (takes latest)', () => {
+    const days = [
+      makeDay('2024-01-01', 1),
+      makeDay('2024-01-02', 1),
+      makeDay('2024-01-03', 0),
+      makeDay('2024-01-04', 1),
+      makeDay('2024-01-05', 1)
+    ]
+    const result = calculateStreaks(days)
+    expect(result.streakLongest).toBe(2)
+    // Should take the later streak (Jan 4-5)
+    expect(result.longestStreakEnd.toISOString()).toContain('2024-01-05')
   })
 })

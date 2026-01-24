@@ -1,4 +1,11 @@
-import { precisionRound, rgbToHex, datesDayDifference, sameDay } from './utils.js'
+import {
+  precisionRound,
+  rgbToHex,
+  datesDayDifference,
+  sameDay,
+  getContributionCount,
+  calculateStreaks
+} from './utils.js'
 
 const dateFormat = new Intl.DateTimeFormat('en-US', { month: 'short', day: 'numeric', timeZone: 'UTC' })
 
@@ -129,18 +136,7 @@ const setContainerViewType = (type) => {
   contributionsBox.classList.toggle('ic-cubes', type !== 'squares')
 }
 
-const getCountFromNode = (node) => {
-  // Contribution label formats:
-  // No contributions on January 9th
-  // 1 contribution on January 10th.
-  // 2 contributions on August 31st.
-  const contributionMatches = node.textContent.match(/(\d+|No) contributions? on/)
-  if (!contributionMatches) {
-    return 0
-  }
-
-  return contributionMatches[1] === 'No' ? 0 : Number.parseInt(contributionMatches[1], 10)
-}
+const getCountFromNode = (node) => getContributionCount(node.textContent)
 
 const getSquareColor = (rect) => {
   return rgbToHex(getComputedStyle(rect).getPropertyValue('fill'))
@@ -157,13 +153,6 @@ const refreshColors = () => {
 }
 
 const loadStats = () => {
-  let temporaryStreak = 0
-  let temporaryStreakStart = null
-  let longestStreakStart = null
-  let longestStreakEnd = null
-  let currentStreakStart = null
-  let currentStreakEnd = null
-
   const dayNodes = [...document.querySelectorAll('.js-calendar-graph-table tbody td.ContributionCalendar-day')].map(
     (d) => {
       return {
@@ -196,64 +185,25 @@ const loadStats = () => {
   firstDay = days[0].date
   lastDay = days.find((d) => sameDay(d.date, new Date()))?.date ?? days.at(-1).date
 
-  for (const d of days) {
-    const currentDayCount = d.count
-    yearTotal += currentDayCount
+  // Calculate streaks using pure function
+  const stats = calculateStreaks(days)
+  yearTotal = stats.yearTotal
+  maxCount = stats.maxCount
+  bestDay = stats.bestDay
+  streakLongest = stats.streakLongest
+  streakCurrent = stats.streakCurrent
 
-    // Check for best day
-    if (currentDayCount > maxCount) {
-      bestDay = d.date
-      maxCount = currentDayCount
-    }
-
-    // Check for longest streak
-    if (currentDayCount > 0) {
-      if (temporaryStreak === 0) {
-        temporaryStreakStart = d.date
-      }
-
-      temporaryStreak++
-
-      if (temporaryStreak >= streakLongest) {
-        longestStreakStart = temporaryStreakStart
-        longestStreakEnd = d.date
-        streakLongest = temporaryStreak
-      }
-    } else {
-      temporaryStreak = 0
-      temporaryStreakStart = null
-    }
-  }
-
+  // Week total
   weekStartDay = currentWeekDays[0].date
   for (const d of currentWeekDays) {
     weekTotal += d.count
   }
 
-  // Check for current streak
-  const reversedDays = days.toReversed()
-  currentStreakEnd = reversedDays[0].date
-
-  for (let i = 0; i < reversedDays.length; i++) {
-    const currentDayCount = reversedDays[i].count
-    // If there's no activity today, continue on to yesterday
-    if (i === 0 && currentDayCount === 0) {
-      currentStreakEnd = reversedDays[1].date
-      continue
-    }
-
-    if (currentDayCount > 0) {
-      streakCurrent++
-      currentStreakStart = reversedDays[i].date
-    } else {
-      break
-    }
-  }
-
+  // Format current streak dates
   if (streakCurrent > 0) {
-    currentStreakStart = dateFormat.format(currentStreakStart)
-    currentStreakEnd = dateFormat.format(currentStreakEnd)
-    datesCurrent = `${currentStreakStart} → ${currentStreakEnd}`
+    const currentStart = dateFormat.format(stats.currentStreakStart)
+    const currentEnd = dateFormat.format(stats.currentStreakEnd)
+    datesCurrent = `${currentStart} → ${currentEnd}`
   } else {
     datesCurrent = 'No current streak'
   }
@@ -274,9 +224,9 @@ const loadStats = () => {
 
   // Longest streak
   if (streakLongest > 0) {
-    longestStreakStart = dateFormat.format(longestStreakStart)
-    longestStreakEnd = dateFormat.format(longestStreakEnd)
-    datesLongest = `${longestStreakStart} → ${longestStreakEnd}`
+    const longestStart = dateFormat.format(stats.longestStreakStart)
+    const longestEnd = dateFormat.format(stats.longestStreakEnd)
+    datesLongest = `${longestStart} → ${longestEnd}`
   } else {
     datesLongest = 'No longest streak'
   }
