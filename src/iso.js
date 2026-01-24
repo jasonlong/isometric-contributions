@@ -125,10 +125,6 @@ const handleViewToggle = (event) => {
 
   persistSetting('toggleSetting', event.target.dataset.icOption)
   toggleSetting = event.target.dataset.icOption
-
-  // Apply user preference
-  document.querySelector(`.ic-toggle-option.${toggleSetting}`).classList.add('selected')
-  contributionsBox.classList.add(`ic-${toggleSetting}`)
 }
 
 const setContainerViewType = (type) => {
