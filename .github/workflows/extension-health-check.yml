@@ -1,0 +1,96 @@
+name: Extension Health Check
+
+on:
+  schedule:
+    # Run every 6 hours to detect GitHub markup changes
+    - cron: '0 */6 * * *'
+  workflow_dispatch:
+  pull_request:
+  push:
+    branches:
+      - main
+
+jobs:
+  test-extension:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Build extension
+        run: npm run build:chrome
+
+      - name: Install Puppeteer
+        run: npm install puppeteer
+
+      - name: Run extension test
+        run: node test-extension.js
+
+      - name: Upload screenshot on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: error-screenshot
+          path: error-screenshot.png
+          if-no-files-found: ignore
+
+      - name: Create issue on failure (scheduled runs only)
+        if: failure() && github.event_name == 'schedule'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const issueTitle = 'Extension Health Check Failed'
+            const issueBody = `
+            ## Extension Test Failure
+
+            The automated health check has failed. This usually means GitHub changed their contribution graph markup.
+
+            **Workflow Run:** ${context.payload.repository.html_url}/actions/runs/${context.runId}
+            **Commit:** ${context.sha.substring(0, 7)}
+
+            ### Possible Causes
+            - GitHub changed their contribution graph markup
+            - Extension selectors need updating
+            - Network/timeout issues
+
+            ### Next Steps
+            1. Check the workflow logs above
+            2. Download the error screenshot artifact if available
+            3. Manually test the extension on github.com
+            4. Update extension selectors if needed
+
+            This issue was automatically created by the Extension Health Check workflow.
+            `
+
+            const issues = await github.rest.issues.listForRepo({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              state: 'open',
+              labels: ['automated-check']
+            })
+
+            if (issues.data.length === 0) {
+              await github.rest.issues.create({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                title: issueTitle,
+                body: issueBody,
+                labels: ['automated-check']
+              })
+            } else {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: issues.data[0].number,
+                body: `### Another failure detected\n\n**Workflow Run:** ${context.payload.repository.html_url}/actions/runs/${context.runId}\n**Time:** ${new Date().toISOString()}`
+              })
+            }
