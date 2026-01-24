@@ -11,6 +11,7 @@
     "build:firefox": "node scripts/build.js firefox",
     "build:all": "node scripts/build.js all",
     "test": "xo && vitest run",
+    "test:e2e": "npm run build:chrome && node test-extension.js",
     "test:watch": "vitest",
     "version:get": "node scripts/version.js get",
     "version:patch": "node scripts/version.js patch",
@@ -24,6 +25,7 @@
     "release": "npm run build:all && npm run submit:all"
   },
   "devDependencies": {
+    "puppeteer": "^24.0.0",
     "@parcel/config-webextension": "^2.16.3",
     "@parcel/reporter-bundle-analyzer": "^2.16.3",
     "@parcel/reporter-bundle-buddy": "^2.16.3",
