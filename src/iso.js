@@ -1,5 +1,6 @@
+import { precisionRound, rgbToHex, datesDayDifference, sameDay } from './utils.js'
+
 const dateFormat = new Intl.DateTimeFormat('en-US', { month: 'short', day: 'numeric', timeZone: 'UTC' })
-const sameDay = (d1, d2) => d1.toDateString() === d2.toDateString()
 
 let days
 let weeks
@@ -286,15 +287,6 @@ const loadStats = () => {
   weekDatesTotal = `${weekDateFirst} → ${dateLast}`
 }
 
-const rgbToHex = (rgb) => {
-  const separator = rgb.includes(',') ? ',' : ' '
-  return rgb
-    .slice(4, -1)
-    .split(separator)
-    .map((n) => Number(n).toString(16).padStart(2, '0'))
-    .join('')
-}
-
 const renderIsometricChart = () => {
   const SIZE = 16
   const MAX_HEIGHT = 100
@@ -406,22 +398,6 @@ const generateIsometricChart = () => {
   loadStats()
   renderStats()
   renderIsometricChart()
-}
-
-const precisionRound = (number, precision) => {
-  const factor = 10 ** precision
-  return Math.round(number * factor) / factor
-}
-
-const datesDayDifference = (date1, date2) => {
-  let diffDays = null
-
-  if (date1 && date2) {
-    const timeDiff = Math.abs(date2.getTime() - date1.getTime())
-    diffDays = Math.ceil(timeDiff / (1000 * 3600 * 24))
-  }
-
-  return diffDays
 }
 
 ;(async function () {
