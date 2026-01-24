@@ -459,10 +459,7 @@ const datesDayDifference = (date1, date2) => {
   const initIfReady = () => {
     if (document.querySelector('.js-calendar-graph') && !document.querySelector('.ic-contributions-wrapper')) {
       generateIsometricChart()
-      return true
     }
-
-    return false
   }
 
   const setupObserver = () => {
@@ -470,30 +467,30 @@ const datesDayDifference = (date1, date2) => {
       return
     }
 
-    // Try immediate init (graph might already be loaded)
+    // Remove stale elements from Turbo cache restore
+    document.querySelector('.ic-contributions-wrapper')?.remove()
+    document.querySelector('.ic-toggle-option')?.parentElement?.remove()
+
     initIfReady()
 
-    // Observe main content area instead of <html>
-    // Don't disconnect - need to detect year changes which replace the graph
     const target = document.querySelector('main') || document.body
-
-    const observer = new MutationObserver(() => {
-      initIfReady()
-    })
-
+    const observer = new MutationObserver(() => initIfReady())
     observer.observe(target, { childList: true, subtree: true })
   }
 
   await getSettings()
 
-  // Fix deprecated addListener -> addEventListener
   globalThis.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
     if (document.querySelector('.ic-contributions-wrapper')) {
       renderIsometricChart()
     }
   })
 
-  // Handle both initial load and SPA navigation
   setupObserver()
   document.addEventListener('turbo:load', setupObserver)
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'visible' && document.querySelector('.ic-contributions-wrapper')) {
+      renderIsometricChart()
+    }
+  })
 })()
