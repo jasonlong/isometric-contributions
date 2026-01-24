@@ -9,3 +9,5 @@ src/Archive.zip
 dist
 .parcel-cache
 .claude
+artifacts
+.env
