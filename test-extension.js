@@ -1,6 +1,6 @@
-import puppeteer from 'puppeteer'
 import path from 'node:path'
 import process from 'node:process'
+import puppeteer from 'puppeteer'
 
 const validateNumberIsPositive = (number) => {
   const value = Number.parseInt(number.replaceAll(',', ''), 10)
@@ -24,14 +24,14 @@ const run = async () => {
       '--load-extension=' + pathToExtension,
       '--no-sandbox',
       '--disable-setuid-sandbox',
-      '--disable-dev-shm-usage',
-    ],
+      '--disable-dev-shm-usage'
+    ]
   })
 
   try {
     const page = await browser.newPage()
 
-    page.on('console', (msg) => console.log('PAGE LOG:', msg.text()))
+    page.on('console', (message) => console.log('PAGE LOG:', message.text()))
     page.on('pageerror', (error) => console.log('PAGE ERROR:', error.message))
 
     await page.setViewport({ width: 1280, height: 1024 })
@@ -39,20 +39,22 @@ const run = async () => {
     console.log('Navigating to GitHub profile...')
     await page.goto('https://github.com/jasonlong', {
       waitUntil: 'networkidle2',
-      timeout: 30_000,
+      timeout: 30_000
     })
 
     console.log('Waiting for extension to inject UI...')
     await page.waitForSelector('[data-ic-option="cubes"]', {
       visible: true,
-      timeout: 10_000,
+      timeout: 10_000
     })
 
     console.log('Clicking 3D toggle...')
     await page.click('[data-ic-option="cubes"]')
 
     // Give the 3D render a moment to complete
-    await new Promise((resolve) => setTimeout(resolve, 2000))
+    await new Promise((resolve) => {
+      setTimeout(resolve, 2000)
+    })
 
     console.log('Checking canvas is rendered...')
     const canvasDrawn = await page.evaluate(() => {
@@ -69,7 +71,7 @@ const run = async () => {
         exists: true,
         width: canvas.width,
         height: canvas.height,
-        nonTransparentPixels,
+        nonTransparentPixels
       }
     })
 
@@ -82,13 +84,13 @@ const run = async () => {
     }
 
     console.log(
-      `Canvas rendered: ${canvasDrawn.width}x${canvasDrawn.height} with ${canvasDrawn.nonTransparentPixels.toLocaleString()} drawn pixels`,
+      `Canvas rendered: ${canvasDrawn.width}x${canvasDrawn.height} with ${canvasDrawn.nonTransparentPixels.toLocaleString()} drawn pixels`
     )
 
     console.log('Checking contribution data...')
     const contribTotal = await page.$eval(
       '.ic-contributions-wrapper ::-p-text(Contributions) + div ::-p-text(Total)',
-      (el) => el.previousElementSibling.textContent,
+      (element) => element.previousElementSibling.textContent
     )
 
     const validatedTotal = validateNumberIsPositive(contribTotal.toString())
@@ -97,12 +99,12 @@ const run = async () => {
     console.log('Contribution total:', validatedTotal.toLocaleString())
 
     await browser.close()
-    process.exit(0)
   } catch (error) {
     console.error('Extension check failed:', error.message)
 
     try {
-      const page = (await browser.pages())[0]
+      const pages = await browser.pages()
+      const page = pages[0]
       await page.screenshot({ path: 'error-screenshot.png', fullPage: true })
       console.log('Error screenshot saved to error-screenshot.png')
     } catch {
@@ -110,7 +112,7 @@ const run = async () => {
     }
 
     await browser.close()
-    process.exit(1)
+    throw error
   }
 }
 
