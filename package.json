@@ -14,11 +14,12 @@
   },
   "devDependencies": {
     "@parcel/config-webextension": "^2.16.3",
-    "vitest": "^3.0.0",
     "@parcel/reporter-bundle-analyzer": "^2.16.3",
     "@parcel/reporter-bundle-buddy": "^2.16.3",
     "chrome-webstore-upload-cli": "^3.5.0",
+    "jsdom": "^27.4.0",
     "parcel": "^2.16.3",
+    "vitest": "^3.0.0",
     "web-ext-submit": "^7.8.0",
     "xo": "^1.2.3"
   },
