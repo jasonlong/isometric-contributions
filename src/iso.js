@@ -456,29 +456,45 @@ const datesDayDifference = (date1, date2) => {
 }
 
 ;(async function () {
-  // Are we on a profile page?
-  if (document.querySelector('.vcard-names-container')) {
-    await getSettings()
-
-    const config = { attributes: true, childList: true, subtree: true }
-    const callback = (mutationsList) => {
-      for (const mutation of mutationsList) {
-        if (
-          mutation.type === 'childList' &&
-          document.querySelector('.js-calendar-graph') &&
-          !document.querySelector('.ic-contributions-wrapper')
-        ) {
-          generateIsometricChart()
-        }
-      }
+  const initIfReady = () => {
+    if (document.querySelector('.js-calendar-graph') && !document.querySelector('.ic-contributions-wrapper')) {
+      generateIsometricChart()
+      return true
     }
 
-    globalThis.matchMedia('(prefers-color-scheme: dark)').addListener(() => {
-      renderIsometricChart()
+    return false
+  }
+
+  const setupObserver = () => {
+    if (!document.querySelector('.vcard-names-container')) {
+      return
+    }
+
+    // Try immediate init (graph might already be loaded)
+    if (initIfReady()) return
+
+    // Observe main content area instead of <html>
+    const target = document.querySelector('main') || document.body
+
+    const observer = new MutationObserver(() => {
+      if (initIfReady()) {
+        observer.disconnect()
+      }
     })
 
-    const observedContainer = document.querySelector('html')
-    const observer = new MutationObserver(callback)
-    observer.observe(observedContainer, config)
+    observer.observe(target, { childList: true, subtree: true })
   }
+
+  await getSettings()
+
+  // Fix deprecated addListener -> addEventListener
+  globalThis.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
+    if (document.querySelector('.ic-contributions-wrapper')) {
+      renderIsometricChart()
+    }
+  })
+
+  // Handle both initial load and SPA navigation
+  setupObserver()
+  document.addEventListener('turbo:load', setupObserver)
 })()
