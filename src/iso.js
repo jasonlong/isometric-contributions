@@ -145,6 +145,16 @@ const getSquareColor = (rect) => {
   return rgbToHex(getComputedStyle(rect).getPropertyValue('fill'))
 }
 
+const refreshColors = () => {
+  const dayElements = document.querySelectorAll('.js-calendar-graph-table tbody td.ContributionCalendar-day')
+  for (const d of days) {
+    const element = [...dayElements].find((node) => node.dataset.date === d.date.toISOString().split('T')[0])
+    if (element) {
+      d.color = getSquareColor(element)
+    }
+  }
+}
+
 const loadStats = () => {
   let temporaryStreak = 0
   let temporaryStreakStart = null
@@ -443,6 +453,7 @@ const datesDayDifference = (date1, date2) => {
 
   globalThis.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
     if (document.querySelector('.ic-contributions-wrapper')) {
+      refreshColors()
       renderIsometricChart()
     }
   })
