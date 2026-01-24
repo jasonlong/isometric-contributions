@@ -242,8 +242,7 @@ const loadStats = () => {
   }
 
   // Check for current streak
-  const reversedDays = days
-  reversedDays.reverse()
+  const reversedDays = days.toReversed()
   currentStreakEnd = reversedDays[0].date
 
   for (let i = 0; i < reversedDays.length; i++) {
@@ -458,19 +457,21 @@ const datesDayDifference = (date1, date2) => {
     }
   }
 
+  let observer = null
+
   const setupObserver = () => {
     if (!document.querySelector('.vcard-names-container')) {
       return
     }
 
-    // Remove stale elements from Turbo cache restore
     document.querySelector('.ic-contributions-wrapper')?.remove()
     document.querySelector('.ic-toggle-option')?.parentElement?.remove()
 
     initIfReady()
 
+    observer?.disconnect()
     const target = document.querySelector('main') || document.body
-    const observer = new MutationObserver(() => initIfReady())
+    observer = new MutationObserver(() => initIfReady())
     observer.observe(target, { childList: true, subtree: true })
   }
 
