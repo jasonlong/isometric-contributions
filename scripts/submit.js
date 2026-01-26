@@ -139,30 +139,32 @@ async function submitFirefox() {
 async function submitEdge() {
   console.log('\n=== Microsoft Edge Add-ons ===\n')
 
-  checkEnvVars(['EDGE_PRODUCT_ID', 'EDGE_CLIENT_ID', 'EDGE_CLIENT_SECRET', 'EDGE_ACCESS_TOKEN_URL'])
-  checkArtifact('isometric-contributions-edge.zip')
+  checkEnvVars(['EDGE_PRODUCT_ID', 'EDGE_CLIENT_ID', 'EDGE_API_KEY'])
+  const zipPath = checkArtifact('isometric-contributions-edge.zip')
 
   if (dryRun) {
-    console.log('  Validating credentials...')
-    // Try to get an access token to validate credentials
-    const tokenResult = execSync(
-      `curl -s -X POST "${process.env.EDGE_ACCESS_TOKEN_URL}" \
-        -H "Content-Type: application/x-www-form-urlencoded" \
-        -d "client_id=${process.env.EDGE_CLIENT_ID}" \
-        -d "scope=https://api.addons.microsoftedge.microsoft.com/.default" \
-        -d "client_secret=${process.env.EDGE_CLIENT_SECRET}" \
-        -d "grant_type=client_credentials"`,
+    console.log('  Validating credentials (v1.1 API)...')
+    // Test the v1.1 API by checking the current draft submission
+    const result = execSync(
+      `curl -s -w "\\n%{http_code}" \
+        -H "Authorization: ApiKey ${process.env.EDGE_API_KEY}" \
+        -H "X-ClientID: ${process.env.EDGE_CLIENT_ID}" \
+        "https://api.addons.microsoftedge.microsoft.com/v1/products/${process.env.EDGE_PRODUCT_ID}/submissions/draft/package"`,
       { encoding: 'utf8' }
     )
-    const tokenData = JSON.parse(tokenResult)
-    if (tokenData.access_token) {
-      console.log('  ✓ Credentials valid (got access token)')
+    const lines = result.trim().split('\n')
+    const httpCode = lines.pop()
+    const body = lines.join('\n')
+
+    // 200 = has draft, 404 = no draft (both are valid), 401/403 = auth error
+    if (httpCode === '200' || httpCode === '404') {
+      console.log(`  ✓ Credentials valid (HTTP ${httpCode})`)
     } else {
-      console.error('  ✗ Invalid credentials:', tokenData.error_description || tokenData.error)
+      console.error(`  ✗ API request failed (HTTP ${httpCode}):`, body)
       process.exit(1)
     }
 
-    console.log('\n  [DRY RUN] Would upload to Edge Add-ons')
+    console.log('\n  [DRY RUN] Would upload:', zipPath)
     return
   }
 
