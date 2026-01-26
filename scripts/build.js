@@ -1,9 +1,9 @@
 #!/usr/bin/env node
 
+import { execSync } from 'node:child_process'
 import fs from 'node:fs'
 import path from 'node:path'
 import process from 'node:process'
-import { execSync } from 'node:child_process'
 import { fileURLToPath } from 'node:url'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
@@ -57,7 +57,7 @@ function transformForFirefox(manifest) {
 
 function writeDistManifest(manifest) {
   const distManifestPath = path.join(distDir, 'manifest.json')
-  fs.writeFileSync(distManifestPath, JSON.stringify(manifest, null, 2) + '\n')
+  fs.writeFileSync(distManifestPath, `${JSON.stringify(manifest, null, 2)}\n`)
 }
 
 function runParcelBuild() {
@@ -83,7 +83,9 @@ function createZip(browser) {
   })
 
   const stats = fs.statSync(zipPath)
-  console.log(`Created ${config.zipName} (${(stats.size / 1024).toFixed(1)} KB)`)
+  console.log(
+    `Created ${config.zipName} (${(stats.size / 1024).toFixed(1)} KB)`
+  )
 }
 
 function build(browser) {
@@ -98,7 +100,9 @@ function build(browser) {
   // For Firefox, transform the manifest in dist/
   if (browser === 'firefox') {
     console.log('Transforming manifest for Firefox (v3 → v2)...')
-    const manifest = JSON.parse(fs.readFileSync(path.join(distDir, 'manifest.json'), 'utf8'))
+    const manifest = JSON.parse(
+      fs.readFileSync(path.join(distDir, 'manifest.json'), 'utf8')
+    )
     const v2Manifest = transformForFirefox(manifest)
     writeDistManifest(v2Manifest)
   }

@@ -20,8 +20,8 @@ const run = async () => {
   const browser = await puppeteer.launch({
     headless: 'new',
     args: [
-      '--disable-extensions-except=' + pathToExtension,
-      '--load-extension=' + pathToExtension,
+      `--disable-extensions-except=${pathToExtension}`,
+      `--load-extension=${pathToExtension}`,
       '--no-sandbox',
       '--disable-setuid-sandbox',
       '--disable-dev-shm-usage'

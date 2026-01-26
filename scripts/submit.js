@@ -1,9 +1,9 @@
 #!/usr/bin/env node
 
+import { execSync } from 'node:child_process'
 import fs from 'node:fs'
 import path from 'node:path'
 import process from 'node:process'
-import { execSync } from 'node:child_process'
 import { fileURLToPath } from 'node:url'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
@@ -15,7 +15,9 @@ const dryRun = process.argv.includes('--dry-run')
 function checkEnvVars(vars) {
   const missing = vars.filter((v) => !process.env[v])
   if (missing.length > 0) {
-    console.error(`Missing required environment variables: ${missing.join(', ')}`)
+    console.error(
+      `Missing required environment variables: ${missing.join(', ')}`
+    )
     process.exit(1)
   }
 
@@ -42,7 +44,12 @@ function checkArtifact(zipName) {
 async function submitChrome() {
   console.log('\n=== Chrome Web Store ===\n')
 
-  checkEnvVars(['CHROME_EXTENSION_ID', 'CHROME_CLIENT_ID', 'CHROME_CLIENT_SECRET', 'CHROME_REFRESH_TOKEN'])
+  checkEnvVars([
+    'CHROME_EXTENSION_ID',
+    'CHROME_CLIENT_ID',
+    'CHROME_CLIENT_SECRET',
+    'CHROME_REFRESH_TOKEN'
+  ])
   const zipPath = checkArtifact('isometric-contributions-chrome.zip')
 
   if (dryRun) {
@@ -60,7 +67,10 @@ async function submitChrome() {
     if (tokenData.access_token) {
       console.log('  ✓ Credentials valid (got access token)')
     } else {
-      console.error('  ✗ Invalid credentials:', tokenData.error_description || tokenData.error)
+      console.error(
+        '  ✗ Invalid credentials:',
+        tokenData.error_description || tokenData.error
+      )
       process.exit(1)
     }
 
@@ -103,10 +113,12 @@ async function submitFirefox() {
     // Web-ext doesn't have a validate-only mode, but we can check the JWT format
     const apiKey = process.env.AMO_API_KEY
     const apiSecret = process.env.AMO_API_SECRET
-    if (apiKey && apiKey.startsWith('user:') && apiSecret && apiSecret.length > 20) {
+    if (apiKey?.startsWith('user:') && apiSecret && apiSecret.length > 20) {
       console.log('  ✓ Credentials format looks valid')
     } else {
-      console.log('  ⚠ Credentials format may be incorrect (expected JWT issuer starting with "user:")')
+      console.log(
+        '  ⚠ Credentials format may be incorrect (expected JWT issuer starting with "user:")'
+      )
     }
 
     console.log('\n  [DRY RUN] Would submit to Firefox Add-ons')
@@ -190,7 +202,9 @@ async function submitAll() {
 const target = process.argv.slice(2).find((a) => !a.startsWith('--'))
 
 if (!target) {
-  console.error('Usage: node scripts/submit.js <chrome|firefox|edge|all> [--dry-run]')
+  console.error(
+    'Usage: node scripts/submit.js <chrome|firefox|edge|all> [--dry-run]'
+  )
   process.exit(1)
 }
 
@@ -203,7 +217,9 @@ const handlers = {
 
 if (!handlers[target]) {
   console.error(`Unknown target: ${target}`)
-  console.error('Usage: node scripts/submit.js <chrome|firefox|edge|all> [--dry-run]')
+  console.error(
+    'Usage: node scripts/submit.js <chrome|firefox|edge|all> [--dry-run]'
+  )
   process.exit(1)
 }
 
