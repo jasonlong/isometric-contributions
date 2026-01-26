@@ -14,7 +14,7 @@ function readManifest() {
 }
 
 function writeManifest(manifest) {
-  fs.writeFileSync(manifestPath, JSON.stringify(manifest, null, 2) + '\n')
+  fs.writeFileSync(manifestPath, `${JSON.stringify(manifest, null, 2)}\n`)
 }
 
 function parseVersion(version) {

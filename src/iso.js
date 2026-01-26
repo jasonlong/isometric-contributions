@@ -1,18 +1,22 @@
 import {
-  precisionRound,
-  datesDayDifference,
-  sameDay,
-  calculateStreaks,
   applyViewType,
-  getElementColor,
-  parseCalendarGraph,
-  loadSetting,
-  saveSetting,
+  calculateStreaks,
+  datesDayDifference,
   generateContributionsMarkup,
-  generateStreaksMarkup
+  generateStreaksMarkup,
+  getElementColor,
+  loadSetting,
+  parseCalendarGraph,
+  precisionRound,
+  sameDay,
+  saveSetting
 } from './utils.js'
 
-const dateFormat = new Intl.DateTimeFormat('en-US', { month: 'short', day: 'numeric', timeZone: 'UTC' })
+const dateFormat = new Intl.DateTimeFormat('en-US', {
+  month: 'short',
+  day: 'numeric',
+  timeZone: 'UTC'
+})
 
 let days
 let weeks
@@ -83,16 +87,21 @@ const initUI = () => {
 
   // Inject toggle
   let insertLocation = contributionsBox.querySelector('h2')
-  if (insertLocation.previousElementSibling && insertLocation.previousElementSibling.nodeName === 'DETAILS') {
+  if (
+    insertLocation.previousElementSibling &&
+    insertLocation.previousElementSibling.nodeName === 'DETAILS'
+  ) {
     insertLocation = insertLocation.previousElementSibling
   }
 
   const buttonGroup = document.createElement('div')
-  buttonGroup.className = 'BtnGroup mt-1 ml-3 position-relative top-0 float-right'
+  buttonGroup.className =
+    'BtnGroup mt-1 ml-3 position-relative top-0 float-right'
 
   const squaresButton = document.createElement('button')
   squaresButton.textContent = '2D'
-  squaresButton.className = 'ic-toggle-option squares btn BtnGroup-item btn-sm py-0 px-1'
+  squaresButton.className =
+    'ic-toggle-option squares btn BtnGroup-item btn-sm py-0 px-1'
   squaresButton.dataset.icOption = 'squares'
   squaresButton.addEventListener('click', handleViewToggle)
   if (toggleSetting === 'squares') {
@@ -101,7 +110,8 @@ const initUI = () => {
 
   const cubesButton = document.createElement('button')
   cubesButton.textContent = '3D'
-  cubesButton.className = 'ic-toggle-option cubes btn BtnGroup-item btn-sm py-0 px-1'
+  cubesButton.className =
+    'ic-toggle-option cubes btn BtnGroup-item btn-sm py-0 px-1'
   cubesButton.dataset.icOption = 'cubes'
   cubesButton.addEventListener('click', handleViewToggle)
   if (toggleSetting === 'cubes') {
@@ -135,9 +145,13 @@ const setContainerViewType = (type) => {
 const getSquareColor = (rect) => getElementColor(rect)
 
 const refreshColors = () => {
-  const dayElements = document.querySelectorAll('.js-calendar-graph-table tbody td.ContributionCalendar-day')
+  const dayElements = document.querySelectorAll(
+    '.js-calendar-graph-table tbody td.ContributionCalendar-day'
+  )
   for (const d of days) {
-    const element = [...dayElements].find((node) => node.dataset.date === d.date.toISOString().split('T')[0])
+    const element = [...dayElements].find(
+      (node) => node.dataset.date === d.date.toISOString().split('T')[0]
+    )
     if (element) {
       d.color = getSquareColor(element)
     }
@@ -145,15 +159,20 @@ const refreshColors = () => {
 }
 
 const loadStats = () => {
-  const dayElements = document.querySelectorAll('.js-calendar-graph-table tbody td.ContributionCalendar-day')
-  const tooltipElements = document.querySelectorAll('.js-calendar-graph tool-tip')
+  const dayElements = document.querySelectorAll(
+    '.js-calendar-graph-table tbody td.ContributionCalendar-day'
+  )
+  const tooltipElements = document.querySelectorAll(
+    '.js-calendar-graph tool-tip'
+  )
 
   days = parseCalendarGraph(dayElements, tooltipElements, getSquareColor)
   weeks = Object.values(Object.groupBy(days, (d) => d.week))
   const currentWeekDays = weeks.at(-1)
 
   firstDay = days[0].date
-  lastDay = days.find((d) => sameDay(d.date, new Date()))?.date ?? days.at(-1).date
+  lastDay =
+    days.find((d) => sameDay(d.date, new Date()))?.date ?? days.at(-1).date
 
   // Calculate streaks using pure function
   const stats = calculateStreaks(days)
@@ -228,11 +247,16 @@ const renderIsometricChart = () => {
       let cubeHeight = 3
 
       if (maxCount > 0) {
-        cubeHeight += Number.parseInt((MAX_HEIGHT / maxCount) * currentDayCount, 10)
+        cubeHeight += Number.parseInt(
+          (MAX_HEIGHT / maxCount) * currentDayCount,
+          10
+        )
       }
 
       const dimension = new obelisk.CubeDimension(SIZE, SIZE, cubeHeight)
-      const color = new obelisk.CubeColor().getByHorizontalColor(Number.parseInt(d.color, 16))
+      const color = new obelisk.CubeColor().getByHorizontalColor(
+        Number.parseInt(d.color, 16)
+      )
       const cube = new obelisk.Cube(dimension, color, false)
       const p3d = new obelisk.Point3D(SIZE * x, SIZE * y, 0)
       pixelView.renderObject(cube, p3d)
@@ -241,8 +265,8 @@ const renderIsometricChart = () => {
 }
 
 const renderStats = () => {
-  const graphHeaderText =
-    document.querySelector('.ic-contributions-wrapper').parentNode.previousElementSibling.textContent
+  const graphHeaderText = document.querySelector('.ic-contributions-wrapper')
+    .parentNode.previousElementSibling.textContent
   const viewingYear = /in \d{4}/.test(graphHeaderText)
 
   const contributionsStats = {
@@ -262,8 +286,12 @@ const renderStats = () => {
     datesCurrent
   }
 
-  const topMarkup = generateContributionsMarkup(contributionsStats, { showWeek: !viewingYear })
-  const bottomMarkup = generateStreaksMarkup(streaksStats, { showCurrent: !viewingYear })
+  const topMarkup = generateContributionsMarkup(contributionsStats, {
+    showWeek: !viewingYear
+  })
+  const bottomMarkup = generateStreaksMarkup(streaksStats, {
+    showCurrent: !viewingYear
+  })
 
   const icStatsBlockTop = document.createElement('div')
   icStatsBlockTop.innerHTML = topMarkup
@@ -285,9 +313,12 @@ const generateIsometricChart = () => {
   renderIsometricChart()
 }
 
-;(async function () {
+;(async () => {
   const initIfReady = () => {
-    if (document.querySelector('.js-calendar-graph') && !document.querySelector('.ic-contributions-wrapper')) {
+    if (
+      document.querySelector('.js-calendar-graph') &&
+      !document.querySelector('.ic-contributions-wrapper')
+    ) {
       generateIsometricChart()
     }
   }
@@ -312,17 +343,22 @@ const generateIsometricChart = () => {
 
   await getSettings()
 
-  globalThis.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
-    if (document.querySelector('.ic-contributions-wrapper')) {
-      refreshColors()
-      renderIsometricChart()
-    }
-  })
+  globalThis
+    .matchMedia('(prefers-color-scheme: dark)')
+    .addEventListener('change', () => {
+      if (document.querySelector('.ic-contributions-wrapper')) {
+        refreshColors()
+        renderIsometricChart()
+      }
+    })
 
   setupObserver()
   document.addEventListener('turbo:load', setupObserver)
   document.addEventListener('visibilitychange', () => {
-    if (document.visibilityState === 'visible' && document.querySelector('.ic-contributions-wrapper')) {
+    if (
+      document.visibilityState === 'visible' &&
+      document.querySelector('.ic-contributions-wrapper')
+    ) {
       renderIsometricChart()
     }
   })

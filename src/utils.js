@@ -67,7 +67,9 @@ export const getContributionCount = (text) => {
     return 0
   }
 
-  return contributionMatches[1] === 'No' ? 0 : Number.parseInt(contributionMatches[1], 10)
+  return contributionMatches[1] === 'No'
+    ? 0
+    : Number.parseInt(contributionMatches[1], 10)
 }
 
 /**
@@ -183,7 +185,10 @@ export const applyViewType = (element, type) => {
  * @param {Function} getComputedStyleFn - The getComputedStyle function (for testing)
  * @returns {string} Hex color string without # prefix
  */
-export const getElementColor = (element, getComputedStyleFn = globalThis.getComputedStyle) => {
+export const getElementColor = (
+  element,
+  getComputedStyleFn = globalThis.getComputedStyle
+) => {
   return rgbToHex(getComputedStyleFn(element).getPropertyValue('fill'))
 }
 
@@ -194,7 +199,11 @@ export const getElementColor = (element, getComputedStyleFn = globalThis.getComp
  * @param {Function} getColorFn - Function to get color from element
  * @returns {Array<{date: Date, week: string, color: string, count: number}>}
  */
-export const parseCalendarGraph = (dayElements, tooltipElements, getColorFn) => {
+export const parseCalendarGraph = (
+  dayElements,
+  tooltipElements,
+  getColorFn
+) => {
   const dayNodes = [...dayElements].map((d) => ({
     date: new Date(d.dataset.date),
     week: d.dataset.ix,
@@ -277,7 +286,15 @@ export const saveSetting = (storage, key, value) => {
  * @returns {string} HTML markup
  */
 export const generateContributionsMarkup = (stats, options = {}) => {
-  const { countTotal, datesTotal, weekCountTotal, weekDatesTotal, maxCount, dateBest, averageCount } = stats
+  const {
+    countTotal,
+    datesTotal,
+    weekCountTotal,
+    weekDatesTotal,
+    maxCount,
+    dateBest,
+    averageCount
+  } = stats
   const { showWeek = true } = options
 
   let markup = `

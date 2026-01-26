@@ -1,27 +1,27 @@
-import { describe, it, expect } from 'vitest'
+import { describe, expect, it } from 'vitest'
 import {
+  calculateStreaks,
+  datesDayDifference,
+  getContributionCount,
   precisionRound,
   rgbToHex,
-  datesDayDifference,
-  sameDay,
-  getContributionCount,
-  calculateStreaks
+  sameDay
 } from './utils.js'
 
 describe('precisionRound', () => {
   it('rounds to 0 decimal places', () => {
-    expect(precisionRound(3.141_59, 0)).toBe(3)
+    expect(precisionRound(Math.PI, 0)).toBe(3)
     expect(precisionRound(3.5, 0)).toBe(4)
   })
 
   it('rounds to 2 decimal places', () => {
-    expect(precisionRound(3.141_59, 2)).toBe(3.14)
+    expect(precisionRound(Math.PI, 2)).toBe(3.14)
     expect(precisionRound(3.145, 2)).toBe(3.15)
     expect(precisionRound(3.144, 2)).toBe(3.14)
   })
 
   it('rounds to 4 decimal places', () => {
-    expect(precisionRound(3.141_592_65, 4)).toBe(3.1416)
+    expect(precisionRound(Math.PI, 4)).toBe(3.1416)
   })
 
   it('handles whole numbers', () => {
@@ -30,7 +30,7 @@ describe('precisionRound', () => {
   })
 
   it('handles negative numbers', () => {
-    expect(precisionRound(-3.141_59, 2)).toBe(-3.14)
+    expect(precisionRound(-Math.PI, 2)).toBe(-3.14)
     expect(precisionRound(-3.145, 2)).toBe(-3.14) // Note: JS rounds -3.145 to -3.14
   })
 })
@@ -144,7 +144,9 @@ describe('getContributionCount', () => {
   it('parses multiple contributions', () => {
     expect(getContributionCount('2 contributions on August 31st.')).toBe(2)
     expect(getContributionCount('15 contributions on March 5th.')).toBe(15)
-    expect(getContributionCount('100 contributions on December 25th.')).toBe(100)
+    expect(getContributionCount('100 contributions on December 25th.')).toBe(
+      100
+    )
   })
 
   it('returns 0 for non-matching text', () => {
@@ -153,7 +155,9 @@ describe('getContributionCount', () => {
   })
 
   it('handles text with extra content', () => {
-    expect(getContributionCount('5 contributions on January 1st. More text here')).toBe(5)
+    expect(
+      getContributionCount('5 contributions on January 1st. More text here')
+    ).toBe(5)
   })
 })
 
@@ -161,13 +165,21 @@ describe('calculateStreaks', () => {
   const makeDay = (dateString, count) => ({ date: new Date(dateString), count })
 
   it('calculates year total', () => {
-    const days = [makeDay('2024-01-01', 5), makeDay('2024-01-02', 3), makeDay('2024-01-03', 2)]
+    const days = [
+      makeDay('2024-01-01', 5),
+      makeDay('2024-01-02', 3),
+      makeDay('2024-01-03', 2)
+    ]
     const result = calculateStreaks(days)
     expect(result.yearTotal).toBe(10)
   })
 
   it('finds best day with max contributions', () => {
-    const days = [makeDay('2024-01-01', 5), makeDay('2024-01-02', 10), makeDay('2024-01-03', 3)]
+    const days = [
+      makeDay('2024-01-01', 5),
+      makeDay('2024-01-02', 10),
+      makeDay('2024-01-03', 3)
+    ]
     const result = calculateStreaks(days)
     expect(result.maxCount).toBe(10)
     expect(result.bestDay.toISOString()).toContain('2024-01-02')
@@ -214,7 +226,11 @@ describe('calculateStreaks', () => {
   })
 
   it('returns 0 current streak when no recent activity', () => {
-    const days = [makeDay('2024-01-01', 1), makeDay('2024-01-02', 0), makeDay('2024-01-03', 0)]
+    const days = [
+      makeDay('2024-01-01', 1),
+      makeDay('2024-01-02', 0),
+      makeDay('2024-01-03', 0)
+    ]
     const result = calculateStreaks(days)
     expect(result.streakCurrent).toBe(0)
   })
@@ -238,7 +254,11 @@ describe('calculateStreaks', () => {
   })
 
   it('handles all zero contributions', () => {
-    const days = [makeDay('2024-01-01', 0), makeDay('2024-01-02', 0), makeDay('2024-01-03', 0)]
+    const days = [
+      makeDay('2024-01-01', 0),
+      makeDay('2024-01-02', 0),
+      makeDay('2024-01-03', 0)
+    ]
     const result = calculateStreaks(days)
     expect(result.yearTotal).toBe(0)
     expect(result.maxCount).toBe(0)

@@ -36,14 +36,17 @@ async function main() {
   console.log('Uploading package to Edge Add-ons...')
   const zipBuffer = fs.readFileSync(zipPath)
 
-  const uploadResponse = await fetch(`${API_BASE}/products/${EDGE_PRODUCT_ID}/submissions/draft/package`, {
-    method: 'POST',
-    headers: {
-      ...headers,
-      'Content-Type': 'application/zip'
-    },
-    body: zipBuffer
-  })
+  const uploadResponse = await fetch(
+    `${API_BASE}/products/${EDGE_PRODUCT_ID}/submissions/draft/package`,
+    {
+      method: 'POST',
+      headers: {
+        ...headers,
+        'Content-Type': 'application/zip'
+      },
+      body: zipBuffer
+    }
+  )
 
   if (!uploadResponse.ok) {
     const errorText = await uploadResponse.text()
@@ -59,14 +62,17 @@ async function main() {
 
   // Step 3: Publish the submission
   console.log('Publishing update...')
-  const publishResponse = await fetch(`${API_BASE}/products/${EDGE_PRODUCT_ID}/submissions`, {
-    method: 'POST',
-    headers: {
-      ...headers,
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify({ notes: 'Automated submission via CI/CD' })
-  })
+  const publishResponse = await fetch(
+    `${API_BASE}/products/${EDGE_PRODUCT_ID}/submissions`,
+    {
+      method: 'POST',
+      headers: {
+        ...headers,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ notes: 'Automated submission via CI/CD' })
+    }
+  )
 
   if (!publishResponse.ok) {
     const errorText = await publishResponse.text()
@@ -94,7 +100,9 @@ async function pollOperation(operationUrl, headers, operationName) {
     if (!response.ok) {
       // eslint-disable-next-line no-await-in-loop
       const errorText = await response.text()
-      throw new Error(`${operationName} status check failed (${response.status}): ${errorText}`)
+      throw new Error(
+        `${operationName} status check failed (${response.status}): ${errorText}`
+      )
     }
 
     // eslint-disable-next-line no-await-in-loop
@@ -106,7 +114,9 @@ async function pollOperation(operationUrl, headers, operationName) {
     }
 
     if (status.status === 'Failed' || status.state === 'Failed') {
-      throw new Error(`${operationName} failed: ${JSON.stringify(status.errors || status.message)}`)
+      throw new Error(
+        `${operationName} failed: ${JSON.stringify(status.errors || status.message)}`
+      )
     }
 
     // eslint-disable-next-line no-await-in-loop

@@ -1,15 +1,15 @@
 /**
  * @vitest-environment jsdom
  */
-import { describe, it, expect, beforeEach, vi } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 import {
   applyViewType,
-  getElementColor,
-  parseCalendarGraph,
-  loadSetting,
-  saveSetting,
   generateContributionsMarkup,
-  generateStreaksMarkup
+  generateStreaksMarkup,
+  getElementColor,
+  loadSetting,
+  parseCalendarGraph,
+  saveSetting
 } from './utils.js'
 
 // =============================================================================
@@ -60,18 +60,21 @@ describe('applyViewType', () => {
 describe('loadSetting', () => {
   it('loads from chrome storage API', async () => {
     const mockStorage = {
-      get: vi.fn((keys, callback) => {
+      get: vi.fn((_keys, callback) => {
         callback({ toggleSetting: 'squares' })
       })
     }
     const result = await loadSetting(mockStorage, 'toggleSetting', 'cubes')
     expect(result).toBe('squares')
-    expect(mockStorage.get).toHaveBeenCalledWith(['toggleSetting'], expect.any(Function))
+    expect(mockStorage.get).toHaveBeenCalledWith(
+      ['toggleSetting'],
+      expect.any(Function)
+    )
   })
 
   it('returns default value when chrome storage key is missing', async () => {
     const mockStorage = {
-      get: vi.fn((keys, callback) => {
+      get: vi.fn((_keys, callback) => {
         callback({})
       })
     }
@@ -266,7 +269,10 @@ describe('parseCalendarGraph', () => {
   }
 
   it('parses day elements and tooltips into structured data', () => {
-    const dayElements = [createDayElement('2024-01-01', '0', 'tip-1'), createDayElement('2024-01-02', '0', 'tip-2')]
+    const dayElements = [
+      createDayElement('2024-01-01', '0', 'tip-1'),
+      createDayElement('2024-01-02', '0', 'tip-2')
+    ]
     const tooltipElements = [
       createTooltipElement('tip-1', '5 contributions on January 1st.'),
       createTooltipElement('tip-2', 'No contributions on January 2nd')
@@ -304,7 +310,10 @@ describe('parseCalendarGraph', () => {
   })
 
   it('calls getColorFn for each day element', () => {
-    const dayElements = [createDayElement('2024-01-01', '0', 'tip-1'), createDayElement('2024-01-02', '0', 'tip-2')]
+    const dayElements = [
+      createDayElement('2024-01-01', '0', 'tip-1'),
+      createDayElement('2024-01-02', '0', 'tip-2')
+    ]
     const tooltipElements = [
       createTooltipElement('tip-1', '1 contribution on January 1st.'),
       createTooltipElement('tip-2', '2 contributions on January 2nd.')
