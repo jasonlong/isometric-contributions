@@ -167,7 +167,16 @@ const loadStats = () => {
   )
 
   days = parseCalendarGraph(dayElements, tooltipElements, getSquareColor)
-  weeks = Object.values(Object.groupBy(days, (d) => d.week))
+  weeks = Object.values(
+    days.reduce((acc, day) => {
+      const key = day.week
+      if (!acc[key]) {
+        acc[key] = []
+      }
+      acc[key].push(day)
+      return acc
+    }, {})
+  )
   const currentWeekDays = weeks.at(-1)
 
   firstDay = days[0].date
@@ -208,8 +217,7 @@ const loadStats = () => {
   averageCount = precisionRound(yearTotal / dayDifference, 2)
 
   // Best day
-  dateBest = dateFormat.format(bestDay)
-  dateBest ||= 'No activity found'
+  dateBest = bestDay ? dateFormat.format(bestDay) : 'No activity found'
 
   // Longest streak
   if (streakLongest > 0) {

@@ -262,6 +262,7 @@ describe('calculateStreaks', () => {
     const result = calculateStreaks(days)
     expect(result.yearTotal).toBe(0)
     expect(result.maxCount).toBe(0)
+    expect(result.bestDay).toBe(null)
     expect(result.streakLongest).toBe(0)
     expect(result.streakCurrent).toBe(0)
   })
