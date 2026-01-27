@@ -9,6 +9,8 @@ Besides being sort of neat looking, this view is interesting in that it highligh
 
 <img src="img/preview.png" width="1052" />
 
+<img src="img/preview-dark.png" width="1052" />
+
 ## Installation
 
 ### Chrome/Brave
