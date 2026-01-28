@@ -118,8 +118,19 @@ const initUI = () => {
     cubesButton.classList.add('selected')
   }
 
+  const bothButton = document.createElement('button')
+  bothButton.textContent = 'Both'
+  bothButton.className =
+    'ic-toggle-option both btn BtnGroup-item btn-sm py-0 px-1'
+  bothButton.dataset.icOption = 'both'
+  bothButton.addEventListener('click', handleViewToggle)
+  if (toggleSetting === 'both') {
+    bothButton.classList.add('selected')
+  }
+
   buttonGroup.append(squaresButton)
   buttonGroup.append(cubesButton)
+  buttonGroup.append(bothButton)
   insertLocation.before(buttonGroup)
 
   setContainerViewType(toggleSetting)
