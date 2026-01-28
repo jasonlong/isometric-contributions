@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 
+import { execSync } from 'node:child_process'
 import fs from 'node:fs'
 import path from 'node:path'
 import process from 'node:process'
@@ -15,6 +16,7 @@ function readManifest() {
 
 function writeManifest(manifest) {
   fs.writeFileSync(manifestPath, `${JSON.stringify(manifest, null, 2)}\n`)
+  execSync(`npx biome format --write ${manifestPath}`, { stdio: 'ignore' })
 }
 
 function parseVersion(version) {
