@@ -12,6 +12,62 @@ const zipPath = path.join(artifactsDir, 'isometric-contributions-edge.zip')
 
 const API_BASE = 'https://api.addons.microsoftedge.microsoft.com/v1'
 
+async function cancelPendingSubmission(productId, headers) {
+  // Check for any in-review submissions
+  console.log('Checking for pending submissions...')
+
+  const response = await fetch(
+    `${API_BASE}/products/${productId}/submissions`,
+    { headers }
+  )
+
+  if (!response.ok) {
+    // 404 means no submissions, which is fine
+    if (response.status === 404) {
+      console.log('No pending submissions found')
+      return
+    }
+    const errorText = await response.text()
+    console.warn(
+      `Could not check submissions (${response.status}): ${errorText}`
+    )
+    return
+  }
+
+  const submissions = await response.json()
+
+  // Find any submission that's in review or pending
+  const pendingStates = ['InReview', 'Submitted', 'InProgress']
+  const pending = submissions.find((s) => pendingStates.includes(s.status))
+
+  if (!pending) {
+    console.log('No pending submissions to cancel')
+    return
+  }
+
+  console.log(
+    `Found pending submission (${pending.id}) with status: ${pending.status}`
+  )
+  console.log('Canceling pending submission...')
+
+  const cancelResponse = await fetch(
+    `${API_BASE}/products/${productId}/submissions/${pending.id}`,
+    {
+      method: 'DELETE',
+      headers
+    }
+  )
+
+  if (!cancelResponse.ok) {
+    const errorText = await cancelResponse.text()
+    throw new Error(
+      `Failed to cancel submission (${cancelResponse.status}): ${errorText}`
+    )
+  }
+
+  console.log('Pending submission canceled successfully')
+}
+
 async function main() {
   const { EDGE_PRODUCT_ID, EDGE_CLIENT_ID, EDGE_API_KEY } = process.env
 
@@ -31,6 +87,9 @@ async function main() {
     Authorization: `ApiKey ${EDGE_API_KEY}`,
     'X-ClientID': EDGE_CLIENT_ID
   }
+
+  // Step 0: Cancel any pending submissions
+  await cancelPendingSubmission(EDGE_PRODUCT_ID, headers)
 
   // Step 1: Upload the package
   console.log('Uploading package to Edge Add-ons...')
