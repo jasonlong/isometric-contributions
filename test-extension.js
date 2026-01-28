@@ -125,6 +125,83 @@ const run = async () => {
         `Canvas rendered: ${canvasDrawn.width}x${canvasDrawn.height} with ${canvasDrawn.nonTransparentPixels.toLocaleString()} drawn pixels`
       )
 
+      console.log('Checking that 2D graph is hidden in 3D mode...')
+      const graphVisibility = await page.evaluate(() => {
+        const calendarGraph = document.querySelector('.js-calendar-graph')
+        if (!calendarGraph) return { exists: false }
+        const style = window.getComputedStyle(calendarGraph)
+        return {
+          exists: true,
+          display: style.display,
+          visibility: style.visibility,
+          isHidden: style.display === 'none'
+        }
+      })
+
+      if (!graphVisibility.exists) {
+        throw new Error('Could not find .js-calendar-graph element')
+      }
+
+      if (!graphVisibility.isHidden) {
+        throw new Error(
+          `2D graph should be hidden in 3D mode but has display: "${graphVisibility.display}"`
+        )
+      }
+
+      console.log('2D graph correctly hidden in 3D mode')
+
+      // Test 2D mode
+      console.log('Clicking 2D toggle...')
+      await page.click('[data-ic-option="squares"]')
+      await new Promise((resolve) => setTimeout(resolve, 500))
+
+      const mode2D = await page.evaluate(() => {
+        const canvas = document.querySelector('#isometric-contributions')
+        const calendarGraph = document.querySelector('.js-calendar-graph')
+        const canvasStyle = window.getComputedStyle(canvas)
+        const graphStyle = window.getComputedStyle(calendarGraph)
+        return {
+          canvasHidden: canvasStyle.display === 'none',
+          graphVisible: graphStyle.display !== 'none'
+        }
+      })
+
+      if (!mode2D.canvasHidden) {
+        throw new Error('3D canvas should be hidden in 2D mode')
+      }
+      if (!mode2D.graphVisible) {
+        throw new Error('2D graph should be visible in 2D mode')
+      }
+      console.log('2D mode working correctly')
+
+      // Test Both mode
+      console.log('Clicking Both toggle...')
+      await page.click('[data-ic-option="both"]')
+      await new Promise((resolve) => setTimeout(resolve, 500))
+
+      const modeBoth = await page.evaluate(() => {
+        const canvas = document.querySelector('#isometric-contributions')
+        const calendarGraph = document.querySelector('.js-calendar-graph')
+        const canvasStyle = window.getComputedStyle(canvas)
+        const graphStyle = window.getComputedStyle(calendarGraph)
+        return {
+          canvasVisible: canvasStyle.display !== 'none',
+          graphVisible: graphStyle.display !== 'none'
+        }
+      })
+
+      if (!modeBoth.canvasVisible) {
+        throw new Error('3D canvas should be visible in Both mode')
+      }
+      if (!modeBoth.graphVisible) {
+        throw new Error('2D graph should be visible in Both mode')
+      }
+      console.log('Both mode working correctly')
+
+      // Switch back to 3D for contribution data check
+      await page.click('[data-ic-option="cubes"]')
+      await new Promise((resolve) => setTimeout(resolve, 500))
+
       console.log('Checking contribution data...')
       const contribTotal = await page.$eval(
         '.ic-contributions-wrapper ::-p-text(Contributions) + div ::-p-text(Total)',

@@ -172,11 +172,12 @@ export const calculateStreaks = (days) => {
 /**
  * Apply view type classes to a container element.
  * @param {Element} element - The container element
- * @param {string} type - View type ('squares' or 'cubes')
+ * @param {string} type - View type ('squares', 'cubes', or 'both')
  */
 export const applyViewType = (element, type) => {
   element.classList.toggle('ic-squares', type === 'squares')
-  element.classList.toggle('ic-cubes', type !== 'squares')
+  element.classList.toggle('ic-cubes', type === 'cubes')
+  element.classList.toggle('ic-both', type === 'both')
 }
 
 /**

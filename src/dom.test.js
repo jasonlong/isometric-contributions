@@ -37,10 +37,11 @@ describe('applyViewType', () => {
     expect(element.classList.contains('ic-squares')).toBe(false)
   })
 
-  it('adds ic-cubes for any non-squares type', () => {
-    applyViewType(element, 'anything')
-    expect(element.classList.contains('ic-cubes')).toBe(true)
+  it('adds ic-both class for both type', () => {
+    applyViewType(element, 'both')
+    expect(element.classList.contains('ic-both')).toBe(true)
     expect(element.classList.contains('ic-squares')).toBe(false)
+    expect(element.classList.contains('ic-cubes')).toBe(false)
   })
 
   it('handles toggling from cubes to squares', () => {

@@ -1,14 +1,17 @@
-/* Normal chart display */
+/* Normal chart display (2D only) */
 .ic-squares #isometric-contributions,
 .ic-squares .ic-contributions-wrapper {
   display: none;
 }
 
-/* Isometric cube display */
+/* Isometric cube display (3D only) */
 .ic-cubes .contrib-details {
   display: none;
 }
 
 .ic-cubes .js-calendar-graph {
-  display: none;
+  /* Override GitHub Primer's d-flex !important */
+  display: none !important;
 }
+
+/* Both display - no hiding needed, both are visible by default */

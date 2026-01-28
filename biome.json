@@ -37,6 +37,16 @@
           }
         }
       }
+    },
+    {
+      "includes": ["src/iso.css"],
+      "linter": {
+        "rules": {
+          "complexity": {
+            "noImportantStyles": "off"
+          }
+        }
+      }
     }
   ]
 }
