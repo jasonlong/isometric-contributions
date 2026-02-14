@@ -37,6 +37,10 @@ To hack on the extension, you'll first need to make sure you've installed it in 
 
 <img src="img/reload-link.png" width="410" />
 
+## Community Forks
+
+- [isometric-contributions-plus](https://github.com/Qiuner/isometric-contributions-plus) - Extended version with GitCode integration and additional features
+
 ## License
 
 This project is licensed under the [MIT License](http://opensource.org/licenses/MIT).
