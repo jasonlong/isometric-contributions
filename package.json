@@ -27,7 +27,7 @@
     "release": "npm run build:all && npm run submit:all"
   },
   "devDependencies": {
-    "@biomejs/biome": "^2.3.14",
+    "@biomejs/biome": "^2.4.0",
     "@parcel/config-webextension": "^2.16.4",
     "@parcel/reporter-bundle-analyzer": "^2.16.4",
     "@parcel/reporter-bundle-buddy": "^2.16.4",
