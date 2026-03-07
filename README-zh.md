@@ -15,7 +15,7 @@
 
 ### Chrome / Brave
 
-[Install from the Chrome Web Store](https://chrome.google.com/webstore/detail/isometric-contributions/mjoedlfflcchnleknnceiplgaeoegien?hl=en&gl=US)
+[Install from the Chrome Web Store](https://chromewebstore.google.com/detail/isometric-contributions/mjoedlfflcchnleknnceiplgaeoegien?hl=en&gl=US)
 
 ### Firefox
 
