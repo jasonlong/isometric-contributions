@@ -96,7 +96,7 @@ const initUI = () => {
 
   const buttonGroup = document.createElement('div')
   buttonGroup.className =
-    'BtnGroup mt-1 ml-3 position-relative top-0 float-right'
+    'BtnGroup mt-1 mx-2 position-relative top-0 float-right'
 
   const squaresButton = document.createElement('button')
   squaresButton.textContent = '2D'
