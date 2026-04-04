@@ -9,6 +9,21 @@ import { fileURLToPath } from 'node:url'
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 const rootDir = path.resolve(__dirname, '..')
 const manifestPath = path.join(rootDir, 'src', 'manifest.json')
+const safariManifestPath = path.join(
+  rootDir,
+  'safari',
+  'Isometric Contributions',
+  'Isometric Contributions Extension',
+  'Resources',
+  'manifest.json'
+)
+const pbxprojPath = path.join(
+  rootDir,
+  'safari',
+  'Isometric Contributions',
+  'Isometric Contributions.xcodeproj',
+  'project.pbxproj'
+)
 
 function readManifest() {
   return JSON.parse(fs.readFileSync(manifestPath, 'utf8'))
@@ -17,6 +32,32 @@ function readManifest() {
 function writeManifest(manifest) {
   fs.writeFileSync(manifestPath, `${JSON.stringify(manifest, null, 2)}\n`)
   execSync(`npx biome format --write ${manifestPath}`, { stdio: 'ignore' })
+}
+
+function updateSafariVersion(newVersion) {
+  // Update Safari extension manifest
+  if (fs.existsSync(safariManifestPath)) {
+    const safariManifest = JSON.parse(
+      fs.readFileSync(safariManifestPath, 'utf8')
+    )
+    safariManifest.version = newVersion
+    fs.writeFileSync(
+      safariManifestPath,
+      `${JSON.stringify(safariManifest, null, 2)}\n`
+    )
+    console.log(`Updated Safari manifest.json to version ${newVersion}`)
+  }
+
+  // Update Xcode project MARKETING_VERSION
+  if (fs.existsSync(pbxprojPath)) {
+    let pbxproj = fs.readFileSync(pbxprojPath, 'utf8')
+    pbxproj = pbxproj.replace(
+      /MARKETING_VERSION = [\d.]+;/g,
+      `MARKETING_VERSION = ${newVersion};`
+    )
+    fs.writeFileSync(pbxprojPath, pbxproj)
+    console.log(`Updated Xcode MARKETING_VERSION to ${newVersion}`)
+  }
 }
 
 function parseVersion(version) {
@@ -68,6 +109,7 @@ function setVersion(newVersion) {
   manifest.version = newVersion
   writeManifest(manifest)
   console.log(`Updated manifest.json to version ${newVersion}`)
+  updateSafariVersion(newVersion)
 }
 
 const command = process.argv[2]

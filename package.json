@@ -9,6 +9,8 @@
     "build:chrome": "node scripts/build.js chrome",
     "build:edge": "node scripts/build.js edge",
     "build:firefox": "node scripts/build.js firefox",
+    "build:safari": "node scripts/build-safari.js",
+    "build:safari:release": "node scripts/build-safari.js --release",
     "build:all": "node scripts/build.js all",
     "lint": "biome check",
     "lint:fix": "biome check --write",

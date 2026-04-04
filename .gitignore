@@ -10,5 +10,6 @@ dist
 .parcel-cache
 .claude
 artifacts
+.deriveddata-safari
 .env
 error-screenshot.png

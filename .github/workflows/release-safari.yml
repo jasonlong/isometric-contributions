@@ -1,0 +1,163 @@
+name: Release Safari
+
+on:
+  workflow_dispatch:
+  workflow_call:
+    inputs:
+      ref:
+        description: 'Git ref to build (tag or SHA)'
+        required: false
+        type: string
+
+permissions:
+  contents: write
+
+jobs:
+  build-and-release:
+    runs-on: macos-15
+    timeout-minutes: 30
+    env:
+      APP_PATH: .deriveddata-safari/Build/Products/Release/Isometric Contributions.app
+      ARCHIVE_PATH: /tmp/IsometricContributions-unsigned.zip
+      FINAL_ARCHIVE_PATH: artifacts/isometric-contributions-safari.zip
+      KEYCHAIN_PATH: /tmp/isometric-contributions-build.keychain-db
+      KEYCHAIN_PROFILE: isometric-contributions-notary
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+        with:
+          ref: ${{ inputs.ref || '' }}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v5
+        with:
+          node-version: '22'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Show Xcode version
+        run: xcodebuild -version
+
+      - name: Build extension and sync resources
+        run: node scripts/build-safari.js --resources-only
+
+      - name: Import Developer ID certificate
+        env:
+          APPLE_CERTIFICATE_BASE64: ${{ secrets.APPLE_CERTIFICATE_BASE64 }}
+          APPLE_CERTIFICATE_PASSWORD: ${{ secrets.APPLE_CERTIFICATE_PASSWORD }}
+          APPLE_SIGNING_IDENTITY: ${{ secrets.APPLE_SIGNING_IDENTITY }}
+        run: |
+          test -n "$APPLE_CERTIFICATE_BASE64"
+          test -n "$APPLE_CERTIFICATE_PASSWORD"
+          test -n "$APPLE_SIGNING_IDENTITY"
+
+          CERTIFICATE_PATH=/tmp/developer-id.p12
+          KEYCHAIN_PASSWORD="$(uuidgen)"
+
+          printf '%s' "$APPLE_CERTIFICATE_BASE64" | base64 -D > "$CERTIFICATE_PATH"
+          security create-keychain -p "$KEYCHAIN_PASSWORD" "$KEYCHAIN_PATH"
+          security set-keychain-settings -lut 21600 "$KEYCHAIN_PATH"
+          security unlock-keychain -p "$KEYCHAIN_PASSWORD" "$KEYCHAIN_PATH"
+          security import "$CERTIFICATE_PATH" \
+            -k "$KEYCHAIN_PATH" \
+            -P "$APPLE_CERTIFICATE_PASSWORD" \
+            -T /usr/bin/codesign \
+            -T /usr/bin/security \
+            -T /usr/bin/xcrun
+          security set-key-partition-list -S apple-tool:,apple:,codesign: -s -k "$KEYCHAIN_PASSWORD" "$KEYCHAIN_PATH"
+          security list-keychains -d user -s "$KEYCHAIN_PATH"
+          security default-keychain -d user -s "$KEYCHAIN_PATH"
+          echo "KEYCHAIN_PASSWORD=$KEYCHAIN_PASSWORD" >> "$GITHUB_ENV"
+
+      - name: Build signed release app
+        env:
+          APPLE_SIGNING_IDENTITY: ${{ secrets.APPLE_SIGNING_IDENTITY }}
+          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+        run: |
+          test -n "$APPLE_SIGNING_IDENTITY"
+          test -n "$APPLE_TEAM_ID"
+
+          xcodebuild build \
+            -project "safari/Isometric Contributions/Isometric Contributions.xcodeproj" \
+            -scheme "Isometric Contributions" \
+            -configuration Release \
+            -destination 'platform=macOS' \
+            -derivedDataPath .deriveddata-safari \
+            CODE_SIGN_STYLE=Manual \
+            CODE_SIGN_IDENTITY="$APPLE_SIGNING_IDENTITY" \
+            DEVELOPMENT_TEAM="$APPLE_TEAM_ID" \
+            OTHER_CODE_SIGN_FLAGS="--timestamp"
+
+      - name: Verify signed app
+        run: |
+          codesign --verify --deep --strict --verbose=2 "$APP_PATH"
+          codesign --display --verbose=4 "$APP_PATH"
+
+      - name: Store notarization credentials
+        env:
+          APPLE_ID: ${{ secrets.APPLE_ID }}
+          APPLE_APP_SPECIFIC_PASSWORD: ${{ secrets.APPLE_APP_SPECIFIC_PASSWORD }}
+          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+        run: |
+          test -n "$APPLE_ID"
+          test -n "$APPLE_APP_SPECIFIC_PASSWORD"
+          test -n "$APPLE_TEAM_ID"
+          xcrun notarytool store-credentials "$KEYCHAIN_PROFILE" \
+            --apple-id "$APPLE_ID" \
+            --team-id "$APPLE_TEAM_ID" \
+            --password "$APPLE_APP_SPECIFIC_PASSWORD" \
+            --keychain "$KEYCHAIN_PATH"
+
+      - name: Create notarization archive
+        run: |
+          ditto -c -k --sequesterRsrc --keepParent \
+            "$APP_PATH" \
+            "$ARCHIVE_PATH"
+
+      - name: Submit for notarization
+        run: |
+          xcrun notarytool submit "$ARCHIVE_PATH" \
+            --keychain-profile "$KEYCHAIN_PROFILE" \
+            --keychain "$KEYCHAIN_PATH" \
+            --wait | tee /tmp/notary-submit-output.txt
+
+      - name: Show notarization submission output
+        if: always()
+        run: cat /tmp/notary-submit-output.txt
+
+      - name: Staple notarization ticket
+        run: |
+          for attempt in $(seq 1 20); do
+            if xcrun stapler staple "$APP_PATH"; then
+              break
+            fi
+
+            if [ "$attempt" -eq 20 ]; then
+              exit 65
+            fi
+
+            echo "Stapler ticket not available yet; retrying in 15 seconds (attempt $attempt/20)..."
+            sleep 15
+          done
+          xcrun stapler validate "$APP_PATH"
+          spctl --assess --type execute --verbose=4 "$APP_PATH"
+
+      - name: Package signed release app
+        run: |
+          mkdir -p artifacts
+          ditto -c -k --sequesterRsrc --keepParent \
+            "$APP_PATH" \
+            "$FINAL_ARCHIVE_PATH"
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: isometric-contributions-safari
+          path: artifacts/isometric-contributions-safari.zip
+
+      - name: Clean up signing keychain
+        if: always()
+        run: security delete-keychain "$KEYCHAIN_PATH" || true

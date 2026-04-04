@@ -13,11 +13,12 @@ on:
           - major
 
 jobs:
-  release:
+  prepare:
     runs-on: ubuntu-latest
     permissions:
       contents: write
-
+    outputs:
+      version: ${{ steps.version.outputs.version }}
     steps:
       - name: Checkout
         uses: actions/checkout@v5
@@ -51,6 +52,8 @@ jobs:
       - name: Commit version bump
         run: |
           git add src/manifest.json
+          git add "safari/Isometric Contributions/Isometric Contributions Extension/Resources/manifest.json"
+          git add "safari/Isometric Contributions/Isometric Contributions.xcodeproj/project.pbxproj"
           git commit -m "Bump version to ${{ steps.version.outputs.version }}"
           git tag "v${{ steps.version.outputs.version }}"
 
@@ -58,6 +61,40 @@ jobs:
         run: |
           git push origin HEAD
           git push origin "v${{ steps.version.outputs.version }}"
+
+  safari:
+    needs: prepare
+    uses: ./.github/workflows/release-safari.yml
+    with:
+      ref: v${{ needs.prepare.outputs.version }}
+    secrets: inherit
+
+  release:
+    needs: [prepare, safari]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+        with:
+          ref: v${{ needs.prepare.outputs.version }}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v5
+        with:
+          node-version: '22'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Download Safari artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: isometric-contributions-safari
+          path: artifacts
 
       - name: Build all browsers
         run: npm run build:all
@@ -87,10 +124,11 @@ jobs:
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: v${{ steps.version.outputs.version }}
-          name: v${{ steps.version.outputs.version }}
+          tag_name: v${{ needs.prepare.outputs.version }}
+          name: v${{ needs.prepare.outputs.version }}
           generate_release_notes: true
           files: |
             artifacts/isometric-contributions-chrome.zip
             artifacts/isometric-contributions-edge.zip
             artifacts/isometric-contributions-firefox.zip
+            artifacts/isometric-contributions-safari.zip
