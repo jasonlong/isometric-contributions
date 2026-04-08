@@ -44,27 +44,42 @@ jobs:
       - name: Build extension and sync resources
         run: node scripts/build-safari.js --resources-only
 
-      - name: Import Apple Distribution certificate
+      - name: Import signing certificates
         env:
           APPLE_CERTIFICATE_BASE64: ${{ secrets.APPLE_CERTIFICATE_BASE64 }}
           APPLE_CERTIFICATE_PASSWORD: ${{ secrets.APPLE_CERTIFICATE_PASSWORD }}
+          APPLE_INSTALLER_CERT_BASE64: ${{ secrets.APPLE_INSTALLER_CERT_BASE64 }}
+          APPLE_INSTALLER_CERT_PASSWORD: ${{ secrets.APPLE_INSTALLER_CERT_PASSWORD }}
         run: |
           test -n "$APPLE_CERTIFICATE_BASE64"
           test -n "$APPLE_CERTIFICATE_PASSWORD"
+          test -n "$APPLE_INSTALLER_CERT_BASE64"
+          test -n "$APPLE_INSTALLER_CERT_PASSWORD"
 
-          CERTIFICATE_PATH=/tmp/distribution.p12
           KEYCHAIN_PASSWORD="$(uuidgen)"
-
-          printf '%s' "$APPLE_CERTIFICATE_BASE64" | base64 -D > "$CERTIFICATE_PATH"
           security create-keychain -p "$KEYCHAIN_PASSWORD" "$KEYCHAIN_PATH"
           security set-keychain-settings -lut 21600 "$KEYCHAIN_PATH"
           security unlock-keychain -p "$KEYCHAIN_PASSWORD" "$KEYCHAIN_PATH"
-          security import "$CERTIFICATE_PATH" \
+
+          # Import Apple Distribution certificate (signs the app)
+          printf '%s' "$APPLE_CERTIFICATE_BASE64" | base64 -D > /tmp/distribution.p12
+          security import /tmp/distribution.p12 \
             -k "$KEYCHAIN_PATH" \
             -P "$APPLE_CERTIFICATE_PASSWORD" \
             -T /usr/bin/codesign \
             -T /usr/bin/security \
             -T /usr/bin/xcrun
+
+          # Import Mac Installer Distribution certificate (signs the .pkg)
+          printf '%s' "$APPLE_INSTALLER_CERT_BASE64" | base64 -D > /tmp/installer.p12
+          security import /tmp/installer.p12 \
+            -k "$KEYCHAIN_PATH" \
+            -P "$APPLE_INSTALLER_CERT_PASSWORD" \
+            -T /usr/bin/codesign \
+            -T /usr/bin/security \
+            -T /usr/bin/xcrun \
+            -T /usr/bin/productbuild
+
           security set-key-partition-list -S apple-tool:,apple:,codesign: -s -k "$KEYCHAIN_PASSWORD" "$KEYCHAIN_PATH"
           security list-keychains -d user -s "$KEYCHAIN_PATH"
           security default-keychain -d user -s "$KEYCHAIN_PATH"
