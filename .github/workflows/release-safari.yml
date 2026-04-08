@@ -17,11 +17,11 @@ jobs:
     runs-on: macos-15
     timeout-minutes: 30
     env:
-      APP_PATH: .deriveddata-safari/Build/Products/Release/Isometric Contributions.app
-      ARCHIVE_PATH: /tmp/IsometricContributions-unsigned.zip
-      FINAL_ARCHIVE_PATH: artifacts/isometric-contributions-safari.zip
+      XCODEPROJ: safari/Isometric Contributions/Isometric Contributions.xcodeproj
+      SCHEME: Isometric Contributions
+      ARCHIVE_PATH: .deriveddata-safari/IsometricContributions.xcarchive
+      EXPORT_PATH: .deriveddata-safari/export
       KEYCHAIN_PATH: /tmp/isometric-contributions-build.keychain-db
-      KEYCHAIN_PROFILE: isometric-contributions-notary
 
     steps:
       - name: Checkout
@@ -44,17 +44,15 @@ jobs:
       - name: Build extension and sync resources
         run: node scripts/build-safari.js --resources-only
 
-      - name: Import Developer ID certificate
+      - name: Import Apple Distribution certificate
         env:
           APPLE_CERTIFICATE_BASE64: ${{ secrets.APPLE_CERTIFICATE_BASE64 }}
           APPLE_CERTIFICATE_PASSWORD: ${{ secrets.APPLE_CERTIFICATE_PASSWORD }}
-          APPLE_SIGNING_IDENTITY: ${{ secrets.APPLE_SIGNING_IDENTITY }}
         run: |
           test -n "$APPLE_CERTIFICATE_BASE64"
           test -n "$APPLE_CERTIFICATE_PASSWORD"
-          test -n "$APPLE_SIGNING_IDENTITY"
 
-          CERTIFICATE_PATH=/tmp/developer-id.p12
+          CERTIFICATE_PATH=/tmp/distribution.p12
           KEYCHAIN_PASSWORD="$(uuidgen)"
 
           printf '%s' "$APPLE_CERTIFICATE_BASE64" | base64 -D > "$CERTIFICATE_PATH"
@@ -70,111 +68,65 @@ jobs:
           security set-key-partition-list -S apple-tool:,apple:,codesign: -s -k "$KEYCHAIN_PASSWORD" "$KEYCHAIN_PATH"
           security list-keychains -d user -s "$KEYCHAIN_PATH"
           security default-keychain -d user -s "$KEYCHAIN_PATH"
-          echo "KEYCHAIN_PASSWORD=$KEYCHAIN_PASSWORD" >> "$GITHUB_ENV"
 
-      - name: Build signed release app
+      - name: Write App Store Connect API key
         env:
-          APPLE_SIGNING_IDENTITY: ${{ secrets.APPLE_SIGNING_IDENTITY }}
+          ASC_API_KEY_BASE64: ${{ secrets.ASC_API_KEY_BASE64 }}
+          ASC_API_KEY_ID: ${{ secrets.ASC_API_KEY_ID }}
+        run: |
+          test -n "$ASC_API_KEY_BASE64"
+          test -n "$ASC_API_KEY_ID"
+
+          mkdir -p ~/.private_keys
+          printf '%s' "$ASC_API_KEY_BASE64" | base64 -D \
+            > ~/.private_keys/AuthKey_${ASC_API_KEY_ID}.p8
+
+      - name: Archive
+        env:
+          ASC_API_KEY_ID: ${{ secrets.ASC_API_KEY_ID }}
+          ASC_API_ISSUER_ID: ${{ secrets.ASC_API_ISSUER_ID }}
           APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
         run: |
-          test -n "$APPLE_SIGNING_IDENTITY"
-          test -n "$APPLE_TEAM_ID"
-
-          xcodebuild build \
-            -project "safari/Isometric Contributions/Isometric Contributions.xcodeproj" \
-            -scheme "Isometric Contributions" \
+          xcodebuild archive \
+            -project "$XCODEPROJ" \
+            -scheme "$SCHEME" \
             -configuration Release \
             -destination 'platform=macOS' \
-            -derivedDataPath .deriveddata-safari \
-            CODE_SIGN_STYLE=Manual \
-            CODE_SIGN_IDENTITY="$APPLE_SIGNING_IDENTITY" \
+            -archivePath "$ARCHIVE_PATH" \
+            -allowProvisioningUpdates \
+            -authenticationKeyPath ~/".private_keys/AuthKey_${ASC_API_KEY_ID}.p8" \
+            -authenticationKeyID "$ASC_API_KEY_ID" \
+            -authenticationKeyIssuerID "$ASC_API_ISSUER_ID" \
             DEVELOPMENT_TEAM="$APPLE_TEAM_ID" \
-            OTHER_CODE_SIGN_FLAGS="--timestamp"
+            CODE_SIGN_INJECT_BASE_ENTITLEMENTS=NO
 
-      - name: Verify signed app
-        run: |
-          codesign --verify --deep --strict --verbose=2 "$APP_PATH"
-          codesign --display --verbose=4 "$APP_PATH"
-
-      - name: Store notarization credentials
+      - name: Export for App Store
         env:
-          APPLE_ID: ${{ secrets.APPLE_ID }}
-          APPLE_APP_SPECIFIC_PASSWORD: ${{ secrets.APPLE_APP_SPECIFIC_PASSWORD }}
-          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+          ASC_API_KEY_ID: ${{ secrets.ASC_API_KEY_ID }}
+          ASC_API_ISSUER_ID: ${{ secrets.ASC_API_ISSUER_ID }}
         run: |
-          test -n "$APPLE_ID"
-          test -n "$APPLE_APP_SPECIFIC_PASSWORD"
-          test -n "$APPLE_TEAM_ID"
-          xcrun notarytool store-credentials "$KEYCHAIN_PROFILE" \
-            --apple-id "$APPLE_ID" \
-            --team-id "$APPLE_TEAM_ID" \
-            --password "$APPLE_APP_SPECIFIC_PASSWORD" \
-            --keychain "$KEYCHAIN_PATH"
+          xcodebuild -exportArchive \
+            -archivePath "$ARCHIVE_PATH" \
+            -exportPath "$EXPORT_PATH" \
+            -exportOptionsPlist safari/ExportOptions.plist \
+            -allowProvisioningUpdates \
+            -authenticationKeyPath ~/".private_keys/AuthKey_${ASC_API_KEY_ID}.p8" \
+            -authenticationKeyID "$ASC_API_KEY_ID" \
+            -authenticationKeyIssuerID "$ASC_API_ISSUER_ID"
 
-      - name: Create notarization archive
+      - name: Upload to App Store Connect
+        env:
+          ASC_API_KEY_ID: ${{ secrets.ASC_API_KEY_ID }}
+          ASC_API_ISSUER_ID: ${{ secrets.ASC_API_ISSUER_ID }}
         run: |
-          ditto -c -k --sequesterRsrc --keepParent \
-            "$APP_PATH" \
-            "$ARCHIVE_PATH"
+          xcrun altool --upload-app \
+            -f "$EXPORT_PATH/Isometric Contributions.pkg" \
+            --type macos \
+            --apiKey "$ASC_API_KEY_ID" \
+            --apiIssuer "$ASC_API_ISSUER_ID"
 
-      - name: Submit for notarization
-        run: |
-          xcrun notarytool submit "$ARCHIVE_PATH" \
-            --keychain-profile "$KEYCHAIN_PROFILE" \
-            --keychain "$KEYCHAIN_PATH" \
-            --wait | tee /tmp/notary-submit-output.txt
-
-          # notarytool exits 0 even on Invalid, so check explicitly
-          if grep -q "status: Invalid" /tmp/notary-submit-output.txt; then
-            SUBMISSION_ID=$(grep "id:" /tmp/notary-submit-output.txt | head -1 | awk '{print $2}')
-            echo "Notarization failed. Fetching rejection log..."
-            xcrun notarytool log "$SUBMISSION_ID" \
-              --keychain-profile "$KEYCHAIN_PROFILE" \
-              --keychain "$KEYCHAIN_PATH" \
-              /tmp/notary-log.json || true
-            cat /tmp/notary-log.json
-            exit 1
-          fi
-
-      - name: Show notarization submission output
+      - name: Clean up
         if: always()
         run: |
-          cat /tmp/notary-submit-output.txt
-          if [ -f /tmp/notary-log.json ]; then
-            echo "--- Notarization Log ---"
-            cat /tmp/notary-log.json
-          fi
-
-      - name: Staple notarization ticket
-        run: |
-          for attempt in $(seq 1 20); do
-            if xcrun stapler staple "$APP_PATH"; then
-              break
-            fi
-
-            if [ "$attempt" -eq 20 ]; then
-              exit 65
-            fi
-
-            echo "Stapler ticket not available yet; retrying in 15 seconds (attempt $attempt/20)..."
-            sleep 15
-          done
-          xcrun stapler validate "$APP_PATH"
-          spctl --assess --type execute --verbose=4 "$APP_PATH"
-
-      - name: Package signed release app
-        run: |
-          mkdir -p artifacts
-          ditto -c -k --sequesterRsrc --keepParent \
-            "$APP_PATH" \
-            "$FINAL_ARCHIVE_PATH"
-
-      - name: Upload artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: isometric-contributions-safari
-          path: artifacts/isometric-contributions-safari.zip
-
-      - name: Clean up signing keychain
-        if: always()
-        run: security delete-keychain "$KEYCHAIN_PATH" || true
+          security delete-keychain "$KEYCHAIN_PATH" || true
+          rm -rf ~/.private_keys || true
