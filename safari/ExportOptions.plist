@@ -12,9 +12,9 @@
 	<string>manual</string>
 	<key>provisioningProfiles</key>
 	<dict>
-		<key>me.jasonlong.isometric-contributions</key>
+		<key>me.jasonlong.isometric-contribution</key>
 		<string>Isometric Contributions App Store</string>
-		<key>me.jasonlong.isometric-contributions.Extension</key>
+		<key>me.jasonlong.isometric-contribution.Extension</key>
 		<string>Isometric Contributions Extension App Store</string>
 	</dict>
 </dict>

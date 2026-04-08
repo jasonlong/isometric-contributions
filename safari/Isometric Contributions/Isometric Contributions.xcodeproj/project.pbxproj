@@ -454,7 +454,7 @@
 					"-framework",
 					SafariServices,
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = "me.jasonlong.isometric-contributions.Extension";
+				PRODUCT_BUNDLE_IDENTIFIER = "me.jasonlong.isometric-contribution.Extension";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
@@ -490,7 +490,7 @@
 				);
 				CODE_SIGN_INJECT_BASE_ENTITLEMENTS = NO;
 				PROVISIONING_PROFILE_SPECIFIER = "Isometric Contributions Extension App Store";
-				PRODUCT_BUNDLE_IDENTIFIER = "me.jasonlong.isometric-contributions.Extension";
+				PRODUCT_BUNDLE_IDENTIFIER = "me.jasonlong.isometric-contribution.Extension";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
@@ -530,7 +530,7 @@
 					"-framework",
 					WebKit,
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = "me.jasonlong.isometric-contributions";
+				PRODUCT_BUNDLE_IDENTIFIER = "me.jasonlong.isometric-contribution";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				REGISTER_APP_GROUPS = YES;
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
@@ -573,7 +573,7 @@
 				);
 				CODE_SIGN_INJECT_BASE_ENTITLEMENTS = NO;
 				PROVISIONING_PROFILE_SPECIFIER = "Isometric Contributions App Store";
-				PRODUCT_BUNDLE_IDENTIFIER = "me.jasonlong.isometric-contributions";
+				PRODUCT_BUNDLE_IDENTIFIER = "me.jasonlong.isometric-contribution";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				REGISTER_APP_GROUPS = YES;
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
