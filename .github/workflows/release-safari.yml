@@ -123,6 +123,7 @@ jobs:
             -archivePath "$ARCHIVE_PATH" \
             DEVELOPMENT_TEAM="$APPLE_TEAM_ID" \
             CODE_SIGN_STYLE=Manual \
+            CODE_SIGN_IDENTITY="Apple Distribution" \
             CODE_SIGN_INJECT_BASE_ENTITLEMENTS=NO
 
       - name: Export for App Store
