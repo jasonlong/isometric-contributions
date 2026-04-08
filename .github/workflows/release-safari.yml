@@ -84,6 +84,21 @@ jobs:
           security list-keychains -d user -s "$KEYCHAIN_PATH"
           security default-keychain -d user -s "$KEYCHAIN_PATH"
 
+      - name: Install provisioning profiles
+        env:
+          PROVISIONING_PROFILE_APP_BASE64: ${{ secrets.PROVISIONING_PROFILE_APP_BASE64 }}
+          PROVISIONING_PROFILE_EXT_BASE64: ${{ secrets.PROVISIONING_PROFILE_EXT_BASE64 }}
+        run: |
+          test -n "$PROVISIONING_PROFILE_APP_BASE64"
+          test -n "$PROVISIONING_PROFILE_EXT_BASE64"
+
+          mkdir -p ~/Library/MobileDevice/Provisioning\ Profiles
+
+          printf '%s' "$PROVISIONING_PROFILE_APP_BASE64" | base64 -D \
+            > ~/Library/MobileDevice/Provisioning\ Profiles/app.provisionprofile
+          printf '%s' "$PROVISIONING_PROFILE_EXT_BASE64" | base64 -D \
+            > ~/Library/MobileDevice/Provisioning\ Profiles/extension.provisionprofile
+
       - name: Write App Store Connect API key
         env:
           ASC_API_KEY_BASE64: ${{ secrets.ASC_API_KEY_BASE64 }}
@@ -98,8 +113,6 @@ jobs:
 
       - name: Archive
         env:
-          ASC_API_KEY_ID: ${{ secrets.ASC_API_KEY_ID }}
-          ASC_API_ISSUER_ID: ${{ secrets.ASC_API_ISSUER_ID }}
           APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
         run: |
           xcodebuild archive \
@@ -108,26 +121,16 @@ jobs:
             -configuration Release \
             -destination 'platform=macOS' \
             -archivePath "$ARCHIVE_PATH" \
-            -allowProvisioningUpdates \
-            -authenticationKeyPath ~/".private_keys/AuthKey_${ASC_API_KEY_ID}.p8" \
-            -authenticationKeyID "$ASC_API_KEY_ID" \
-            -authenticationKeyIssuerID "$ASC_API_ISSUER_ID" \
             DEVELOPMENT_TEAM="$APPLE_TEAM_ID" \
+            CODE_SIGN_STYLE=Manual \
             CODE_SIGN_INJECT_BASE_ENTITLEMENTS=NO
 
       - name: Export for App Store
-        env:
-          ASC_API_KEY_ID: ${{ secrets.ASC_API_KEY_ID }}
-          ASC_API_ISSUER_ID: ${{ secrets.ASC_API_ISSUER_ID }}
         run: |
           xcodebuild -exportArchive \
             -archivePath "$ARCHIVE_PATH" \
             -exportPath "$EXPORT_PATH" \
-            -exportOptionsPlist safari/ExportOptions.plist \
-            -allowProvisioningUpdates \
-            -authenticationKeyPath ~/".private_keys/AuthKey_${ASC_API_KEY_ID}.p8" \
-            -authenticationKeyID "$ASC_API_KEY_ID" \
-            -authenticationKeyIssuerID "$ASC_API_ISSUER_ID"
+            -exportOptionsPlist safari/ExportOptions.plist
 
       - name: Upload to App Store Connect
         env:

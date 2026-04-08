@@ -9,6 +9,13 @@
 	<key>uploadSymbols</key>
 	<true/>
 	<key>signingStyle</key>
-	<string>automatic</string>
+	<string>manual</string>
+	<key>provisioningProfiles</key>
+	<dict>
+		<key>me.jasonlong.isometric-contributions</key>
+		<string>Isometric Contributions App Store</string>
+		<key>me.jasonlong.isometric-contributions.Extension</key>
+		<string>Isometric Contributions Extension App Store</string>
+	</dict>
 </dict>
 </plist>
