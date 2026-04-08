@@ -488,6 +488,7 @@
 					"-framework",
 					SafariServices,
 				);
+				CODE_SIGN_INJECT_BASE_ENTITLEMENTS = NO;
 				PRODUCT_BUNDLE_IDENTIFIER = "me.jasonlong.isometric-contributions.Extension";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
@@ -569,6 +570,7 @@
 					"-framework",
 					WebKit,
 				);
+				CODE_SIGN_INJECT_BASE_ENTITLEMENTS = NO;
 				PRODUCT_BUNDLE_IDENTIFIER = "me.jasonlong.isometric-contributions";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				REGISTER_APP_GROUPS = YES;
