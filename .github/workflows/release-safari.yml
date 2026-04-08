@@ -124,9 +124,26 @@ jobs:
             --keychain "$KEYCHAIN_PATH" \
             --wait | tee /tmp/notary-submit-output.txt
 
+          # notarytool exits 0 even on Invalid, so check explicitly
+          if grep -q "status: Invalid" /tmp/notary-submit-output.txt; then
+            SUBMISSION_ID=$(grep "id:" /tmp/notary-submit-output.txt | head -1 | awk '{print $2}')
+            echo "Notarization failed. Fetching rejection log..."
+            xcrun notarytool log "$SUBMISSION_ID" \
+              --keychain-profile "$KEYCHAIN_PROFILE" \
+              --keychain "$KEYCHAIN_PATH" \
+              /tmp/notary-log.json || true
+            cat /tmp/notary-log.json
+            exit 1
+          fi
+
       - name: Show notarization submission output
         if: always()
-        run: cat /tmp/notary-submit-output.txt
+        run: |
+          cat /tmp/notary-submit-output.txt
+          if [ -f /tmp/notary-log.json ]; then
+            echo "--- Notarization Log ---"
+            cat /tmp/notary-log.json
+          fi
 
       - name: Staple notarization ticket
         run: |
