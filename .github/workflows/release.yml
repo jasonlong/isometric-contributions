@@ -62,17 +62,15 @@ jobs:
           git push origin HEAD
           git push origin "v${{ steps.version.outputs.version }}"
 
-  safari:
-    needs: prepare
-    uses: ./.github/workflows/release-safari.yml
-    continue-on-error: true
-    with:
-      ref: v${{ needs.prepare.outputs.version }}
-    secrets: inherit
+  # safari:
+  #   needs: prepare
+  #   uses: ./.github/workflows/release-safari.yml
+  #   with:
+  #     ref: v${{ needs.prepare.outputs.version }}
+  #   secrets: inherit
 
   release:
-    needs: [prepare, safari]
-    if: always() && needs.prepare.result == 'success'
+    needs: [prepare]
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -91,13 +89,6 @@ jobs:
 
       - name: Install dependencies
         run: npm ci
-
-      - name: Download Safari artifact
-        if: needs.safari.result == 'success'
-        uses: actions/download-artifact@v4
-        with:
-          name: isometric-contributions-safari
-          path: artifacts
 
       - name: Build all browsers
         run: npm run build:all
@@ -134,4 +125,3 @@ jobs:
             artifacts/isometric-contributions-chrome.zip
             artifacts/isometric-contributions-edge.zip
             artifacts/isometric-contributions-firefox.zip
-            artifacts/isometric-contributions-safari.zip
