@@ -86,17 +86,17 @@ const initUI = () => {
   contributionsWrapper.append(canvas)
 
   // Inject toggle
-  let insertLocation = contributionsBox.querySelector('h2')
-  if (
-    insertLocation.previousElementSibling &&
-    insertLocation.previousElementSibling.nodeName === 'DETAILS'
-  ) {
-    insertLocation = insertLocation.previousElementSibling
-  }
+  const heading = contributionsBox.querySelector('h2')
+
+  const settingsMenu = contributionsBox.querySelector(
+    'focus-group, details.contrib-settings'
+  )
+
+  const wrapper = document.createElement('div')
+  wrapper.className = 'd-flex flex-items-center gap-2 float-right'
 
   const buttonGroup = document.createElement('div')
-  buttonGroup.className =
-    'BtnGroup mt-1 mx-2 position-relative top-0 float-right'
+  buttonGroup.className = 'BtnGroup'
 
   const squaresButton = document.createElement('button')
   squaresButton.textContent = '2D'
@@ -131,7 +131,15 @@ const initUI = () => {
   buttonGroup.append(squaresButton)
   buttonGroup.append(cubesButton)
   buttonGroup.append(bothButton)
-  insertLocation.before(buttonGroup)
+
+  if (settingsMenu) {
+    settingsMenu.before(wrapper)
+    wrapper.append(settingsMenu)
+    wrapper.append(buttonGroup)
+  } else {
+    wrapper.append(buttonGroup)
+    heading.before(wrapper)
+  }
 
   setContainerViewType(toggleSetting)
 }
