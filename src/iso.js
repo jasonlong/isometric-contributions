@@ -86,18 +86,18 @@ const initUI = () => {
   contributionsWrapper.append(canvas)
 
   // Inject toggle
-  let insertLocation = contributionsBox.querySelector('h2')
-  if (
-    insertLocation.previousElementSibling &&
-    insertLocation.previousElementSibling.nodeName === 'DETAILS'
-  ) {
-    insertLocation = insertLocation.previousElementSibling
+  const heading = contributionsBox.querySelector('h2')
+
+  // Add spacing between our toggle and the settings menu if present
+  const settingsButton = contributionsBox.querySelector(
+    'focus-group > button, details.contrib-settings'
+  )
+  if (settingsButton) {
+    settingsButton.classList.add('ml-2')
   }
 
-  const hasSettingsMenu = insertLocation.nodeName === 'DETAILS'
-
   const buttonGroup = document.createElement('div')
-  buttonGroup.className = `BtnGroup mt-1${hasSettingsMenu ? ' ml-2' : ''} position-relative top-0 float-right`
+  buttonGroup.className = 'BtnGroup mt-1 position-relative top-0 float-right'
 
   const squaresButton = document.createElement('button')
   squaresButton.textContent = '2D'
@@ -132,7 +132,7 @@ const initUI = () => {
   buttonGroup.append(squaresButton)
   buttonGroup.append(cubesButton)
   buttonGroup.append(bothButton)
-  insertLocation.before(buttonGroup)
+  heading.before(buttonGroup)
 
   setContainerViewType(toggleSetting)
 }
