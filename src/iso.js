@@ -88,16 +88,15 @@ const initUI = () => {
   // Inject toggle
   const heading = contributionsBox.querySelector('h2')
 
-  // Add spacing between our toggle and the settings menu if present
-  const settingsButton = contributionsBox.querySelector(
-    'focus-group > button, details.contrib-settings'
+  const settingsMenu = contributionsBox.querySelector(
+    'focus-group, details.contrib-settings'
   )
-  if (settingsButton) {
-    settingsButton.classList.add('ml-2')
-  }
+
+  const wrapper = document.createElement('div')
+  wrapper.className = 'd-flex flex-items-center gap-2 float-right'
 
   const buttonGroup = document.createElement('div')
-  buttonGroup.className = 'BtnGroup mt-1 position-relative top-0 float-right'
+  buttonGroup.className = 'BtnGroup'
 
   const squaresButton = document.createElement('button')
   squaresButton.textContent = '2D'
@@ -132,7 +131,15 @@ const initUI = () => {
   buttonGroup.append(squaresButton)
   buttonGroup.append(cubesButton)
   buttonGroup.append(bothButton)
-  heading.before(buttonGroup)
+
+  if (settingsMenu) {
+    settingsMenu.before(wrapper)
+    wrapper.append(settingsMenu)
+    wrapper.append(buttonGroup)
+  } else {
+    wrapper.append(buttonGroup)
+    heading.before(wrapper)
+  }
 
   setContainerViewType(toggleSetting)
 }
