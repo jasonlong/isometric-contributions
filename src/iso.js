@@ -94,9 +94,10 @@ const initUI = () => {
     insertLocation = insertLocation.previousElementSibling
   }
 
+  const hasSettingsMenu = insertLocation.nodeName === 'DETAILS'
+
   const buttonGroup = document.createElement('div')
-  buttonGroup.className =
-    'BtnGroup mt-1 mx-2 position-relative top-0 float-right'
+  buttonGroup.className = `BtnGroup mt-1${hasSettingsMenu ? ' ml-2' : ''} position-relative top-0 float-right`
 
   const squaresButton = document.createElement('button')
   squaresButton.textContent = '2D'
