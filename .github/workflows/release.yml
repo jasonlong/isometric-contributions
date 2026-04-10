@@ -4,16 +4,28 @@ on:
   workflow_dispatch:
     inputs:
       version_type:
-        description: 'Version bump type'
-        required: true
+        description: 'Version bump type (ignored when store is set)'
+        required: false
+        default: patch
         type: choice
         options:
           - patch
           - minor
           - major
+      store:
+        description: 'Which store to submit to'
+        required: false
+        default: all
+        type: choice
+        options:
+          - all
+          - chrome
+          - firefox
+          - edge
 
 jobs:
   prepare:
+    if: inputs.store == 'all'
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -71,6 +83,7 @@ jobs:
 
   release:
     needs: [prepare]
+    if: always() && (needs.prepare.result == 'success' || needs.prepare.result == 'skipped')
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -79,7 +92,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v5
         with:
-          ref: v${{ needs.prepare.outputs.version }}
+          ref: ${{ needs.prepare.outputs.version && format('v{0}', needs.prepare.outputs.version) || github.ref }}
 
       - name: Setup Node.js
         uses: actions/setup-node@v5
@@ -94,6 +107,7 @@ jobs:
         run: npm run build:all
 
       - name: Submit to Chrome Web Store
+        if: inputs.store == 'all' || inputs.store == 'chrome'
         env:
           CHROME_EXTENSION_ID: ${{ secrets.CHROME_EXTENSION_ID }}
           CHROME_CLIENT_ID: ${{ secrets.CHROME_CLIENT_ID }}
@@ -102,13 +116,15 @@ jobs:
         run: npm run submit:chrome
 
       - name: Submit to Firefox Add-ons
+        if: inputs.store == 'all' || inputs.store == 'firefox'
         env:
           AMO_API_KEY: ${{ secrets.AMO_API_KEY }}
           AMO_API_SECRET: ${{ secrets.AMO_API_SECRET }}
         run: npm run submit:firefox
 
       - name: Submit to Edge Add-ons
-        continue-on-error: true
+        if: inputs.store == 'all' || inputs.store == 'edge'
+        continue-on-error: ${{ inputs.store == 'all' }}
         env:
           EDGE_PRODUCT_ID: ${{ secrets.EDGE_PRODUCT_ID }}
           EDGE_CLIENT_ID: ${{ secrets.EDGE_CLIENT_ID }}
@@ -116,6 +132,7 @@ jobs:
         run: npm run submit:edge
 
       - name: Create GitHub Release
+        if: inputs.store == 'all'
         uses: softprops/action-gh-release@v2
         with:
           tag_name: v${{ needs.prepare.outputs.version }}
