@@ -94,10 +94,21 @@ async function submitChrome() {
     '--auto-publish'
   ]
 
-  execSync(`npx ${args.join(' ')}`, {
-    cwd: rootDir,
-    stdio: 'inherit'
-  })
+  try {
+    execSync(`npx ${args.join(' ')}`, {
+      cwd: rootDir,
+      stdio: 'inherit'
+    })
+  } catch (error) {
+    if (error.message?.includes('PKG_INVALID_VERSION_NUMBER')) {
+      console.log(
+        '\n⚠ Version already published to Chrome Web Store — skipping\n'
+      )
+      return
+    }
+
+    throw error
+  }
 
   console.log('\n✓ Chrome Web Store submission complete\n')
 }
@@ -140,10 +151,21 @@ async function submitFirefox() {
     process.env.AMO_API_SECRET
   ]
 
-  execSync(`npx ${args.join(' ')}`, {
-    cwd: rootDir,
-    stdio: 'inherit'
-  })
+  try {
+    execSync(`npx ${args.join(' ')}`, {
+      cwd: rootDir,
+      stdio: 'inherit'
+    })
+  } catch (error) {
+    if (error.message?.includes('Version already exists')) {
+      console.log(
+        '\n⚠ Version already published to Firefox Add-ons — skipping\n'
+      )
+      return
+    }
+
+    throw error
+  }
 
   console.log('\n✓ Firefox Add-ons submission complete\n')
 }
