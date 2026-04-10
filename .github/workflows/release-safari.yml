@@ -79,7 +79,8 @@ jobs:
             -T /usr/bin/xcrun \
             -T /usr/bin/productbuild
 
-          security set-key-partition-list -S apple-tool:,apple:,codesign: -s -k "$KEYCHAIN_PASSWORD" "$KEYCHAIN_PATH"
+          security set-key-partition-list -S apple-tool:,apple:,codesign:,productsign:,productbuild: -s -k "$KEYCHAIN_PASSWORD" "$KEYCHAIN_PATH"
+          echo "KEYCHAIN_PASSWORD=$KEYCHAIN_PASSWORD" >> "$GITHUB_ENV"
           security list-keychains -d user -s "$KEYCHAIN_PATH"
           security default-keychain -d user -s "$KEYCHAIN_PATH"
 
@@ -126,8 +127,6 @@ jobs:
             CODE_SIGN_INJECT_BASE_ENTITLEMENTS=NO
 
       - name: Build installer package
-        env:
-          APPLE_SIGNING_IDENTITY: ${{ secrets.APPLE_SIGNING_IDENTITY }}
         run: |
           APP_PATH="$ARCHIVE_PATH/Products/Applications/Isometric Contributions.app"
 
@@ -137,12 +136,20 @@ jobs:
           cp ~/Library/MobileDevice/Provisioning\ Profiles/extension.provisionprofile \
             "$APP_PATH/Contents/PlugIns/Isometric Contributions Extension.appex/Contents/embedded.provisionprofile"
 
-          # Build the .pkg with productbuild
-          INSTALLER_IDENTITY="3rd Party Mac Developer Installer: Jason Long (DC57SSRSQE)"
+          # Unlock keychain again before signing
+          security unlock-keychain -p "$KEYCHAIN_PASSWORD" "$KEYCHAIN_PATH"
+
+          # Build unsigned .pkg, then sign it
           productbuild \
             --component "$APP_PATH" /Applications \
+            IsometricContributions-unsigned.pkg
+
+          INSTALLER_IDENTITY="3rd Party Mac Developer Installer: Jason Long (DC57SSRSQE)"
+          productsign \
             --sign "$INSTALLER_IDENTITY" \
-            "IsometricContributions.pkg"
+            --keychain "$KEYCHAIN_PATH" \
+            IsometricContributions-unsigned.pkg \
+            IsometricContributions.pkg
 
           ls -la IsometricContributions.pkg
 
