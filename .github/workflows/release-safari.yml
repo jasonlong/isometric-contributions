@@ -127,11 +127,17 @@ jobs:
             CODE_SIGN_INJECT_BASE_ENTITLEMENTS=NO
 
       - name: Export for App Store
+        env:
+          ASC_API_KEY_ID: ${{ secrets.ASC_API_KEY_ID }}
+          ASC_API_ISSUER_ID: ${{ secrets.ASC_API_ISSUER_ID }}
         run: |
           xcodebuild -exportArchive \
             -archivePath "$ARCHIVE_PATH" \
             -exportPath "$EXPORT_PATH" \
-            -exportOptionsPlist safari/ExportOptions.plist
+            -exportOptionsPlist safari/ExportOptions.plist \
+            -authenticationKeyPath ~/".private_keys/AuthKey_${ASC_API_KEY_ID}.p8" \
+            -authenticationKeyID "$ASC_API_KEY_ID" \
+            -authenticationKeyIssuerID "$ASC_API_ISSUER_ID"
 
       - name: Upload to App Store Connect
         env:
