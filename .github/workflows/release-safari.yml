@@ -65,9 +65,7 @@ jobs:
           security import /tmp/distribution.p12 \
             -k "$KEYCHAIN_PATH" \
             -P "$APPLE_CERTIFICATE_PASSWORD" \
-            -T /usr/bin/codesign \
-            -T /usr/bin/security \
-            -T /usr/bin/xcrun
+            -A
 
           # Import Mac Installer Distribution certificate (signs the .pkg)
           printf '%s' "$APPLE_INSTALLER_CERT_BASE64" | base64 -D > /tmp/installer.p12
@@ -76,10 +74,9 @@ jobs:
             -P "$APPLE_INSTALLER_CERT_PASSWORD" \
             -A
 
-          security set-key-partition-list -S apple-tool:,apple:,codesign:,productsign:,productbuild: -s -k "$KEYCHAIN_PASSWORD" "$KEYCHAIN_PATH"
-          echo "KEYCHAIN_PASSWORD=$KEYCHAIN_PASSWORD" >> "$GITHUB_ENV"
           security list-keychains -d user -s "$KEYCHAIN_PATH"
           security default-keychain -d user -s "$KEYCHAIN_PATH"
+          echo "KEYCHAIN_PASSWORD=$KEYCHAIN_PASSWORD" >> "$GITHUB_ENV"
 
       - name: Install provisioning profiles
         env:
