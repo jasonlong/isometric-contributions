@@ -20,7 +20,6 @@ jobs:
       XCODEPROJ: safari/Isometric Contributions/Isometric Contributions.xcodeproj
       SCHEME: Isometric Contributions
       ARCHIVE_PATH: .deriveddata-safari/IsometricContributions.xcarchive
-      EXPORT_PATH: .deriveddata-safari/export
       KEYCHAIN_PATH: /tmp/isometric-contributions-build.keychain-db
 
     steps:
@@ -126,18 +125,26 @@ jobs:
             CODE_SIGN_IDENTITY="Apple Distribution" \
             CODE_SIGN_INJECT_BASE_ENTITLEMENTS=NO
 
-      - name: Export for App Store
+      - name: Build installer package
         env:
-          ASC_API_KEY_ID: ${{ secrets.ASC_API_KEY_ID }}
-          ASC_API_ISSUER_ID: ${{ secrets.ASC_API_ISSUER_ID }}
+          APPLE_SIGNING_IDENTITY: ${{ secrets.APPLE_SIGNING_IDENTITY }}
         run: |
-          xcodebuild -exportArchive \
-            -archivePath "$ARCHIVE_PATH" \
-            -exportPath "$EXPORT_PATH" \
-            -exportOptionsPlist safari/ExportOptions.plist \
-            -authenticationKeyPath ~/".private_keys/AuthKey_${ASC_API_KEY_ID}.p8" \
-            -authenticationKeyID "$ASC_API_KEY_ID" \
-            -authenticationKeyIssuerID "$ASC_API_ISSUER_ID"
+          APP_PATH="$ARCHIVE_PATH/Products/Applications/Isometric Contributions.app"
+
+          # Embed provisioning profiles in the app
+          cp ~/Library/MobileDevice/Provisioning\ Profiles/app.provisionprofile \
+            "$APP_PATH/Contents/embedded.provisionprofile"
+          cp ~/Library/MobileDevice/Provisioning\ Profiles/extension.provisionprofile \
+            "$APP_PATH/Contents/PlugIns/Isometric Contributions Extension.appex/Contents/embedded.provisionprofile"
+
+          # Build the .pkg with productbuild
+          INSTALLER_IDENTITY="3rd Party Mac Developer Installer: Jason Long (DC57SSRSQE)"
+          productbuild \
+            --component "$APP_PATH" /Applications \
+            --sign "$INSTALLER_IDENTITY" \
+            "IsometricContributions.pkg"
+
+          ls -la IsometricContributions.pkg
 
       - name: Upload to App Store Connect
         env:
@@ -145,7 +152,7 @@ jobs:
           ASC_API_ISSUER_ID: ${{ secrets.ASC_API_ISSUER_ID }}
         run: |
           xcrun altool --upload-app \
-            -f "$EXPORT_PATH/Isometric Contributions.pkg" \
+            -f IsometricContributions.pkg \
             --type macos \
             --apiKey "$ASC_API_KEY_ID" \
             --apiIssuer "$ASC_API_ISSUER_ID"
