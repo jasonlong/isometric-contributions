@@ -36,7 +36,7 @@
     "chrome-webstore-upload-cli": "^4.0.1",
     "jsdom": "^29.1.1",
     "parcel": "^2.16.4",
-    "puppeteer": "^25.2.1",
+    "puppeteer": "^25.3.0",
     "vitest": "^4.1.9",
     "web-ext-submit": "^7.8.0"
   },
