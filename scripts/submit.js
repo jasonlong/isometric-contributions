@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-import { execSync } from 'node:child_process'
+import { execFileSync, execSync } from 'node:child_process'
 import fs from 'node:fs'
 import path from 'node:path'
 import process from 'node:process'
@@ -55,12 +55,15 @@ async function submitChrome() {
   if (dryRun) {
     console.log('  Validating credentials...')
     // Try to get an access token to validate credentials
-    const tokenResult = execSync(
-      `curl -s -X POST "https://oauth2.googleapis.com/token" \
-        -d "client_id=${process.env.CHROME_CLIENT_ID}" \
-        -d "client_secret=${process.env.CHROME_CLIENT_SECRET}" \
-        -d "refresh_token=${process.env.CHROME_REFRESH_TOKEN}" \
-        -d "grant_type=refresh_token"`,
+    const tokenResult = execFileSync(
+      'curl',
+      [
+        '-s', '-X', 'POST', 'https://oauth2.googleapis.com/token',
+        '-d', `client_id=${process.env.CHROME_CLIENT_ID}`,
+        '-d', `client_secret=${process.env.CHROME_CLIENT_SECRET}`,
+        '-d', `refresh_token=${process.env.CHROME_REFRESH_TOKEN}`,
+        '-d', 'grant_type=refresh_token'
+      ],
       { encoding: 'utf8' }
     )
     const tokenData = JSON.parse(tokenResult)
@@ -179,11 +182,14 @@ async function submitEdge() {
   if (dryRun) {
     console.log('  Validating credentials (v1.1 API)...')
     // Test the v1.1 API by checking the current draft submission
-    const result = execSync(
-      `curl -s -w "\\n%{http_code}" \
-        -H "Authorization: ApiKey ${process.env.EDGE_API_KEY}" \
-        -H "X-ClientID: ${process.env.EDGE_CLIENT_ID}" \
-        "https://api.addons.microsoftedge.microsoft.com/v1/products/${process.env.EDGE_PRODUCT_ID}/submissions/draft/package"`,
+    const result = execFileSync(
+      'curl',
+      [
+        '-s', '-w', '\n%{http_code}',
+        '-H', `Authorization: ApiKey ${process.env.EDGE_API_KEY}`,
+        '-H', `X-ClientID: ${process.env.EDGE_CLIENT_ID}`,
+        `https://api.addons.microsoftedge.microsoft.com/v1/products/${process.env.EDGE_PRODUCT_ID}/submissions/draft/package`
+      ],
       { encoding: 'utf8' }
     )
     const lines = result.trim().split('\n')
