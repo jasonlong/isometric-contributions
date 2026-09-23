@@ -37,7 +37,7 @@
     "jsdom": "^30.1.0",
     "parcel": "^2.16.4",
     "puppeteer": "^25.11.0",
-    "vitest": "^5.0.0",
+    "vitest": "^5.0.1",
     "web-ext-submit": "^7.8.0"
   },
   "targets": {
