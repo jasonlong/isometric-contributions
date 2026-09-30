@@ -401,15 +401,23 @@ export const generateContributionsMarkup = (stats, options = {}) => {
  * @param {string} stats.datesCurrent - Current streak date range
  * @param {Object} options - Options
  * @param {boolean} options.showCurrent - Whether to show current streak
+ * @param {boolean} options.loading - Whether both streaks are loading
+ * @param {boolean} options.loadingLongest - Whether longest streak is loading
+ * @param {boolean} options.loadingCurrent - Whether current streak is loading
  * @returns {string} HTML markup
  */
 export const generateStreaksMarkup = (stats, options = {}) => {
   const { streakLongest, datesLongest, streakCurrent, datesCurrent } = stats
-  const { showCurrent = true, loading = false } = options
-  const longestValue = loading ? '...' : streakLongest
-  const longestDates = loading ? 'Loading...' : datesLongest
-  const currentValue = loading ? '...' : streakCurrent
-  const currentDates = loading ? 'Loading...' : datesCurrent
+  const {
+    showCurrent = true,
+    loading = false,
+    loadingLongest = loading,
+    loadingCurrent = loading
+  } = options
+  const longestValue = loadingLongest ? '...' : streakLongest
+  const longestDates = loadingLongest ? 'Loading...' : datesLongest
+  const currentValue = loadingCurrent ? '...' : streakCurrent
+  const currentDates = loadingCurrent ? 'Loading...' : datesCurrent
 
   let markup = `
     <div class="position-absolute bottom-0 left-0 ml-5 mb-6">

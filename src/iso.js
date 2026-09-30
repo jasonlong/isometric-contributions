@@ -24,6 +24,10 @@ const fullDateFormat = new Intl.DateTimeFormat('en-US', {
   year: 'numeric',
   timeZone: 'UTC'
 })
+const formatStreakDates = (start, end, streakLength) => {
+  const formatter = streakLength > 365 ? fullDateFormat : dateFormat
+  return `${formatter.format(start)} → ${formatter.format(end)}`
+}
 
 let days
 let weeks
@@ -37,6 +41,8 @@ let countTotal = 0
 let weekCountTotal = 0
 let streakLongest = 0
 let streakCurrent = 0
+let longestStreakLoading = false
+let currentStreakLoading = false
 let bestDay = null
 let firstDay = null
 let lastDay = null
@@ -54,6 +60,8 @@ const resetValues = () => {
   maxCount = 0
   streakLongest = 0
   streakCurrent = 0
+  longestStreakLoading = false
+  currentStreakLoading = false
   weekTotal = 0
   bestDay = null
   firstDay = null
@@ -157,6 +165,8 @@ const fetchExtendedStreakData = async (
  * and update the streak display in-place.
  */
 const extendStreakDataAndUpdate = async () => {
+  if (!longestStreakLoading && !currentStreakLoading) return
+
   const username = getProfileUsername()
   let extendedDays = days
 
@@ -171,14 +181,24 @@ const extendStreakDataAndUpdate = async () => {
   const extendedStats = calculateStreaks(extendedDays)
   streakLongest = extendedStats.streakLongest
   streakCurrent = extendedStats.streakCurrent
+  longestStreakLoading = false
+  currentStreakLoading = false
 
   datesLongest =
     streakLongest > 0 && extendedStats.longestStreakStart
-      ? `${fullDateFormat.format(extendedStats.longestStreakStart)} → ${fullDateFormat.format(extendedStats.longestStreakEnd)}`
+      ? formatStreakDates(
+          extendedStats.longestStreakStart,
+          extendedStats.longestStreakEnd,
+          streakLongest
+        )
       : 'No longest streak'
   datesCurrent =
     streakCurrent > 0 && extendedStats.currentStreakStart
-      ? `${fullDateFormat.format(extendedStats.currentStreakStart)} → ${fullDateFormat.format(extendedStats.currentStreakEnd)}`
+      ? formatStreakDates(
+          extendedStats.currentStreakStart,
+          extendedStats.currentStreakEnd,
+          streakCurrent
+        )
       : 'No current streak'
 
   const longestCountEl = document.getElementById('ic-streak-longest-count')
@@ -331,6 +351,15 @@ const loadStats = () => {
   streakLongest = stats.streakLongest
   streakCurrent = stats.streakCurrent
 
+  const firstDate = firstDay.toISOString().slice(0, 10)
+  const canFetchHistoricalData = Boolean(getProfileUsername())
+  longestStreakLoading =
+    canFetchHistoricalData &&
+    stats.longestStreakStart?.toISOString().slice(0, 10) === firstDate
+  currentStreakLoading =
+    canFetchHistoricalData &&
+    stats.currentStreakStart?.toISOString().slice(0, 10) === firstDate
+
   // Week total
   weekStartDay = currentWeekDays[0].date
   for (const d of currentWeekDays) {
@@ -339,9 +368,11 @@ const loadStats = () => {
 
   // Format current streak dates
   if (streakCurrent > 0) {
-    const currentStart = fullDateFormat.format(stats.currentStreakStart)
-    const currentEnd = fullDateFormat.format(stats.currentStreakEnd)
-    datesCurrent = `${currentStart} → ${currentEnd}`
+    datesCurrent = formatStreakDates(
+      stats.currentStreakStart,
+      stats.currentStreakEnd,
+      streakCurrent
+    )
   } else {
     datesCurrent = 'No current streak'
   }
@@ -360,9 +391,11 @@ const loadStats = () => {
 
   // Longest streak
   if (streakLongest > 0) {
-    const longestStart = fullDateFormat.format(stats.longestStreakStart)
-    const longestEnd = fullDateFormat.format(stats.longestStreakEnd)
-    datesLongest = `${longestStart} → ${longestEnd}`
+    datesLongest = formatStreakDates(
+      stats.longestStreakStart,
+      stats.longestStreakEnd,
+      streakLongest
+    )
   } else {
     datesLongest = 'No longest streak'
   }
@@ -438,7 +471,8 @@ const renderStats = () => {
   })
   const bottomMarkup = generateStreaksMarkup(streaksStats, {
     showCurrent: !viewingYear,
-    loading: true
+    loadingLongest: longestStreakLoading,
+    loadingCurrent: currentStreakLoading
   })
 
   const icStatsBlockTop = document.createElement('div')
