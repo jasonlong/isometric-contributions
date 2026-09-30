@@ -17,11 +17,21 @@ const dateFormat = new Intl.DateTimeFormat('en-US', {
   day: 'numeric',
   timeZone: 'UTC'
 })
+const tooltipDateFormat = new Intl.DateTimeFormat('en-US', {
+  month: 'short',
+  day: 'numeric',
+  year: 'numeric',
+  timeZone: 'UTC'
+})
 
 let days
 let weeks
 let calendarGraph
 let contributionsBox
+let hitPixelView
+let hitDays = []
+let hitBounds = []
+let contributionTooltip
 let yearTotal = 0
 let weekTotal = 0
 let averageCount = 0
@@ -84,6 +94,22 @@ const initUI = () => {
   canvas.height = 600
   canvas.style.width = '100%'
   contributionsWrapper.append(canvas)
+
+  const hitCanvas = document.createElement('canvas')
+  hitCanvas.width = canvas.width
+  hitCanvas.height = canvas.height
+  hitPixelView = new obelisk.PixelView(hitCanvas, new obelisk.Point(130, 90))
+
+  contributionTooltip = document.createElement('div')
+  contributionTooltip.className = 'ic-cube-tooltip'
+  contributionTooltip.setAttribute('role', 'tooltip')
+  contributionTooltip.hidden = true
+  contributionsWrapper.append(contributionTooltip)
+
+  canvas.addEventListener('mousemove', handleCanvasMouseMove)
+  canvas.addEventListener('mouseleave', () => {
+    contributionTooltip.hidden = true
+  })
 
   // Inject toggle
   const heading = contributionsBox.querySelector('h2')
@@ -162,6 +188,58 @@ const setContainerViewType = (type) => {
 }
 
 const getSquareColor = (rect) => getElementColor(rect)
+
+const handleCanvasMouseMove = (event) => {
+  const canvas = event.currentTarget
+  const canvasRect = canvas.getBoundingClientRect()
+  if (!canvasRect.width || !canvasRect.height) return
+
+  const x = Math.floor(
+    ((event.clientX - canvasRect.left) / canvasRect.width) * hitPixelView.canvas.width
+  )
+  const y = Math.floor(
+    ((event.clientY - canvasRect.top) / canvasRect.height) * hitPixelView.canvas.height
+  )
+  if (x < 0 || y < 0 || x >= hitPixelView.canvas.width || y >= hitPixelView.canvas.height) {
+    contributionTooltip.hidden = true
+    return
+  }
+
+  const [red, green, blue] = hitPixelView.context.getImageData(x, y, 1, 1).data
+  const hitId = (red << 16) | (green << 8) | blue
+  const day = hitDays[hitId]
+  const bounds = hitBounds[hitId]
+  if (!day || !bounds) {
+    contributionTooltip.hidden = true
+    return
+  }
+
+  const count = day.count || 0
+  contributionTooltip.textContent = `${tooltipDateFormat.format(day.date)} ${count} contribution${count === 1 ? '' : 's'}`
+  contributionTooltip.hidden = false
+
+  const wrapperRect = canvas.parentElement.getBoundingClientRect()
+  const scaleX = canvasRect.width / hitPixelView.canvas.width
+  const scaleY = canvasRect.height / hitPixelView.canvas.height
+  const cubeCenterX = (bounds.left + bounds.right) / 2
+  const cubeTop = bounds.top
+  const left =
+    canvasRect.left -
+    wrapperRect.left +
+    cubeCenterX * scaleX -
+    contributionTooltip.offsetWidth / 2
+  const top =
+    canvasRect.top -
+    wrapperRect.top +
+    cubeTop * scaleY -
+    contributionTooltip.offsetHeight -
+    8
+  contributionTooltip.style.left = `${Math.max(
+    0,
+    Math.min(left, wrapperRect.width - contributionTooltip.offsetWidth)
+  )}px`
+  contributionTooltip.style.top = `${top}px`
+}
 
 const refreshColors = () => {
   const dayElements = document.querySelectorAll(
@@ -260,8 +338,13 @@ const renderIsometricChart = () => {
   const canvas = document.querySelector('#isometric-contributions')
   const point = new obelisk.Point(130, 90)
   const pixelView = new obelisk.PixelView(canvas, point)
+  pixelView.clear()
+  hitPixelView.clear()
+  hitDays = []
+  hitBounds = []
 
   let transform = GH_OFFSET
+  let hitId = 1
 
   for (const w of weeks) {
     const x = transform / (GH_OFFSET + 1)
@@ -287,6 +370,36 @@ const renderIsometricChart = () => {
       const cube = new obelisk.Cube(dimension, color, false)
       const p3d = new obelisk.Point3D(SIZE * x, SIZE * y, 0)
       pixelView.renderObject(cube, p3d)
+
+      hitDays[hitId] = d
+      const hitColor = new obelisk.CubeColor(hitId, hitId, hitId, hitId, hitId)
+      const hitCube = new obelisk.Cube(dimension, hitColor, false)
+      hitPixelView.renderObject(hitCube, p3d)
+      hitId++
+    }
+  }
+
+  const hitCanvas = hitPixelView.canvas
+  const pixels = hitPixelView.context.getImageData(
+    0,
+    0,
+    hitCanvas.width,
+    hitCanvas.height
+  ).data
+  for (let offset = 0; offset < pixels.length; offset += 4) {
+    const colorId = (pixels[offset] << 16) | (pixels[offset + 1] << 8) | pixels[offset + 2]
+    if (!colorId) continue
+
+    const pixelIndex = offset / 4
+    const x = pixelIndex % hitCanvas.width
+    const y = Math.floor(pixelIndex / hitCanvas.width)
+    const bounds = hitBounds[colorId]
+    if (bounds) {
+      bounds.left = Math.min(bounds.left, x)
+      bounds.right = Math.max(bounds.right, x)
+      bounds.top = Math.min(bounds.top, y)
+    } else {
+      hitBounds[colorId] = { left: x, right: x, top: y }
     }
   }
 }

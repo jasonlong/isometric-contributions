@@ -14,4 +14,22 @@
   display: none !important;
 }
 
+.ic-cube-tooltip {
+  position: absolute;
+  z-index: 2;
+  padding: 6px 8px;
+  border-radius: 6px;
+  background: #1f2328;
+  box-shadow: 0 4px 12px rgb(31 35 40 / 24%);
+  color: #fff;
+  font-size: 12px;
+  line-height: 1.4;
+  white-space: nowrap;
+  pointer-events: none;
+}
+
+.ic-cube-tooltip[hidden] {
+  display: none;
+}
+
 /* Both display - no hiding needed, both are visible by default */
