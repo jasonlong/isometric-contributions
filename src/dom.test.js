@@ -210,6 +210,13 @@ describe('generateStreaksMarkup', () => {
     const markup = generateStreaksMarkup(baseStats)
     expect(markup).toContain('days')
   })
+
+  it('shows a pending state while extended streak data loads', () => {
+    const markup = generateStreaksMarkup(baseStats, { loading: true })
+    expect(markup).toContain('>... <span class="f4">days</span>')
+    expect(markup).toContain('Loading...')
+    expect(markup).not.toContain('30 <span class="f4">days</span>')
+  })
 })
 
 // =============================================================================

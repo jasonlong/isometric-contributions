@@ -7,6 +7,7 @@ import {
   getElementColor,
   loadSetting,
   parseCalendarGraph,
+  parseContributionsHtml,
   precisionRound,
   sameDay,
   saveSetting
@@ -15,6 +16,12 @@ import {
 const dateFormat = new Intl.DateTimeFormat('en-US', {
   month: 'short',
   day: 'numeric',
+  timeZone: 'UTC'
+})
+const fullDateFormat = new Intl.DateTimeFormat('en-US', {
+  month: 'short',
+  day: 'numeric',
+  year: 'numeric',
   timeZone: 'UTC'
 })
 
@@ -71,6 +78,120 @@ const getSettings = async () => {
 
 const persistSetting = (key, value) => {
   saveSetting(getStorage(), key, value)
+}
+
+// =============================================================================
+// Historical contribution fetching (for multi-year streak accuracy)
+// =============================================================================
+
+/**
+ * Extract the username from the current GitHub profile page URL.
+ * @returns {string|null} The username, or null if not on a profile page
+ */
+const getProfileUsername = () => {
+  const pathParts = window.location.pathname.split('/').filter(Boolean)
+  // Profile pages have a single path segment (the username).
+  // We're already guarded by .vcard-names-container / .js-calendar-graph.
+  return pathParts.length >= 1 ? pathParts[0] : null
+}
+
+/**
+ * Fetch contribution data for a date range from GitHub.
+ * @param {string} username - GitHub username
+ * @param {string} from - Start date (YYYY-MM-DD)
+ * @param {string} to - End date (YYYY-MM-DD)
+ * @returns {Promise<Array<{date: Date, count: number}>>}
+ */
+const fetchContributions = async (username, from, to) => {
+  const url = `https://github.com/users/${username}/contributions?from=${from}&to=${to}`
+  try {
+    const response = await fetch(url)
+    if (!response.ok) return []
+    const html = await response.text()
+    return parseContributionsHtml(html)
+  } catch {
+    return []
+  }
+}
+
+/**
+ * Fetch extended contribution data in one bounded request.
+ * @param {string} username - GitHub username
+ * @param {Array<{date: Date, count: number}>} currentDays - DOM-sourced days
+ * @param {number} [maxYearsBack=10] - Max years to look back
+ * @returns {Promise<Array<{date: Date, count: number}>>} Combined historical + current data
+ */
+const fetchExtendedStreakData = async (
+  username,
+  currentDays,
+  maxYearsBack = 10
+) => {
+  if (!username || !currentDays.length) return currentDays
+
+  // Dates already in DOM data (these take priority for accuracy)
+  const existingDates = new Set(
+    currentDays.map((d) => d.date.toISOString().split('T')[0])
+  )
+
+  const earliestYear = currentDays[0].date.getFullYear()
+  const firstYear = earliestYear - maxYearsBack + 1
+  const historicalDays = await fetchContributions(
+    username,
+    `${firstYear}-01-01`,
+    `${earliestYear}-12-31`
+  )
+
+  const allHistoricalDays = historicalDays.filter(
+    (d) => !existingDates.has(d.date.toISOString().split('T')[0])
+  )
+
+  if (allHistoricalDays.length === 0) return currentDays
+
+  return [...allHistoricalDays, ...currentDays].sort(
+    (a, b) => a.date.getTime() - b.date.getTime()
+  )
+}
+
+/**
+ * Asynchronously extend streak data with historical contributions
+ * and update the streak display in-place.
+ */
+const extendStreakDataAndUpdate = async () => {
+  const username = getProfileUsername()
+  let extendedDays = days
+
+  try {
+    if (username) {
+      extendedDays = await fetchExtendedStreakData(username, days)
+    }
+  } catch {
+    // Fall back to the contribution data already rendered on the page.
+  }
+
+  const extendedStats = calculateStreaks(extendedDays)
+  streakLongest = extendedStats.streakLongest
+  streakCurrent = extendedStats.streakCurrent
+
+  datesLongest =
+    streakLongest > 0 && extendedStats.longestStreakStart
+      ? `${fullDateFormat.format(extendedStats.longestStreakStart)} → ${fullDateFormat.format(extendedStats.longestStreakEnd)}`
+      : 'No longest streak'
+  datesCurrent =
+    streakCurrent > 0 && extendedStats.currentStreakStart
+      ? `${fullDateFormat.format(extendedStats.currentStreakStart)} → ${fullDateFormat.format(extendedStats.currentStreakEnd)}`
+      : 'No current streak'
+
+  const longestCountEl = document.getElementById('ic-streak-longest-count')
+  const longestDatesEl = document.getElementById('ic-streak-longest-dates')
+  const currentCountEl = document.getElementById('ic-streak-current-count')
+  const currentDatesEl = document.getElementById('ic-streak-current-dates')
+
+  if (longestCountEl)
+    longestCountEl.innerHTML = `${streakLongest} <span class="f4">days</span>`
+  if (longestDatesEl) longestDatesEl.textContent = datesLongest
+  if (currentCountEl)
+    currentCountEl.innerHTML = `${streakCurrent} <span class="f4">days</span>`
+  if (currentDatesEl) currentDatesEl.textContent = datesCurrent
 }
 
 const initUI = () => {
@@ -218,8 +339,8 @@ const loadStats = () => {
 
   // Format current streak dates
   if (streakCurrent > 0) {
-    const currentStart = dateFormat.format(stats.currentStreakStart)
-    const currentEnd = dateFormat.format(stats.currentStreakEnd)
+    const currentStart = fullDateFormat.format(stats.currentStreakStart)
+    const currentEnd = fullDateFormat.format(stats.currentStreakEnd)
     datesCurrent = `${currentStart} → ${currentEnd}`
   } else {
     datesCurrent = 'No current streak'
@@ -227,21 +348,20 @@ const loadStats = () => {
 
   // Year total
   countTotal = yearTotal.toLocaleString()
-  const dateFirst = dateFormat.format(firstDay)
   const dateLast = dateFormat.format(lastDay)
-  datesTotal = `${dateFirst} → ${dateLast}`
+  datesTotal = `${fullDateFormat.format(firstDay)} → ${dateLast}`
 
   // Average contributions per day
   const dayDifference = datesDayDifference(firstDay, lastDay)
   averageCount = precisionRound(yearTotal / dayDifference, 2)
 
   // Best day
-  dateBest = bestDay ? dateFormat.format(bestDay) : 'No activity found'
+  dateBest = bestDay ? fullDateFormat.format(bestDay) : 'No activity found'
 
   // Longest streak
   if (streakLongest > 0) {
-    const longestStart = dateFormat.format(stats.longestStreakStart)
-    const longestEnd = dateFormat.format(stats.longestStreakEnd)
+    const longestStart = fullDateFormat.format(stats.longestStreakStart)
+    const longestEnd = fullDateFormat.format(stats.longestStreakEnd)
     datesLongest = `${longestStart} → ${longestEnd}`
   } else {
     datesLongest = 'No longest streak'
@@ -317,7 +437,8 @@ const renderStats = () => {
     showWeek: !viewingYear
   })
   const bottomMarkup = generateStreaksMarkup(streaksStats, {
-    showCurrent: !viewingYear
+    showCurrent: !viewingYear,
+    loading: true
   })
 
   const icStatsBlockTop = document.createElement('div')
@@ -338,6 +459,9 @@ const generateIsometricChart = () => {
   loadStats()
   renderStats()
   renderIsometricChart()
+
+  // Asynchronously extend streak data for multi-year accuracy
+  extendStreakDataAndUpdate()
 }
 
 ;(async () => {
