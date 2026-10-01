@@ -337,14 +337,14 @@ const loadStats = () => {
   // Year total
   countTotal = yearTotal.toLocaleString()
   const dateLast = dateFormat.format(lastDay)
-  datesTotal = `${fullDateFormat.format(firstDay)} → ${dateLast}`
+  datesTotal = `${dateFormat.format(firstDay)} → ${dateLast}`
 
   // Average contributions per day
   const dayDifference = datesDayDifference(firstDay, lastDay)
   averageCount = precisionRound(yearTotal / dayDifference, 2)
 
   // Best day
-  dateBest = bestDay ? fullDateFormat.format(bestDay) : 'No activity found'
+  dateBest = bestDay ? dateFormat.format(bestDay) : 'No activity found'
 
   // Longest streak
   if (streakLongest > 0) {
