@@ -24,6 +24,7 @@
     "submit:chrome": "node scripts/submit.js chrome",
     "submit:edge": "node scripts/submit.js edge",
     "submit:firefox": "node scripts/submit.js firefox",
+    "submit:firefox:metadata": "node scripts/submit.js firefox-metadata",
     "submit:all": "node scripts/submit.js all",
     "submit:dry-run": "node scripts/submit.js all --dry-run",
     "release": "npm run build:all && npm run submit:all"

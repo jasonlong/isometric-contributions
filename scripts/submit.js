@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 
-import { execSync } from 'node:child_process'
+import { execFileSync } from 'node:child_process'
+import { createHmac, randomUUID } from 'node:crypto'
 import fs from 'node:fs'
 import path from 'node:path'
 import process from 'node:process'
@@ -11,6 +12,9 @@ const rootDir = path.resolve(__dirname, '..')
 const artifactsDir = path.join(rootDir, 'artifacts')
 
 const dryRun = process.argv.includes('--dry-run')
+const EXTENSION_NAME = 'Isometric Contributions'
+const CHROME_PUBLISHER_ID = '5fed62bc-275d-47ee-8e18-802157d2bb1d'
+const FIREFOX_ADDON_SLUG = 'github-isometric-contributions'
 
 function checkEnvVars(vars) {
   const missing = vars.filter((v) => !process.env[v])
@@ -41,6 +45,62 @@ function checkArtifact(zipName) {
   return zipPath
 }
 
+function createMozillaJwt(apiKey, apiSecret) {
+  const issuedAt = Math.floor(Date.now() / 1000)
+  const encode = (value) =>
+    Buffer.from(JSON.stringify(value)).toString('base64url')
+  const unsignedToken = [
+    encode({ alg: 'HS256', typ: 'JWT' }),
+    encode({
+      iss: apiKey,
+      jti: randomUUID(),
+      iat: issuedAt,
+      exp: issuedAt + 60
+    })
+  ].join('.')
+  const signature = createHmac('sha256', apiSecret)
+    .update(unsignedToken)
+    .digest('base64url')
+
+  return `${unsignedToken}.${signature}`
+}
+
+async function updateFirefoxListingName() {
+  console.log(`Updating Firefox listing name to "${EXTENSION_NAME}"...`)
+  const token = createMozillaJwt(
+    process.env.AMO_API_KEY,
+    process.env.AMO_API_SECRET
+  )
+  const response = await fetch(
+    `https://addons.mozilla.org/api/v5/addons/addon/${FIREFOX_ADDON_SLUG}/`,
+    {
+      method: 'PATCH',
+      headers: {
+        Authorization: `JWT ${token}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ name: { 'en-US': EXTENSION_NAME } })
+    }
+  )
+
+  if (!response.ok) {
+    const errorText = await response.text()
+    throw new Error(
+      `Firefox listing update failed (${response.status}): ${errorText}`
+    )
+  }
+
+  const updatedListing = await response.json()
+  const updatedName = updatedListing.name?.['en-US']
+  if (updatedName !== EXTENSION_NAME) {
+    throw new Error(
+      `Firefox returned an unexpected listing name: ${updatedName || 'missing'}`
+    )
+  }
+
+  console.log('✓ Firefox listing name updated')
+}
+
 async function submitChrome() {
   console.log('\n=== Chrome Web Store ===\n')
 
@@ -54,17 +114,18 @@ async function submitChrome() {
 
   if (dryRun) {
     console.log('  Validating credentials...')
-    // Try to get an access token to validate credentials
-    const tokenResult = execSync(
-      `curl -s -X POST "https://oauth2.googleapis.com/token" \
-        -d "client_id=${process.env.CHROME_CLIENT_ID}" \
-        -d "client_secret=${process.env.CHROME_CLIENT_SECRET}" \
-        -d "refresh_token=${process.env.CHROME_REFRESH_TOKEN}" \
-        -d "grant_type=refresh_token"`,
-      { encoding: 'utf8' }
-    )
-    const tokenData = JSON.parse(tokenResult)
-    if (tokenData.access_token) {
+    const tokenResponse = await fetch('https://oauth2.googleapis.com/token', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: new URLSearchParams({
+        client_id: process.env.CHROME_CLIENT_ID,
+        client_secret: process.env.CHROME_CLIENT_SECRET,
+        refresh_token: process.env.CHROME_REFRESH_TOKEN,
+        grant_type: 'refresh_token'
+      })
+    })
+    const tokenData = await tokenResponse.json()
+    if (tokenResponse.ok && tokenData.access_token) {
       console.log('  ✓ Credentials valid (got access token)')
     } else {
       console.error(
@@ -78,26 +139,20 @@ async function submitChrome() {
     return
   }
 
-  const args = [
-    'chrome-webstore-upload-cli',
-    'upload',
-    '--source',
-    zipPath,
-    '--extension-id',
-    process.env.CHROME_EXTENSION_ID,
-    '--client-id',
-    process.env.CHROME_CLIENT_ID,
-    '--client-secret',
-    process.env.CHROME_CLIENT_SECRET,
-    '--refresh-token',
-    process.env.CHROME_REFRESH_TOKEN,
-    '--auto-publish'
-  ]
+  const args = ['chrome-webstore-upload-cli', '--source', zipPath]
 
   try {
-    execSync(`npx ${args.join(' ')}`, {
+    execFileSync('npx', args, {
       cwd: rootDir,
-      stdio: 'inherit'
+      stdio: 'inherit',
+      env: {
+        ...process.env,
+        EXTENSION_ID: process.env.CHROME_EXTENSION_ID,
+        PUBLISHER_ID: CHROME_PUBLISHER_ID,
+        CLIENT_ID: process.env.CHROME_CLIENT_ID,
+        CLIENT_SECRET: process.env.CHROME_CLIENT_SECRET,
+        REFRESH_TOKEN: process.env.CHROME_REFRESH_TOKEN
+      }
     })
   } catch (error) {
     if (error.message?.includes('PKG_INVALID_VERSION_NUMBER')) {
@@ -144,30 +199,44 @@ async function submitFirefox() {
     '--source-dir',
     path.join(rootDir, 'dist'),
     '--artifacts-dir',
-    artifactsDir,
-    '--api-key',
-    process.env.AMO_API_KEY,
-    '--api-secret',
-    process.env.AMO_API_SECRET
+    artifactsDir
   ]
 
   try {
-    execSync(`npx ${args.join(' ')}`, {
+    execFileSync('npx', args, {
       cwd: rootDir,
-      stdio: 'inherit'
+      stdio: 'inherit',
+      env: {
+        ...process.env,
+        WEB_EXT_API_KEY: process.env.AMO_API_KEY,
+        WEB_EXT_API_SECRET: process.env.AMO_API_SECRET
+      }
     })
   } catch (error) {
     if (error.message?.includes('Version already exists')) {
       console.log(
         '\n⚠ Version already published to Firefox Add-ons — skipping\n'
       )
-      return
+    } else {
+      throw error
     }
-
-    throw error
   }
 
+  await updateFirefoxListingName()
   console.log('\n✓ Firefox Add-ons submission complete\n')
+}
+
+async function updateFirefoxMetadata() {
+  console.log('\n=== Firefox Add-ons Metadata ===\n')
+  checkEnvVars(['AMO_API_KEY', 'AMO_API_SECRET'])
+
+  if (dryRun) {
+    console.log(`  [DRY RUN] Would set listing name to "${EXTENSION_NAME}"`)
+    return
+  }
+
+  await updateFirefoxListingName()
+  console.log('\n✓ Firefox Add-ons metadata update complete\n')
 }
 
 async function submitEdge() {
@@ -177,32 +246,15 @@ async function submitEdge() {
   const zipPath = checkArtifact('isometric-contributions-edge.zip')
 
   if (dryRun) {
-    console.log('  Validating credentials (v1.1 API)...')
-    // Test the v1.1 API by checking the current draft submission
-    const result = execSync(
-      `curl -s -w "\\n%{http_code}" \
-        -H "Authorization: ApiKey ${process.env.EDGE_API_KEY}" \
-        -H "X-ClientID: ${process.env.EDGE_CLIENT_ID}" \
-        "https://api.addons.microsoftedge.microsoft.com/v1/products/${process.env.EDGE_PRODUCT_ID}/submissions/draft/package"`,
-      { encoding: 'utf8' }
+    console.log(
+      '  ✓ Credentials present (Edge validates them during package upload)'
     )
-    const lines = result.trim().split('\n')
-    const httpCode = lines.pop()
-    const body = lines.join('\n')
-
-    // 200 = has draft, 404 = no draft (both are valid), 401/403 = auth error
-    if (httpCode === '200' || httpCode === '404') {
-      console.log(`  ✓ Credentials valid (HTTP ${httpCode})`)
-    } else {
-      console.error(`  ✗ API request failed (HTTP ${httpCode}):`, body)
-      process.exit(1)
-    }
 
     console.log('\n  [DRY RUN] Would upload:', zipPath)
     return
   }
 
-  execSync('node scripts/submit-edge.js', {
+  execFileSync(process.execPath, ['scripts/submit-edge.js'], {
     cwd: rootDir,
     stdio: 'inherit'
   })
@@ -225,7 +277,7 @@ const target = process.argv.slice(2).find((a) => !a.startsWith('--'))
 
 if (!target) {
   console.error(
-    'Usage: node scripts/submit.js <chrome|firefox|edge|all> [--dry-run]'
+    'Usage: node scripts/submit.js <chrome|firefox|firefox-metadata|edge|all> [--dry-run]'
   )
   process.exit(1)
 }
@@ -233,6 +285,7 @@ if (!target) {
 const handlers = {
   chrome: submitChrome,
   firefox: submitFirefox,
+  'firefox-metadata': updateFirefoxMetadata,
   edge: submitEdge,
   all: submitAll
 }
@@ -240,7 +293,7 @@ const handlers = {
 if (!handlers[target]) {
   console.error(`Unknown target: ${target}`)
   console.error(
-    'Usage: node scripts/submit.js <chrome|firefox|edge|all> [--dry-run]'
+    'Usage: node scripts/submit.js <chrome|firefox|firefox-metadata|edge|all> [--dry-run]'
   )
   process.exit(1)
 }

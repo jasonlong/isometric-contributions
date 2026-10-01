@@ -1,4 +1,4 @@
-# GitHub 立体贡献图浏览器拓展程序
+# 立体贡献图浏览器拓展程序
 
 [英文版](https://github.com/jasonlong/isometric-contributions/blob/main/README.md) | 中文版
 

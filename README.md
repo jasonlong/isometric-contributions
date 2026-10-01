@@ -1,4 +1,4 @@
-# GitHub Isometric Contributions extension
+# Isometric Contributions extension
 
 ![Node.js CI](https://github.com/jasonlong/isometric-contributions/workflows/Node.js%20CI/badge.svg)
 [![Biome code style](https://img.shields.io/badge/code_style-Biome-60a5fa.svg)](https://biomejs.dev)

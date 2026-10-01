@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-GitHub Isometric Contributions is a browser extension (Chrome/Brave, Firefox, Edge) that renders GitHub contribution graphs as isometric 3D pixel art using obelisk.js. Users can toggle between the standard 2D view and the isometric 3D view.
+Isometric Contributions is a browser extension (Chrome/Brave, Firefox, Edge) that renders GitHub contribution graphs as isometric 3D pixel art using obelisk.js. Users can toggle between the standard 2D view and the isometric 3D view.
 
 ## Commands
 

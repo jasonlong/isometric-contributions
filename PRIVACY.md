@@ -1,6 +1,6 @@
 # Privacy Policy
 
-GitHub Isometric Contributions is a browser extension that renders GitHub contribution graphs as isometric 3D pixel art.
+Isometric Contributions is a browser extension that renders GitHub contribution graphs as isometric 3D pixel art.
 
 ## Data Collection
 
