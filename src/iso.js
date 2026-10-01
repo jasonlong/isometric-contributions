@@ -97,25 +97,11 @@ const persistSetting = (key, value) => {
   saveSetting(getStorage(), key, value)
 }
 
-// =============================================================================
-// Historical contribution fetching (for multi-year streak accuracy)
-// =============================================================================
-
-/**
- * Extract the username from the current GitHub profile page URL.
- * @returns {string|null} The username, or null if not on a profile page
- */
 const getProfileUsername = () => {
   const pathParts = window.location.pathname.split('/').filter(Boolean)
-  // Profile pages have a single path segment (the username).
-  // We're already guarded by .vcard-names-container / .js-calendar-graph.
   return pathParts.length >= 1 ? pathParts[0] : null
 }
 
-/**
- * Asynchronously extend streak data with historical contributions
- * and update the streak display in-place.
- */
 const extendStreakDataAndUpdate = async () => {
   if (!longestStreakLoading && !currentStreakLoading) return
 
@@ -137,7 +123,7 @@ const extendStreakDataAndUpdate = async () => {
       )
     }
   } catch {
-    // Fall back to the contribution data already rendered on the page.
+    // Keep the visible calendar on failure.
   }
 
   if (
@@ -465,7 +451,6 @@ const generateIsometricChart = () => {
   renderStats()
   renderIsometricChart()
 
-  // Asynchronously extend streak data for multi-year accuracy
   extendStreakDataAndUpdate()
 }
 

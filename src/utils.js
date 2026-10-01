@@ -228,13 +228,6 @@ export const parseCalendarGraph = (
   return data.sort((a, b) => a.date.getTime() - b.date.getTime())
 }
 
-/**
- * Parse contribution data from a GitHub contributions HTML fragment.
- * Used to extract historical contribution data from the
- * /users/{username}/contributions endpoint.
- * @param {string} html - The HTML string from GitHub's contributions endpoint
- * @returns {Array<{date: Date, count: number}>} Array of day objects sorted by date ascending
- */
 export const parseContributionsHtml = (html) => {
   const parser = new DOMParser()
   const doc = parser.parseFromString(html, 'text/html')
@@ -254,7 +247,6 @@ export const parseContributionsHtml = (html) => {
     const level = Number.parseInt(el.dataset.level || '0', 10)
     let count = 0
 
-    // Strategy 1: Get exact count from tooltip via aria-labelledby
     const tid = el.getAttribute('aria-labelledby')
     if (tid) {
       const tooltip = doc.getElementById(tid)
@@ -263,7 +255,6 @@ export const parseContributionsHtml = (html) => {
       }
     }
 
-    // Strategy 2: Try sr-only span inside the element
     if (count === 0 && level > 0) {
       const srSpan = el.querySelector('.sr-only')
       if (srSpan) {
@@ -271,7 +262,7 @@ export const parseContributionsHtml = (html) => {
       }
     }
 
-    // Strategy 3: If level > 0 but couldn't get exact count, at least mark as active
+    // Streaks need activity, even when an exact count is unavailable.
     if (count === 0 && level > 0) {
       count = 1
     }

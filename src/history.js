@@ -3,7 +3,6 @@ import { parseContributionsHtml } from './utils.js'
 const dateKey = (date) => date.toISOString().slice(0, 10)
 const DAY_MS = 24 * 60 * 60 * 1000
 
-/** Extend the streak at the calendar's start, requesting one year at a time. */
 export const fetchExtendedStreakData = async (
   username,
   currentDays,
@@ -18,7 +17,7 @@ export const fetchExtendedStreakData = async (
   for (let offset = 0; offset < maxYearsBack; offset++) {
     if (signal?.aborted) break
     const year = earliestYear - offset
-    // A calendar starting on January 1 already contains this whole year.
+    // Skip dates already present in the visible calendar.
     if (combined[0].date.getTime() === Date.UTC(year, 0, 1)) continue
 
     const url = `https://github.com/users/${encodeURIComponent(username)}/contributions?from=${year}-01-01&to=${year}-12-31`
@@ -34,7 +33,7 @@ export const fetchExtendedStreakData = async (
     const boundary = combined[0].date.getTime()
     const dates = new Map(historicalDays.map((day) => [dateKey(day.date), day]))
     const earlierDays = []
-    // Require every preceding day: missing data must never bridge a gap.
+    // Missing dates must not bridge a streak gap.
     for (let time = Date.UTC(year, 0, 1); time < boundary; time += DAY_MS) {
       const day = dates.get(dateKey(new Date(time)))
       if (!day) return combined
@@ -42,7 +41,7 @@ export const fetchExtendedStreakData = async (
     }
 
     combined = [...earlierDays, ...combined]
-    // Once a zero breaks the boundary streak, older years cannot extend it.
+    // Older years cannot extend a broken streak.
     if (earlierDays.some((day) => day.count === 0)) break
   }
 
