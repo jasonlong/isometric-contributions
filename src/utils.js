@@ -130,7 +130,10 @@ export const calculateStreaks = (days) => {
   let streakCurrent = 0
   let currentStreakStart = null
   let currentStreakEnd = null
-  const reversedDays = [...days].reverse()
+  const today = new Date().toISOString().slice(0, 10)
+  const reversedDays = [...days]
+    .filter((day) => day.date.toISOString().slice(0, 10) <= today)
+    .reverse()
 
   if (reversedDays.length > 0) {
     currentStreakEnd = reversedDays[0].date
@@ -223,6 +226,51 @@ export const parseCalendarGraph = (
   }))
 
   return data.sort((a, b) => a.date.getTime() - b.date.getTime())
+}
+
+export const parseContributionsHtml = (html) => {
+  const parser = new DOMParser()
+  const doc = parser.parseFromString(html, 'text/html')
+
+  const dayElements = doc.querySelectorAll(
+    'td.ContributionCalendar-day[data-date]'
+  )
+  const days = []
+
+  for (const el of dayElements) {
+    const dateStr = el.dataset.date
+    if (!dateStr) continue
+
+    const date = new Date(dateStr)
+    if (Number.isNaN(date.getTime())) continue
+
+    const level = Number.parseInt(el.dataset.level || '0', 10)
+    let count = 0
+
+    const tid = el.getAttribute('aria-labelledby')
+    if (tid) {
+      const tooltip = doc.getElementById(tid)
+      if (tooltip) {
+        count = getContributionCount(tooltip.textContent)
+      }
+    }
+
+    if (count === 0 && level > 0) {
+      const srSpan = el.querySelector('.sr-only')
+      if (srSpan) {
+        count = getContributionCount(srSpan.textContent)
+      }
+    }
+
+    // Streaks need activity, even when an exact count is unavailable.
+    if (count === 0 && level > 0) {
+      count = 1
+    }
+
+    days.push({ date, count })
+  }
+
+  return days.sort((a, b) => a.date.getTime() - b.date.getTime())
 }
 
 // =============================================================================
@@ -344,29 +392,41 @@ export const generateContributionsMarkup = (stats, options = {}) => {
  * @param {string} stats.datesCurrent - Current streak date range
  * @param {Object} options - Options
  * @param {boolean} options.showCurrent - Whether to show current streak
+ * @param {boolean} options.loading - Whether both streaks are loading
+ * @param {boolean} options.loadingLongest - Whether longest streak is loading
+ * @param {boolean} options.loadingCurrent - Whether current streak is loading
  * @returns {string} HTML markup
  */
 export const generateStreaksMarkup = (stats, options = {}) => {
   const { streakLongest, datesLongest, streakCurrent, datesCurrent } = stats
-  const { showCurrent = true } = options
+  const {
+    showCurrent = true,
+    loading = false,
+    loadingLongest = loading,
+    loadingCurrent = loading
+  } = options
+  const longestValue = loadingLongest ? '...' : streakLongest
+  const longestDates = loadingLongest ? 'Loading...' : datesLongest
+  const currentValue = loadingCurrent ? '...' : streakCurrent
+  const currentDates = loadingCurrent ? 'Loading...' : datesCurrent
 
   let markup = `
     <div class="position-absolute bottom-0 left-0 ml-5 mb-6">
       <h5 class="mb-1">Streaks</h5>
       <div class="d-flex flex-justify-between rounded-2 border px-1 px-md-2">
         <div class="p-2">
-          <span class="d-block f2 text-bold color-fg-success lh-condensed">${streakLongest} <span class="f4">days</span></span>
+          <span id="ic-streak-longest-count" class="d-block f2 text-bold color-fg-success lh-condensed">${longestValue} <span class="f4">days</span></span>
           <span class="d-block text-small text-bold">Longest</span>
-          <span class="d-none d-sm-block text-small color-fg-muted">${datesLongest}</span>
+          <span id="ic-streak-longest-dates" class="d-none d-sm-block text-small color-fg-muted">${longestDates}</span>
         </div>
     `
 
   if (showCurrent) {
     markup += `
           <div class="p-2">
-            <span class="d-block f2 text-bold color-fg-success lh-condensed">${streakCurrent} <span class="f4">days</span></span>
+            <span id="ic-streak-current-count" class="d-block f2 text-bold color-fg-success lh-condensed">${currentValue} <span class="f4">days</span></span>
             <span class="d-block text-small text-bold">Current</span>
-            <span class="d-none d-sm-block text-small color-fg-muted">${datesCurrent}</span>
+            <span id="ic-streak-current-dates" class="d-none d-sm-block text-small color-fg-muted">${currentDates}</span>
           </div>
         </div>
       </div>

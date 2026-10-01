@@ -225,6 +225,27 @@ describe('calculateStreaks', () => {
     expect(result.currentStreakEnd.toISOString()).toContain('2024-01-03')
   })
 
+  it('ignores future calendar days when calculating the current streak', () => {
+    const now = new Date()
+    const today = new Date(
+      Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate())
+    )
+    const days = []
+
+    for (let offset = -500; offset <= 30; offset++) {
+      const date = new Date(today)
+      date.setUTCDate(date.getUTCDate() + offset)
+      days.push(makeDay(date.toISOString().slice(0, 10), offset <= 0 ? 1 : 0))
+    }
+
+    const result = calculateStreaks(days)
+    expect(result.streakLongest).toBe(501)
+    expect(result.streakCurrent).toBe(501)
+    expect(result.currentStreakEnd.toISOString()).toContain(
+      today.toISOString().slice(0, 10)
+    )
+  })
+
   it('returns 0 current streak when no recent activity', () => {
     const days = [
       makeDay('2024-01-01', 1),

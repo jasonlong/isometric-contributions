@@ -210,6 +210,20 @@ describe('generateStreaksMarkup', () => {
     const markup = generateStreaksMarkup(baseStats)
     expect(markup).toContain('days')
   })
+
+  it('shows a pending state while extended streak data loads', () => {
+    const markup = generateStreaksMarkup(baseStats, { loading: true })
+    expect(markup).toContain('>... <span class="f4">days</span>')
+    expect(markup).toContain('Loading...')
+    expect(markup).not.toContain('30 <span class="f4">days</span>')
+  })
+
+  it('loads only the streak that needs historical data', () => {
+    const markup = generateStreaksMarkup(baseStats, { loadingLongest: true })
+    expect(markup).toContain('>... <span class="f4">days</span>')
+    expect(markup).toContain('5 <span class="f4">days</span>')
+    expect(markup).toContain('Dec 27 → Dec 31')
+  })
 })
 
 // =============================================================================

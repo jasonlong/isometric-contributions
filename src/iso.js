@@ -1,3 +1,4 @@
+import { fetchExtendedStreakData } from './history.js'
 import {
   applyViewType,
   calculateStreaks,
@@ -17,6 +18,16 @@ const dateFormat = new Intl.DateTimeFormat('en-US', {
   day: 'numeric',
   timeZone: 'UTC'
 })
+const fullDateFormat = new Intl.DateTimeFormat('en-US', {
+  month: 'short',
+  day: 'numeric',
+  year: 'numeric',
+  timeZone: 'UTC'
+})
+const formatStreakDates = (start, end, streakLength) => {
+  const formatter = streakLength > 365 ? fullDateFormat : dateFormat
+  return `${formatter.format(start)} → ${formatter.format(end)}`
+}
 
 let days
 let weeks
@@ -30,6 +41,8 @@ let countTotal = 0
 let weekCountTotal = 0
 let streakLongest = 0
 let streakCurrent = 0
+let longestStreakLoading = false
+let currentStreakLoading = false
 let bestDay = null
 let firstDay = null
 let lastDay = null
@@ -40,13 +53,24 @@ let datesLongest = null
 let datesCurrent = null
 let dateBest = null
 let toggleSetting = 'cubes'
+let chartGeneration = 0
+let historyRequest = null
+
+const cancelHistoryRequest = () => {
+  chartGeneration++
+  historyRequest?.abort()
+  historyRequest = null
+}
 
 const resetValues = () => {
+  cancelHistoryRequest()
   yearTotal = 0
   averageCount = 0
   maxCount = 0
   streakLongest = 0
   streakCurrent = 0
+  longestStreakLoading = false
+  currentStreakLoading = false
   weekTotal = 0
   bestDay = null
   firstDay = null
@@ -71,6 +95,82 @@ const getSettings = async () => {
 
 const persistSetting = (key, value) => {
   saveSetting(getStorage(), key, value)
+}
+
+const getProfileUsername = () => {
+  const pathParts = window.location.pathname.split('/').filter(Boolean)
+  return pathParts.length >= 1 ? pathParts[0] : null
+}
+
+const extendStreakDataAndUpdate = async () => {
+  if (!longestStreakLoading && !currentStreakLoading) return
+
+  const username = getProfileUsername()
+  const generation = chartGeneration
+  const sourceDays = days
+  const wrapper = document.querySelector('.ic-contributions-wrapper')
+  const controller = new AbortController()
+  historyRequest = controller
+  let extendedDays = days
+
+  try {
+    if (username) {
+      extendedDays = await fetchExtendedStreakData(
+        username,
+        sourceDays,
+        10,
+        controller.signal
+      )
+    }
+  } catch {
+    // Keep the visible calendar on failure.
+  }
+
+  if (
+    controller.signal.aborted ||
+    generation !== chartGeneration ||
+    sourceDays !== days ||
+    username !== getProfileUsername() ||
+    !wrapper?.isConnected
+  ) {
+    return
+  }
+  historyRequest = null
+
+  const extendedStats = calculateStreaks(extendedDays)
+  streakLongest = extendedStats.streakLongest
+  streakCurrent = extendedStats.streakCurrent
+  longestStreakLoading = false
+  currentStreakLoading = false
+
+  datesLongest =
+    streakLongest > 0 && extendedStats.longestStreakStart
+      ? formatStreakDates(
+          extendedStats.longestStreakStart,
+          extendedStats.longestStreakEnd,
+          streakLongest
+        )
+      : 'No longest streak'
+  datesCurrent =
+    streakCurrent > 0 && extendedStats.currentStreakStart
+      ? formatStreakDates(
+          extendedStats.currentStreakStart,
+          extendedStats.currentStreakEnd,
+          streakCurrent
+        )
+      : 'No current streak'
+
+  const longestCountEl = document.getElementById('ic-streak-longest-count')
+  const longestDatesEl = document.getElementById('ic-streak-longest-dates')
+  const currentCountEl = document.getElementById('ic-streak-current-count')
+  const currentDatesEl = document.getElementById('ic-streak-current-dates')
+
+  if (longestCountEl)
+    longestCountEl.innerHTML = `${streakLongest} <span class="f4">days</span>`
+  if (longestDatesEl) longestDatesEl.textContent = datesLongest
+  if (currentCountEl)
+    currentCountEl.innerHTML = `${streakCurrent} <span class="f4">days</span>`
+  if (currentDatesEl) currentDatesEl.textContent = datesCurrent
 }
 
 const initUI = () => {
@@ -210,6 +310,13 @@ const loadStats = () => {
   streakLongest = stats.streakLongest
   streakCurrent = stats.streakCurrent
 
+  const firstDate = firstDay.toISOString().slice(0, 10)
+  const canFetchHistoricalData = Boolean(getProfileUsername())
+  longestStreakLoading = canFetchHistoricalData && days[0].count > 0
+  currentStreakLoading =
+    canFetchHistoricalData &&
+    stats.currentStreakStart?.toISOString().slice(0, 10) === firstDate
+
   // Week total
   weekStartDay = currentWeekDays[0].date
   for (const d of currentWeekDays) {
@@ -218,18 +325,19 @@ const loadStats = () => {
 
   // Format current streak dates
   if (streakCurrent > 0) {
-    const currentStart = dateFormat.format(stats.currentStreakStart)
-    const currentEnd = dateFormat.format(stats.currentStreakEnd)
-    datesCurrent = `${currentStart} → ${currentEnd}`
+    datesCurrent = formatStreakDates(
+      stats.currentStreakStart,
+      stats.currentStreakEnd,
+      streakCurrent
+    )
   } else {
     datesCurrent = 'No current streak'
   }
 
   // Year total
   countTotal = yearTotal.toLocaleString()
-  const dateFirst = dateFormat.format(firstDay)
   const dateLast = dateFormat.format(lastDay)
-  datesTotal = `${dateFirst} → ${dateLast}`
+  datesTotal = `${dateFormat.format(firstDay)} → ${dateLast}`
 
   // Average contributions per day
   const dayDifference = datesDayDifference(firstDay, lastDay)
@@ -240,9 +348,11 @@ const loadStats = () => {
 
   // Longest streak
   if (streakLongest > 0) {
-    const longestStart = dateFormat.format(stats.longestStreakStart)
-    const longestEnd = dateFormat.format(stats.longestStreakEnd)
-    datesLongest = `${longestStart} → ${longestEnd}`
+    datesLongest = formatStreakDates(
+      stats.longestStreakStart,
+      stats.longestStreakEnd,
+      streakLongest
+    )
   } else {
     datesLongest = 'No longest streak'
   }
@@ -317,7 +427,9 @@ const renderStats = () => {
     showWeek: !viewingYear
   })
   const bottomMarkup = generateStreaksMarkup(streaksStats, {
-    showCurrent: !viewingYear
+    showCurrent: !viewingYear,
+    loadingLongest: longestStreakLoading,
+    loadingCurrent: currentStreakLoading
   })
 
   const icStatsBlockTop = document.createElement('div')
@@ -338,6 +450,8 @@ const generateIsometricChart = () => {
   loadStats()
   renderStats()
   renderIsometricChart()
+
+  extendStreakDataAndUpdate()
 }
 
 ;(async () => {
@@ -353,6 +467,7 @@ const generateIsometricChart = () => {
   let observer = null
 
   const setupObserver = () => {
+    cancelHistoryRequest()
     if (!document.querySelector('.vcard-names-container')) {
       return
     }
