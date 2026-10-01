@@ -7,7 +7,8 @@ const DAY_MS = 24 * 60 * 60 * 1000
 export const fetchExtendedStreakData = async (
   username,
   currentDays,
-  maxYearsBack = 10
+  maxYearsBack = 10,
+  signal
 ) => {
   if (!username || !currentDays.length) return currentDays
 
@@ -15,6 +16,7 @@ export const fetchExtendedStreakData = async (
   const earliestYear = currentDays[0].date.getUTCFullYear()
 
   for (let offset = 0; offset < maxYearsBack; offset++) {
+    if (signal?.aborted) break
     const year = earliestYear - offset
     // A calendar starting on January 1 already contains this whole year.
     if (combined[0].date.getTime() === Date.UTC(year, 0, 1)) continue
@@ -22,7 +24,7 @@ export const fetchExtendedStreakData = async (
     const url = `https://github.com/users/${encodeURIComponent(username)}/contributions?from=${year}-01-01&to=${year}-12-31`
     let historicalDays
     try {
-      const response = await fetch(url)
+      const response = await fetch(url, { signal })
       if (!response.ok) break
       historicalDays = parseContributionsHtml(await response.text())
     } catch {

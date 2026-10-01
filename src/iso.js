@@ -53,8 +53,17 @@ let datesLongest = null
 let datesCurrent = null
 let dateBest = null
 let toggleSetting = 'cubes'
+let chartGeneration = 0
+let historyRequest = null
+
+const cancelHistoryRequest = () => {
+  chartGeneration++
+  historyRequest?.abort()
+  historyRequest = null
+}
 
 const resetValues = () => {
+  cancelHistoryRequest()
   yearTotal = 0
   averageCount = 0
   maxCount = 0
@@ -111,15 +120,36 @@ const extendStreakDataAndUpdate = async () => {
   if (!longestStreakLoading && !currentStreakLoading) return
 
   const username = getProfileUsername()
+  const generation = chartGeneration
+  const sourceDays = days
+  const wrapper = document.querySelector('.ic-contributions-wrapper')
+  const controller = new AbortController()
+  historyRequest = controller
   let extendedDays = days
 
   try {
     if (username) {
-      extendedDays = await fetchExtendedStreakData(username, days)
+      extendedDays = await fetchExtendedStreakData(
+        username,
+        sourceDays,
+        10,
+        controller.signal
+      )
     }
   } catch {
     // Fall back to the contribution data already rendered on the page.
   }
+
+  if (
+    controller.signal.aborted ||
+    generation !== chartGeneration ||
+    sourceDays !== days ||
+    username !== getProfileUsername() ||
+    !wrapper?.isConnected
+  ) {
+    return
+  }
+  historyRequest = null
 
   const extendedStats = calculateStreaks(extendedDays)
   streakLongest = extendedStats.streakLongest
@@ -454,6 +484,7 @@ const generateIsometricChart = () => {
   let observer = null
 
   const setupObserver = () => {
+    cancelHistoryRequest()
     if (!document.querySelector('.vcard-names-container')) {
       return
     }
