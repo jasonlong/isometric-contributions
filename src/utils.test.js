@@ -3,7 +3,6 @@ import {
   calculateStreaks,
   datesDayDifference,
   getContributionCount,
-  parseContributionsHtml,
   precisionRound,
   rgbToHex,
   sameDay

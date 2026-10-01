@@ -1,3 +1,4 @@
+import { fetchExtendedStreakData } from './history.js'
 import {
   applyViewType,
   calculateStreaks,
@@ -7,7 +8,6 @@ import {
   getElementColor,
   loadSetting,
   parseCalendarGraph,
-  parseContributionsHtml,
   precisionRound,
   sameDay,
   saveSetting
@@ -101,63 +101,6 @@ const getProfileUsername = () => {
   // Profile pages have a single path segment (the username).
   // We're already guarded by .vcard-names-container / .js-calendar-graph.
   return pathParts.length >= 1 ? pathParts[0] : null
-}
-
-/**
- * Fetch contribution data for a date range from GitHub.
- * @param {string} username - GitHub username
- * @param {string} from - Start date (YYYY-MM-DD)
- * @param {string} to - End date (YYYY-MM-DD)
- * @returns {Promise<Array<{date: Date, count: number}>>}
- */
-const fetchContributions = async (username, from, to) => {
-  const url = `https://github.com/users/${username}/contributions?from=${from}&to=${to}`
-  try {
-    const response = await fetch(url)
-    if (!response.ok) return []
-    const html = await response.text()
-    return parseContributionsHtml(html)
-  } catch {
-    return []
-  }
-}
-
-/**
- * Fetch extended contribution data in one bounded request.
- * @param {string} username - GitHub username
- * @param {Array<{date: Date, count: number}>} currentDays - DOM-sourced days
- * @param {number} [maxYearsBack=10] - Max years to look back
- * @returns {Promise<Array<{date: Date, count: number}>>} Combined historical + current data
- */
-const fetchExtendedStreakData = async (
-  username,
-  currentDays,
-  maxYearsBack = 10
-) => {
-  if (!username || !currentDays.length) return currentDays
-
-  // Dates already in DOM data (these take priority for accuracy)
-  const existingDates = new Set(
-    currentDays.map((d) => d.date.toISOString().split('T')[0])
-  )
-
-  const earliestYear = currentDays[0].date.getFullYear()
-  const firstYear = earliestYear - maxYearsBack + 1
-  const historicalDays = await fetchContributions(
-    username,
-    `${firstYear}-01-01`,
-    `${earliestYear}-12-31`
-  )
-
-  const allHistoricalDays = historicalDays.filter(
-    (d) => !existingDates.has(d.date.toISOString().split('T')[0])
-  )
-
-  if (allHistoricalDays.length === 0) return currentDays
-
-  return [...allHistoricalDays, ...currentDays].sort(
-    (a, b) => a.date.getTime() - b.date.getTime()
-  )
 }
 
 /**
