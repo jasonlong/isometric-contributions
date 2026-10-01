@@ -326,9 +326,7 @@ const loadStats = () => {
 
   const firstDate = firstDay.toISOString().slice(0, 10)
   const canFetchHistoricalData = Boolean(getProfileUsername())
-  longestStreakLoading =
-    canFetchHistoricalData &&
-    stats.longestStreakStart?.toISOString().slice(0, 10) === firstDate
+  longestStreakLoading = canFetchHistoricalData && days[0].count > 0
   currentStreakLoading =
     canFetchHistoricalData &&
     stats.currentStreakStart?.toISOString().slice(0, 10) === firstDate

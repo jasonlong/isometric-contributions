@@ -1,5 +1,5 @@
 /** @vitest-environment jsdom */
-import { afterEach, expect, it, vi } from 'vitest'
+import { afterEach, beforeEach, expect, it, vi } from 'vitest'
 import { fetchExtendedStreakData } from './history.js'
 
 vi.mock('./history.js', () => ({ fetchExtendedStreakData: vi.fn() }))
@@ -21,6 +21,40 @@ const showCalendar = (days) => {
     </section></main>`
 }
 
+let onNavigate
+
+beforeEach(() => {
+  vi.resetModules()
+  vi.spyOn(document, 'addEventListener').mockImplementation(
+    (name, listener) => {
+      if (name === 'turbo:load') onNavigate = listener
+    }
+  )
+  vi.stubGlobal('matchMedia', () => ({ addEventListener() {} }))
+  vi.stubGlobal(
+    'MutationObserver',
+    class {
+      observe() {}
+      disconnect() {}
+    }
+  )
+  vi.stubGlobal('obelisk', {
+    Point: class {},
+    Point3D: class {},
+    PixelView: class {
+      renderObject() {}
+    },
+    CubeDimension: class {},
+    CubeColor: class {
+      getByHorizontalColor() {
+        return 0
+      }
+    },
+    Cube: class {}
+  })
+  window.history.replaceState(null, '', '/old-profile')
+})
+
 afterEach(() => {
   vi.restoreAllMocks()
   vi.unstubAllGlobals()
@@ -31,36 +65,6 @@ afterEach(() => {
 it.each(['another profile', 'another year on the same profile'])(
   'ignores a delayed historical response after navigating to %s',
   async (destination) => {
-    vi.resetModules()
-    let onNavigate
-    vi.spyOn(document, 'addEventListener').mockImplementation(
-      (name, listener) => {
-        if (name === 'turbo:load') onNavigate = listener
-      }
-    )
-    vi.stubGlobal('matchMedia', () => ({ addEventListener() {} }))
-    vi.stubGlobal(
-      'MutationObserver',
-      class {
-        observe() {}
-        disconnect() {}
-      }
-    )
-    vi.stubGlobal('obelisk', {
-      Point: class {},
-      Point3D: class {},
-      PixelView: class {
-        renderObject() {}
-      },
-      CubeDimension: class {},
-      CubeColor: class {
-        getByHorizontalColor() {
-          return 0
-        }
-      },
-      Cube: class {}
-    })
-    window.history.replaceState(null, '', '/old-profile')
     const oldDays = [day('2024-01-01'), day('2024-01-02')]
     showCalendar(oldDays)
     let resolveOld
@@ -113,3 +117,42 @@ it.each(['another profile', 'another year on the same profile'])(
     )
   }
 )
+
+const boundaryCalendar = (firstDayActive = true) =>
+  Array.from({ length: 20 }, (_, i) =>
+    day(
+      `2024-01-${String(i + 1).padStart(2, '0')}`,
+      (i < 5 && (i > 0 || firstDayActive)) || i >= 10 ? 1 : 0
+    )
+  )
+
+it('extends a shorter boundary streak that can exceed the visible longest', async () => {
+  const current = boundaryCalendar()
+  const historical = Array.from({ length: 100 }, (_, i) => ({
+    date: new Date(Date.UTC(2023, 8, 23 + i)),
+    count: 1
+  }))
+  showCalendar(current)
+  fetchExtendedStreakData.mockResolvedValueOnce([...historical, ...current])
+  await import('./iso.js')
+  await vi.waitFor(() =>
+    expect(document.getElementById('ic-streak-longest-count').textContent).toBe(
+      '105 days'
+    )
+  )
+  expect(fetchExtendedStreakData).toHaveBeenCalledTimes(1)
+  expect(document.getElementById('ic-streak-current-count').textContent).toBe(
+    '10 days'
+  )
+})
+
+it('skips historical requests when the first visible day is inactive', async () => {
+  showCalendar(boundaryCalendar(false))
+  await import('./iso.js')
+  await vi.waitFor(() =>
+    expect(document.getElementById('ic-streak-longest-count').textContent).toBe(
+      '10 days'
+    )
+  )
+  expect(fetchExtendedStreakData).not.toHaveBeenCalled()
+})
