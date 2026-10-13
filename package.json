@@ -34,7 +34,7 @@
     "@parcel/config-webextension": "^2.16.4",
     "@parcel/reporter-bundle-analyzer": "^2.16.4",
     "@parcel/reporter-bundle-buddy": "^2.16.4",
-    "chrome-webstore-upload-cli": "^4.0.1",
+    "chrome-webstore-upload-cli": "^4.0.2",
     "jsdom": "^30.1.2",
     "parcel": "^2.16.4",
     "puppeteer": "^25.13.0",
