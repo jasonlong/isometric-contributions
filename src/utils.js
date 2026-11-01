@@ -1,3 +1,5 @@
+import { HEIGHT_SCALES, normalizeHeightScale } from './settings.js'
+
 // =============================================================================
 // Pure utility functions
 // =============================================================================
@@ -366,6 +368,7 @@ export const saveSetting = (storage, key, value) => {
  * @param {number} stats.averageCount - Average per day
  * @param {Object} options - Options
  * @param {boolean} options.showWeek - Whether to show week stats
+ * @param {string} options.heightScale - Selected contribution height scale
  * @returns {string} HTML markup
  */
 export const generateContributionsMarkup = (stats, options = {}) => {
@@ -378,7 +381,8 @@ export const generateContributionsMarkup = (stats, options = {}) => {
     dateBest,
     averageCount
   } = stats
-  const { showWeek = true } = options
+  const { showWeek = true, heightScale = 'linear' } = options
+  const scale = HEIGHT_SCALES[normalizeHeightScale(heightScale)]
 
   let markup = `
     <div class="position-absolute top-0 right-0 mt-3 mr-5">
@@ -408,9 +412,10 @@ export const generateContributionsMarkup = (stats, options = {}) => {
         <span class="d-none d-sm-block text-small color-fg-muted">${dateBest}</span>
       </div>
     </div>
-    <p class="mt-1 text-right text-small">
-      Average: <span class="text-bold color-fg-success">${averageCount}</span> <span class="color-fg-muted">/ day</span>
-      </p>
+    <p class="d-flex flex-wrap flex-justify-between gap-2 mt-1 text-small">
+      <span id="ic-height-scale-label" class="color-fg-muted" title="${scale.description}">Scale: ${scale.label}</span>
+      <span class="ml-auto text-right">Average: <span class="text-bold color-fg-success">${averageCount}</span> <span class="color-fg-muted">/ day</span></span>
+    </p>
     </div>
   `
 

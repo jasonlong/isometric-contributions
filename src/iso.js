@@ -383,6 +383,9 @@ const renderIsometricChart = () => {
     `Contribution chart with ${scale.label.toLowerCase()} bar heights`
   )
   canvas.title = scale.description
+  const scaleLabel = document.getElementById('ic-height-scale-label')
+  scaleLabel.textContent = `Scale: ${scale.label}`
+  scaleLabel.title = scale.description
   const point = new obelisk.Point(130, 90)
   const pixelView = new obelisk.PixelView(canvas, point)
   pixelView.clear()
@@ -437,7 +440,8 @@ const renderStats = () => {
   }
 
   const topMarkup = generateContributionsMarkup(contributionsStats, {
-    showWeek: !viewingYear
+    showWeek: !viewingYear,
+    heightScale
   })
   const bottomMarkup = generateStreaksMarkup(streaksStats, {
     showCurrent: !viewingYear,

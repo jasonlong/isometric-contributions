@@ -110,11 +110,17 @@ it.each([
 
     const canvas = document.getElementById('isometric-contributions')
     const stats = document.querySelector('.ic-contributions-wrapper > div')
-    const originalStats = stats.textContent
+    const scaleLabel = document.getElementById('ic-height-scale-label')
+    const statValues = () =>
+      [...stats.querySelectorAll('span:not(#ic-height-scale-label)')].map(
+        (span) => span.textContent
+      )
+    const originalStats = statValues()
     const originalCalendar =
       document.querySelector('.js-calendar-graph').innerHTML
     expect(document.getElementById('ic-height-scale')).toBeNull()
     expect(canvas.getAttribute('aria-label')).toContain('linear')
+    expect(scaleLabel.textContent).toBe('Scale: Linear')
     expect(clearChart).toHaveBeenCalledTimes(1)
 
     notify({ heightScale: { newValue: scale } })
@@ -122,7 +128,9 @@ it.each([
     expect(clearChart).toHaveBeenCalledTimes(2)
     expect(canvas.getAttribute('aria-label')).toContain(label.toLowerCase())
     expect(canvas.title).not.toBe('')
-    expect(stats.textContent).toBe(originalStats)
+    expect(scaleLabel.textContent).toBe(`Scale: ${label}`)
+    expect(scaleLabel.title).toBe(canvas.title)
+    expect(statValues()).toEqual(originalStats)
     expect(document.querySelector('.js-calendar-graph').innerHTML).toBe(
       originalCalendar
     )
@@ -131,6 +139,7 @@ it.each([
     expect(renderedHeights).toEqual([3, 4, 103])
     expect(clearChart).toHaveBeenCalledTimes(3)
     expect(canvas.getAttribute('aria-label')).toContain('linear')
+    expect(scaleLabel.textContent).toBe('Scale: Linear')
   }
 )
 
