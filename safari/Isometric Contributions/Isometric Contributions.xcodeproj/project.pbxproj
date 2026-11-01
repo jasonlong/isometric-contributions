@@ -7,6 +7,9 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		38E190DD541C4134932D5B26 /* popup.html in Resources */ = {isa = PBXBuildFile; fileRef = E290F14F329E44BCA1888421 /* popup.html */; };
+		4B7A390D36B14BD49BCFD7DA /* popup.js in Resources */ = {isa = PBXBuildFile; fileRef = 4F055A9FB6F941E7A2CF8F22 /* popup.js */; };
+		A31CA91F1D8B48EAB0621171 /* popup.css in Resources */ = {isa = PBXBuildFile; fileRef = C6F26032F98644B69BF724AA /* popup.css */; };
 		966838B02F808F7100F6C07B /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 966838AF2F808F7100F6C07B /* AppDelegate.swift */; };
 		966838B42F808F7100F6C07B /* Main.html in Resources */ = {isa = PBXBuildFile; fileRef = 966838B22F808F7100F6C07B /* Main.html */; };
 		966838B62F808F7100F6C07B /* Icon.png in Resources */ = {isa = PBXBuildFile; fileRef = 966838B52F808F7100F6C07B /* Icon.png */; };
@@ -50,6 +53,9 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		E290F14F329E44BCA1888421 /* popup.html */ = {isa = PBXFileReference; lastKnownFileType = text.html; name = popup.html; path = Resources/popup.html; sourceTree = "<group>"; };
+		4F055A9FB6F941E7A2CF8F22 /* popup.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; name = popup.js; path = Resources/popup.js; sourceTree = "<group>"; };
+		C6F26032F98644B69BF724AA /* popup.css */ = {isa = PBXFileReference; lastKnownFileType = text.css; name = popup.css; path = Resources/popup.css; sourceTree = "<group>"; };
 		966838AC2F808F7100F6C07B /* Isometric Contributions.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Isometric Contributions.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		966838AF2F808F7100F6C07B /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		966838B32F808F7100F6C07B /* Base */ = {isa = PBXFileReference; lastKnownFileType = text.html; name = Base; path = Base.lproj/Main.html; sourceTree = "<group>"; };
@@ -144,6 +150,9 @@
 		966838D82F808F7200F6C07B /* Resources */ = {
 			isa = PBXGroup;
 			children = (
+				E290F14F329E44BCA1888421 /* popup.html */,
+				4F055A9FB6F941E7A2CF8F22 /* popup.js */,
+				C6F26032F98644B69BF724AA /* popup.css */,
 				966838D92F808F7200F6C07B /* obelisk.min.js */,
 				966838DA2F808F7200F6C07B /* icon-48.png */,
 				966838DC2F808F7200F6C07B /* iso.js */,
@@ -254,6 +263,9 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				38E190DD541C4134932D5B26 /* popup.html in Resources */,
+				4B7A390D36B14BD49BCFD7DA /* popup.js in Resources */,
+				A31CA91F1D8B48EAB0621171 /* popup.css in Resources */,
 				966838E62F808F7200F6C07B /* iso.css in Resources */,
 				966838EA2F808F7200F6C07B /* icon-128.png in Resources */,
 				966838E52F808F7200F6C07B /* iso.js in Resources */,

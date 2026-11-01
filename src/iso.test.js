@@ -29,6 +29,7 @@ const clearChart = vi.fn(() => {
 
 beforeEach(() => {
   vi.resetModules()
+  onNavigate = null
   localStorage.clear()
   vi.spyOn(document, 'addEventListener').mockImplementation(
     (name, listener) => {
@@ -78,45 +79,57 @@ const outlierCalendar = () => [
   day('2024-01-03', 609)
 ]
 
+const mockChromeStorage = (settings = {}) => {
+  let onChanged
+  vi.stubGlobal('chrome', {
+    storage: {
+      local: {
+        get: (_keys, callback) => callback(settings),
+        set: vi.fn()
+      },
+      onChanged: {
+        addListener: (listener) => {
+          onChanged = listener
+        }
+      }
+    }
+  })
+  return (changes, area = 'local') => onChanged(changes, area)
+}
+
 it.each([
   ['square-root', 'Square root', [3, 15, 103]],
   ['logarithmic', 'Logarithmic', [3, 40, 103]]
 ])(
   'switches to %s and back while preserving counts and colors',
   async (scale, label, heights) => {
+    const notify = mockChromeStorage()
     showCalendar(outlierCalendar())
     await import('./iso.js')
     await vi.waitFor(() => expect(renderedHeights).toEqual([3, 4, 103]))
 
-    const select = document.getElementById('ic-height-scale')
     const canvas = document.getElementById('isometric-contributions')
     const stats = document.querySelector('.ic-contributions-wrapper > div')
     const originalStats = stats.textContent
     const originalCalendar =
       document.querySelector('.js-calendar-graph').innerHTML
-    expect(select.labels[0].textContent).toContain('Height scale:')
-    expect(select.value).toBe('linear')
+    expect(document.getElementById('ic-height-scale')).toBeNull()
     expect(canvas.getAttribute('aria-label')).toContain('linear')
     expect(clearChart).toHaveBeenCalledTimes(1)
 
-    select.value = scale
-    select.dispatchEvent(new Event('change'))
+    notify({ heightScale: { newValue: scale } })
     expect(renderedHeights).toEqual(heights)
     expect(clearChart).toHaveBeenCalledTimes(2)
-    expect(localStorage.getItem('heightScale')).toBe(scale)
     expect(canvas.getAttribute('aria-label')).toContain(label.toLowerCase())
-    expect(select.title).toBe(canvas.title)
-    expect(select.title).not.toBe('')
+    expect(canvas.title).not.toBe('')
     expect(stats.textContent).toBe(originalStats)
     expect(document.querySelector('.js-calendar-graph').innerHTML).toBe(
       originalCalendar
     )
 
-    select.value = 'linear'
-    select.dispatchEvent(new Event('change'))
+    notify({ heightScale: { newValue: 'linear' } })
     expect(renderedHeights).toEqual([3, 4, 103])
     expect(clearChart).toHaveBeenCalledTimes(3)
-    expect(localStorage.getItem('heightScale')).toBe('linear')
     expect(canvas.getAttribute('aria-label')).toContain('linear')
   }
 )
@@ -129,17 +142,8 @@ it.each([
 ])(
   'restores a %s preference for %s and keeps it after navigation',
   async (storageType, scale, heights) => {
-    const storageSet = vi.fn()
     if (storageType === 'chrome.storage.local') {
-      vi.stubGlobal('chrome', {
-        storage: {
-          local: {
-            get: (_keys, callback) =>
-              callback({ heightScale: scale, toggleSetting: 'both' }),
-            set: storageSet
-          }
-        }
-      })
+      mockChromeStorage({ heightScale: scale, toggleSetting: 'both' })
     } else {
       localStorage.setItem('heightScale', scale)
       localStorage.setItem('toggleSetting', 'both')
@@ -147,7 +151,11 @@ it.each([
     showCalendar(outlierCalendar())
     await import('./iso.js')
     await vi.waitFor(() => expect(renderedHeights).toEqual(heights))
-    expect(document.getElementById('ic-height-scale').value).toBe(scale)
+    expect(
+      document
+        .getElementById('isometric-contributions')
+        .getAttribute('aria-label')
+    ).toContain(scale.replace('-', ' '))
     expect(
       document.querySelector('.js-yearly-contributions').classList
     ).toContain('ic-both')
@@ -156,15 +164,6 @@ it.each([
     showCalendar(outlierCalendar())
     onNavigate()
     expect(renderedHeights).toEqual(heights)
-    const select = document.getElementById('ic-height-scale')
-    expect(select.value).toBe(scale)
-    select.value = 'linear'
-    select.dispatchEvent(new Event('change'))
-    if (storageType === 'chrome.storage.local') {
-      expect(storageSet).toHaveBeenCalledWith({ heightScale: 'linear' })
-    } else {
-      expect(localStorage.getItem('heightScale')).toBe('linear')
-    }
     expect(
       document.querySelector('.js-yearly-contributions').classList
     ).toContain('ic-both')
@@ -176,7 +175,36 @@ it('falls back to linear for an unrecognized stored height scale', async () => {
   showCalendar(outlierCalendar())
   await import('./iso.js')
   await vi.waitFor(() => expect(renderedHeights).toEqual([3, 4, 103]))
-  expect(document.getElementById('ic-height-scale').value).toBe('linear')
+  expect(
+    document
+      .getElementById('isometric-contributions')
+      .getAttribute('aria-label')
+  ).toContain('linear')
+})
+
+it('ignores unrelated storage changes and resets a removed setting to linear', async () => {
+  const notify = mockChromeStorage({ heightScale: 'square-root' })
+  showCalendar(outlierCalendar())
+  await import('./iso.js')
+  await vi.waitFor(() => expect(renderedHeights).toEqual([3, 15, 103]))
+  notify({ heightScale: { newValue: 'logarithmic' } }, 'sync')
+  notify({ toggleSetting: { newValue: 'squares' } })
+  notify({ heightScale: { newValue: 'square-root' } })
+  expect(clearChart).toHaveBeenCalledTimes(1)
+  notify({ heightScale: { oldValue: 'square-root' } })
+  expect(renderedHeights).toEqual([3, 4, 103])
+})
+
+it('remembers changes made while no chart is present for the next profile', async () => {
+  const notify = mockChromeStorage()
+  await import('./iso.js')
+  await vi.waitFor(() => expect(onNavigate).toBeTypeOf('function'))
+  expect(() =>
+    notify({ heightScale: { newValue: 'logarithmic' } })
+  ).not.toThrow()
+  showCalendar(outlierCalendar())
+  onNavigate()
+  expect(renderedHeights).toEqual([3, 40, 103])
 })
 
 it.each(['another profile', 'another year on the same profile'])(

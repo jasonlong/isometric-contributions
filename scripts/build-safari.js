@@ -25,34 +25,39 @@ const SOURCE_FILES = [
   'iso.css',
   'obelisk.min.js',
   'icon-48.png',
-  'icon-128.png'
+  'icon-128.png',
+  'popup.html',
+  'popup.js',
+  'popup.css'
 ]
 
 function syncResources() {
   console.log('Syncing Parcel output to Safari Resources...')
 
-  const distManifest = JSON.parse(
+  const manifest = JSON.parse(
     fs.readFileSync(path.join(distDir, 'manifest.json'), 'utf8')
   )
-
-  // Build a map from hashed filenames back to original names
-  const hashToOriginal = new Map()
-
-  for (const cs of distManifest.content_scripts || []) {
-    for (const hashedName of [...(cs.js || []), ...(cs.css || [])]) {
-      const original = SOURCE_FILES.find((f) => {
-        const base = f.replace(/\.[^.]+$/, '')
-        const ext = f.slice(f.lastIndexOf('.'))
-        return hashedName.startsWith(base) && hashedName.endsWith(ext)
-      })
-      if (original) {
-        hashToOriginal.set(hashedName, original)
-      }
+  const assets = new Set([
+    ...Object.values(manifest.icons || {}),
+    ...(manifest.content_scripts || []).flatMap((script) => [
+      ...(script.js || []),
+      ...(script.css || [])
+    ])
+  ])
+  if (manifest.action?.default_popup) {
+    assets.add(manifest.action.default_popup)
+    const popup = fs.readFileSync(
+      path.join(distDir, manifest.action.default_popup),
+      'utf8'
+    )
+    for (const [, asset] of popup.matchAll(/\b(?:src|href)=["']?([^"' >]+)/g)) {
+      assets.add(asset.replace(/^\//, ''))
     }
   }
 
-  const icons = distManifest.icons || {}
-  for (const hashedName of Object.values(icons)) {
+  // Build a map from hashed filenames back to original names
+  const hashToOriginal = new Map()
+  for (const hashedName of assets) {
     const original = SOURCE_FILES.find((f) => {
       const base = f.replace(/\.[^.]+$/, '')
       const ext = f.slice(f.lastIndexOf('.'))
@@ -68,7 +73,17 @@ function syncResources() {
     const src = path.join(distDir, hashed)
     const dest = path.join(resourcesDir, original)
     if (fs.existsSync(src)) {
-      fs.copyFileSync(src, dest)
+      if (/\.(html|js|css)$/.test(original)) {
+        let content = fs.readFileSync(src, 'utf8')
+        for (const [hashedName, originalName] of hashToOriginal) {
+          content = content
+            .replaceAll(`/${hashedName}`, originalName)
+            .replaceAll(hashedName, originalName)
+        }
+        fs.writeFileSync(dest, content)
+      } else {
+        fs.copyFileSync(src, dest)
+      }
       console.log(`  ${hashed} -> ${original}`)
     } else {
       console.error(`  WARNING: ${src} not found`)

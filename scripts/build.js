@@ -40,6 +40,11 @@ function transformForFirefox(manifest) {
   // eslint-disable-next-line camelcase
   v2.manifest_version = 2
 
+  if (v2.action) {
+    v2.browser_action = v2.action
+    delete v2.action
+  }
+
   // Move host_permissions into permissions (v2 doesn't have host_permissions)
   if (v2.host_permissions) {
     v2.permissions = [...(v2.permissions || []), ...v2.host_permissions]

@@ -1,4 +1,5 @@
 import { fetchExtendedStreakData } from './history.js'
+import { HEIGHT_SCALES, normalizeHeightScale } from './settings.js'
 import {
   applyViewType,
   calculateStreaks,
@@ -13,23 +14,6 @@ import {
   sameDay,
   saveSetting
 } from './utils.js'
-
-const HEIGHT_SCALES = {
-  linear: {
-    label: 'Linear',
-    description: 'Linear heights are proportional to contribution counts.'
-  },
-  'square-root': {
-    label: 'Square root',
-    description:
-      'Square-root heights give everyday activity a moderate boost while keeping contribution peaks distinct.'
-  },
-  logarithmic: {
-    label: 'Logarithmic',
-    description:
-      'Logarithmic heights keep everyday activity visible alongside contribution peaks.'
-  }
-}
 
 const dateFormat = new Intl.DateTimeFormat('en-US', {
   month: 'short',
@@ -114,9 +98,7 @@ const getSettings = async () => {
     'heightScale',
     'linear'
   )
-  heightScale = Object.hasOwn(HEIGHT_SCALES, savedHeightScale)
-    ? savedHeightScale
-    : 'linear'
+  heightScale = normalizeHeightScale(savedHeightScale)
   return 'Settings loaded'
 }
 
@@ -211,30 +193,6 @@ const initUI = () => {
   canvas.height = 600
   canvas.style.width = '100%'
   contributionsWrapper.append(canvas)
-
-  const scaleLabel = document.createElement('label')
-  scaleLabel.className =
-    'position-absolute bottom-0 right-0 mr-5 mb-3 text-small'
-  scaleLabel.htmlFor = 'ic-height-scale'
-  scaleLabel.textContent = 'Height scale:'
-
-  const scaleSelect = document.createElement('select')
-  scaleSelect.id = 'ic-height-scale'
-  scaleSelect.className = 'form-select form-select-sm ml-1'
-  for (const [value, { label }] of Object.entries(HEIGHT_SCALES)) {
-    const option = document.createElement('option')
-    option.value = value
-    option.textContent = label
-    scaleSelect.append(option)
-  }
-  scaleSelect.value = heightScale
-  scaleSelect.addEventListener('change', (event) => {
-    heightScale = event.target.value
-    persistSetting('heightScale', heightScale)
-    renderIsometricChart()
-  })
-  scaleLabel.append(scaleSelect)
-  contributionsWrapper.append(scaleLabel)
 
   // Inject toggle
   const heading = contributionsBox.querySelector('h2')
@@ -425,7 +383,6 @@ const renderIsometricChart = () => {
     `Contribution chart with ${scale.label.toLowerCase()} bar heights`
   )
   canvas.title = scale.description
-  document.getElementById('ic-height-scale').title = canvas.title
   const point = new obelisk.Point(130, 90)
   const pixelView = new obelisk.PixelView(canvas, point)
   pixelView.clear()
@@ -540,6 +497,18 @@ const generateIsometricChart = () => {
   }
 
   await getSettings()
+
+  if (typeof chrome !== 'undefined' && chrome.storage?.onChanged) {
+    chrome.storage.onChanged.addListener((changes, areaName) => {
+      if (areaName !== 'local' || !changes.heightScale) return
+      const nextScale = normalizeHeightScale(changes.heightScale.newValue)
+      if (heightScale === nextScale) return
+      heightScale = nextScale
+      if (document.querySelector('.ic-contributions-wrapper')) {
+        renderIsometricChart()
+      }
+    })
+  }
 
   globalThis
     .matchMedia('(prefers-color-scheme: dark)')

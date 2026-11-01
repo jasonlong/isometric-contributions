@@ -3,6 +3,14 @@
   "name": "Isometric Contributions",
   "version": "1.2.8",
   "description": "Renders an isometric pixel view of GitHub contribution graphs.",
+  "action": {
+    "default_title": "Isometric Contributions settings",
+    "default_popup": "popup.html",
+    "default_icon": {
+      "48": "icon-48.png",
+      "128": "icon-128.png"
+    }
+  },
   "content_scripts": [
     {
       "css": ["iso.css"],

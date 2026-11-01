@@ -13,13 +13,13 @@ Besides being sort of neat looking, this view is interesting in that it highligh
 
 ## Height scale
 
-Use the **Height scale** selector in the 3D or Both view to choose how bar heights represent daily contributions:
+Click the extension's toolbar icon to open its settings menu. Under **Height scale**, choose how bar heights represent daily contributions:
 
 - **Linear** (default): heights are proportional to contribution counts.
 - **Square root**: gives everyday activity a moderate boost while keeping peaks distinct. A gentler adjustment than logarithmic scaling, with less crowding from tall neighboring bars.
 - **Logarithmic**: reduces the visual impact of unusually busy days so everyday activity is easier to see.
 
-Your choice is saved across profiles, years, and page reloads. All three scales keep inactive days flat and the busiest day at the maximum height. Square-root and logarithmic heights are not proportional to counts. Contribution counts, statistics, and GitHub's square colors stay unchanged.
+Open GitHub charts update immediately when you change the setting. Your choice is saved across profiles, years, and page reloads. All three scales keep inactive days flat and the busiest day at the maximum height. Square-root and logarithmic heights are not proportional to counts. Contribution counts, statistics, and GitHub's square colors stay unchanged.
 
 ## Installation
 
