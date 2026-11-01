@@ -3,11 +3,11 @@
 // =============================================================================
 
 /**
- * Scale bar heights linearly by default, or logarithmically to soften peaks.
- * In either mode, zero stays flat and the busiest day reaches maximum height.
+ * Scale bar heights linearly by default, or soften peaks with a root or log.
+ * In every mode, zero stays flat and the busiest day reaches maximum height.
  * @param {number} count - Contributions on this day
  * @param {number} maxCount - Contributions on the busiest visible day
- * @param {'linear'|'logarithmic'} scale - Height scale
+ * @param {'linear'|'square-root'|'logarithmic'} scale - Height scale
  * @param {number} maxHeight - Available height above the three-pixel base
  * @returns {number} Bar height in pixels
  */
@@ -27,10 +27,13 @@ export const contributionHeight = (
   }
 
   const clampedCount = Math.min(count, maxCount)
-  const scaledCount =
-    scale === 'logarithmic' ? Math.log1p(clampedCount) : clampedCount
-  const scaledMax = scale === 'logarithmic' ? Math.log1p(maxCount) : maxCount
-  return 3 + Math.floor((maxHeight * scaledCount) / scaledMax)
+  let ratio = clampedCount / maxCount
+  if (scale === 'square-root') {
+    ratio = Math.sqrt(ratio)
+  } else if (scale === 'logarithmic') {
+    ratio = Math.log1p(clampedCount) / Math.log1p(maxCount)
+  }
+  return 3 + Math.floor(maxHeight * ratio)
 }
 
 /**

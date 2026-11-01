@@ -78,64 +78,76 @@ const outlierCalendar = () => [
   day('2024-01-03', 609)
 ]
 
-it('switches height scales, clears old bars, and preserves counts and colors', async () => {
-  showCalendar(outlierCalendar())
-  await import('./iso.js')
-  await vi.waitFor(() => expect(renderedHeights).toEqual([3, 4, 103]))
+it.each([
+  ['square-root', 'Square root', [3, 15, 103]],
+  ['logarithmic', 'Logarithmic', [3, 40, 103]]
+])(
+  'switches to %s and back while preserving counts and colors',
+  async (scale, label, heights) => {
+    showCalendar(outlierCalendar())
+    await import('./iso.js')
+    await vi.waitFor(() => expect(renderedHeights).toEqual([3, 4, 103]))
 
-  const select = document.getElementById('ic-height-scale')
-  const canvas = document.getElementById('isometric-contributions')
-  const stats = document.querySelector('.ic-contributions-wrapper > div')
-  const originalStats = stats.textContent
-  const originalCalendar =
-    document.querySelector('.js-calendar-graph').innerHTML
-  expect(select.labels[0].textContent).toContain('Height scale:')
-  expect(select.value).toBe('linear')
-  expect(canvas.getAttribute('aria-label')).toContain('linear')
-  expect(clearChart).toHaveBeenCalledTimes(1)
+    const select = document.getElementById('ic-height-scale')
+    const canvas = document.getElementById('isometric-contributions')
+    const stats = document.querySelector('.ic-contributions-wrapper > div')
+    const originalStats = stats.textContent
+    const originalCalendar =
+      document.querySelector('.js-calendar-graph').innerHTML
+    expect(select.labels[0].textContent).toContain('Height scale:')
+    expect(select.value).toBe('linear')
+    expect(canvas.getAttribute('aria-label')).toContain('linear')
+    expect(clearChart).toHaveBeenCalledTimes(1)
 
-  select.value = 'logarithmic'
-  select.dispatchEvent(new Event('change'))
-  expect(renderedHeights).toEqual([3, 40, 103])
-  expect(clearChart).toHaveBeenCalledTimes(2)
-  expect(localStorage.getItem('heightScale')).toBe('logarithmic')
-  expect(canvas.getAttribute('aria-label')).toContain('logarithmic')
-  expect(select.title).toContain('Logarithmic')
-  expect(stats.textContent).toBe(originalStats)
-  expect(document.querySelector('.js-calendar-graph').innerHTML).toBe(
-    originalCalendar
-  )
+    select.value = scale
+    select.dispatchEvent(new Event('change'))
+    expect(renderedHeights).toEqual(heights)
+    expect(clearChart).toHaveBeenCalledTimes(2)
+    expect(localStorage.getItem('heightScale')).toBe(scale)
+    expect(canvas.getAttribute('aria-label')).toContain(label.toLowerCase())
+    expect(select.title).toBe(canvas.title)
+    expect(select.title).not.toBe('')
+    expect(stats.textContent).toBe(originalStats)
+    expect(document.querySelector('.js-calendar-graph').innerHTML).toBe(
+      originalCalendar
+    )
 
-  select.value = 'linear'
-  select.dispatchEvent(new Event('change'))
-  expect(renderedHeights).toEqual([3, 4, 103])
-  expect(clearChart).toHaveBeenCalledTimes(3)
-  expect(localStorage.getItem('heightScale')).toBe('linear')
-  expect(canvas.getAttribute('aria-label')).toContain('linear')
-})
+    select.value = 'linear'
+    select.dispatchEvent(new Event('change'))
+    expect(renderedHeights).toEqual([3, 4, 103])
+    expect(clearChart).toHaveBeenCalledTimes(3)
+    expect(localStorage.getItem('heightScale')).toBe('linear')
+    expect(canvas.getAttribute('aria-label')).toContain('linear')
+  }
+)
 
-it.each(['localStorage', 'chrome.storage.local'])(
-  'restores a logarithmic preference from %s and keeps it after navigation',
-  async (storageType) => {
+it.each([
+  ['localStorage', 'square-root', [3, 15, 103]],
+  ['chrome.storage.local', 'square-root', [3, 15, 103]],
+  ['localStorage', 'logarithmic', [3, 40, 103]],
+  ['chrome.storage.local', 'logarithmic', [3, 40, 103]]
+])(
+  'restores a %s preference for %s and keeps it after navigation',
+  async (storageType, scale, heights) => {
     const storageSet = vi.fn()
     if (storageType === 'chrome.storage.local') {
       vi.stubGlobal('chrome', {
         storage: {
           local: {
             get: (_keys, callback) =>
-              callback({ heightScale: 'logarithmic', toggleSetting: 'both' }),
+              callback({ heightScale: scale, toggleSetting: 'both' }),
             set: storageSet
           }
         }
       })
     } else {
-      localStorage.setItem('heightScale', 'logarithmic')
+      localStorage.setItem('heightScale', scale)
       localStorage.setItem('toggleSetting', 'both')
     }
     showCalendar(outlierCalendar())
     await import('./iso.js')
-    await vi.waitFor(() => expect(renderedHeights).toEqual([3, 40, 103]))
-    expect(document.getElementById('ic-height-scale').value).toBe('logarithmic')
+    await vi.waitFor(() => expect(renderedHeights).toEqual(heights))
+    expect(document.getElementById('ic-height-scale').value).toBe(scale)
     expect(
       document.querySelector('.js-yearly-contributions').classList
     ).toContain('ic-both')
@@ -143,9 +155,9 @@ it.each(['localStorage', 'chrome.storage.local'])(
     window.history.replaceState(null, '', '/new-profile')
     showCalendar(outlierCalendar())
     onNavigate()
-    expect(renderedHeights).toEqual([3, 40, 103])
+    expect(renderedHeights).toEqual(heights)
     const select = document.getElementById('ic-height-scale')
-    expect(select.value).toBe('logarithmic')
+    expect(select.value).toBe(scale)
     select.value = 'linear'
     select.dispatchEvent(new Event('change'))
     if (storageType === 'chrome.storage.local') {

@@ -14,6 +14,23 @@ import {
   saveSetting
 } from './utils.js'
 
+const HEIGHT_SCALES = {
+  linear: {
+    label: 'Linear',
+    description: 'Linear heights are proportional to contribution counts.'
+  },
+  'square-root': {
+    label: 'Square root',
+    description:
+      'Square-root heights give everyday activity a moderate boost while keeping contribution peaks distinct.'
+  },
+  logarithmic: {
+    label: 'Logarithmic',
+    description:
+      'Logarithmic heights keep everyday activity visible alongside contribution peaks.'
+  }
+}
+
 const dateFormat = new Intl.DateTimeFormat('en-US', {
   month: 'short',
   day: 'numeric',
@@ -97,7 +114,9 @@ const getSettings = async () => {
     'heightScale',
     'linear'
   )
-  heightScale = savedHeightScale === 'logarithmic' ? 'logarithmic' : 'linear'
+  heightScale = Object.hasOwn(HEIGHT_SCALES, savedHeightScale)
+    ? savedHeightScale
+    : 'linear'
   return 'Settings loaded'
 }
 
@@ -202,13 +221,10 @@ const initUI = () => {
   const scaleSelect = document.createElement('select')
   scaleSelect.id = 'ic-height-scale'
   scaleSelect.className = 'form-select form-select-sm ml-1'
-  for (const [value, text] of [
-    ['linear', 'Linear'],
-    ['logarithmic', 'Logarithmic']
-  ]) {
+  for (const [value, { label }] of Object.entries(HEIGHT_SCALES)) {
     const option = document.createElement('option')
     option.value = value
-    option.textContent = text
+    option.textContent = label
     scaleSelect.append(option)
   }
   scaleSelect.value = heightScale
@@ -403,14 +419,12 @@ const renderIsometricChart = () => {
   const MAX_HEIGHT = 100
   const GH_OFFSET = 14
   const canvas = document.querySelector('#isometric-contributions')
+  const scale = HEIGHT_SCALES[heightScale]
   canvas.setAttribute(
     'aria-label',
-    `Contribution chart with ${heightScale} bar heights`
+    `Contribution chart with ${scale.label.toLowerCase()} bar heights`
   )
-  canvas.title =
-    heightScale === 'logarithmic'
-      ? 'Logarithmic heights keep everyday activity visible alongside contribution peaks.'
-      : 'Linear heights are proportional to contribution counts.'
+  canvas.title = scale.description
   document.getElementById('ic-height-scale').title = canvas.title
   const point = new obelisk.Point(130, 90)
   const pixelView = new obelisk.PixelView(canvas, point)

@@ -17,11 +17,12 @@ describe('contributionHeight', () => {
   })
 
   it('keeps ordinary activity visible beside a 609-contribution outlier', () => {
+    expect(contributionHeight(10, 609, 'square-root')).toBe(15)
     expect(contributionHeight(10, 609, 'logarithmic')).toBe(40)
     expect(contributionHeight(609, 609, 'logarithmic')).toBe(103)
   })
 
-  it.each(['linear', 'logarithmic'])(
+  it.each(['linear', 'square-root', 'logarithmic'])(
     '%s preserves ordering and stays within the available height',
     (scale) => {
       const heights = Array.from({ length: 610 }, (_, count) =>
@@ -37,7 +38,7 @@ describe('contributionHeight', () => {
     }
   )
 
-  it.each(['linear', 'logarithmic'])(
+  it.each(['linear', 'square-root', 'logarithmic'])(
     '%s handles empty activity, unavailable counts, and a single-count year',
     (scale) => {
       expect(contributionHeight(0, 609, scale)).toBe(3)
