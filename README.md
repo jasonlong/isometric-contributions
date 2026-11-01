@@ -11,6 +11,15 @@ Besides being sort of neat looking, this view is interesting in that it highligh
 
 <img src="img/preview-dark.png" width="1052" />
 
+## Height scale
+
+Use the **Height scale** selector in the 3D or Both view to choose how bar heights represent daily contributions:
+
+- **Linear** (default): heights are proportional to contribution counts.
+- **Logarithmic**: reduces the visual impact of unusually busy days so everyday activity is easier to see. Heights are no longer proportional to counts.
+
+Your choice is saved across profiles, years, and page reloads. Both scales keep inactive days flat and the busiest day at the maximum height. Contribution counts, statistics, and GitHub's square colors stay unchanged.
+
 ## Installation
 
 ### Chrome/Brave

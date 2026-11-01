@@ -2,6 +2,7 @@ import { fetchExtendedStreakData } from './history.js'
 import {
   applyViewType,
   calculateStreaks,
+  contributionHeight,
   datesDayDifference,
   generateContributionsMarkup,
   generateStreaksMarkup,
@@ -53,6 +54,7 @@ let datesLongest = null
 let datesCurrent = null
 let dateBest = null
 let toggleSetting = 'cubes'
+let heightScale = 'linear'
 let chartGeneration = 0
 let historyRequest = null
 
@@ -90,6 +92,12 @@ const getStorage = () => {
 
 const getSettings = async () => {
   toggleSetting = await loadSetting(getStorage(), 'toggleSetting', 'cubes')
+  const savedHeightScale = await loadSetting(
+    getStorage(),
+    'heightScale',
+    'linear'
+  )
+  heightScale = savedHeightScale === 'logarithmic' ? 'logarithmic' : 'linear'
   return 'Settings loaded'
 }
 
@@ -184,6 +192,33 @@ const initUI = () => {
   canvas.height = 600
   canvas.style.width = '100%'
   contributionsWrapper.append(canvas)
+
+  const scaleLabel = document.createElement('label')
+  scaleLabel.className =
+    'position-absolute bottom-0 right-0 mr-5 mb-3 text-small'
+  scaleLabel.htmlFor = 'ic-height-scale'
+  scaleLabel.textContent = 'Height scale:'
+
+  const scaleSelect = document.createElement('select')
+  scaleSelect.id = 'ic-height-scale'
+  scaleSelect.className = 'form-select form-select-sm ml-1'
+  for (const [value, text] of [
+    ['linear', 'Linear'],
+    ['logarithmic', 'Logarithmic']
+  ]) {
+    const option = document.createElement('option')
+    option.value = value
+    option.textContent = text
+    scaleSelect.append(option)
+  }
+  scaleSelect.value = heightScale
+  scaleSelect.addEventListener('change', (event) => {
+    heightScale = event.target.value
+    persistSetting('heightScale', heightScale)
+    renderIsometricChart()
+  })
+  scaleLabel.append(scaleSelect)
+  contributionsWrapper.append(scaleLabel)
 
   // Inject toggle
   const heading = contributionsBox.querySelector('h2')
@@ -368,8 +403,18 @@ const renderIsometricChart = () => {
   const MAX_HEIGHT = 100
   const GH_OFFSET = 14
   const canvas = document.querySelector('#isometric-contributions')
+  canvas.setAttribute(
+    'aria-label',
+    `Contribution chart with ${heightScale} bar heights`
+  )
+  canvas.title =
+    heightScale === 'logarithmic'
+      ? 'Logarithmic heights keep everyday activity visible alongside contribution peaks.'
+      : 'Linear heights are proportional to contribution counts.'
+  document.getElementById('ic-height-scale').title = canvas.title
   const point = new obelisk.Point(130, 90)
   const pixelView = new obelisk.PixelView(canvas, point)
+  pixelView.clear()
 
   let transform = GH_OFFSET
 
@@ -380,15 +425,12 @@ const renderIsometricChart = () => {
     for (const d of w) {
       const y = offsetY / GH_OFFSET
       offsetY += 13
-      const currentDayCount = d.count
-      let cubeHeight = 3
-
-      if (maxCount > 0) {
-        cubeHeight += Number.parseInt(
-          (MAX_HEIGHT / maxCount) * currentDayCount,
-          10
-        )
-      }
+      const cubeHeight = contributionHeight(
+        d.count,
+        maxCount,
+        heightScale,
+        MAX_HEIGHT
+      )
 
       const dimension = new obelisk.CubeDimension(SIZE, SIZE, cubeHeight)
       const color = new obelisk.CubeColor().getByHorizontalColor(

@@ -1,12 +1,52 @@
 import { describe, expect, it } from 'vitest'
 import {
   calculateStreaks,
+  contributionHeight,
   datesDayDifference,
   getContributionCount,
   precisionRound,
   rgbToHex,
   sameDay
 } from './utils.js'
+
+describe('contributionHeight', () => {
+  it('keeps linear scaling as the default', () => {
+    expect(contributionHeight(10, 609)).toBe(4)
+    expect(contributionHeight(50, 100, 'linear')).toBe(53)
+    expect(contributionHeight(100, 100)).toBe(103)
+  })
+
+  it('keeps ordinary activity visible beside a 609-contribution outlier', () => {
+    expect(contributionHeight(10, 609, 'logarithmic')).toBe(40)
+    expect(contributionHeight(609, 609, 'logarithmic')).toBe(103)
+  })
+
+  it.each(['linear', 'logarithmic'])(
+    '%s preserves ordering and stays within the available height',
+    (scale) => {
+      const heights = Array.from({ length: 610 }, (_, count) =>
+        contributionHeight(count, 609, scale)
+      )
+      expect(heights[0]).toBe(3)
+      expect(heights.at(-1)).toBe(103)
+      expect(
+        heights.every((height, i) => i === 0 || height >= heights[i - 1])
+      ).toBe(true)
+      expect(contributionHeight(700, 609, scale)).toBe(103)
+      expect(contributionHeight(609, 609, scale, 50)).toBe(53)
+    }
+  )
+
+  it.each(['linear', 'logarithmic'])(
+    '%s handles empty activity, unavailable counts, and a single-count year',
+    (scale) => {
+      expect(contributionHeight(0, 609, scale)).toBe(3)
+      expect(contributionHeight(0, 0, scale)).toBe(3)
+      expect(contributionHeight(undefined, 609, scale)).toBe(3)
+      expect(contributionHeight(1, 1, scale)).toBe(103)
+    }
+  )
+})
 
 describe('precisionRound', () => {
   it('rounds to 0 decimal places', () => {
