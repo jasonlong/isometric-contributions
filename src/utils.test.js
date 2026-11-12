@@ -149,6 +149,12 @@ describe('getContributionCount', () => {
     )
   })
 
+  it('parses capped contributions as their lower bound', () => {
+    expect(getContributionCount('100+ contributions on November 12th.')).toBe(
+      100
+    )
+  })
+
   it('returns 0 for non-matching text', () => {
     expect(getContributionCount('Some random text')).toBe(0)
     expect(getContributionCount('')).toBe(0)

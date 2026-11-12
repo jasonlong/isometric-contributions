@@ -58,11 +58,12 @@ export const sameDay = (d1, d2) => d1.toDateString() === d2.toDateString()
  * - "No contributions on January 9th"
  * - "1 contribution on January 10th."
  * - "2 contributions on August 31st."
+ * - "100+ contributions on November 12th." (a lower bound)
  * @param {string} text - The tooltip text content
  * @returns {number} The contribution count (0 if no match or "No contributions")
  */
 export const getContributionCount = (text) => {
-  const contributionMatches = text.match(/(\d+|No) contributions? on/)
+  const contributionMatches = text.match(/(\d+|No)\+? contributions? on/)
   if (!contributionMatches) {
     return 0
   }
