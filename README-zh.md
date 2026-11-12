@@ -11,6 +11,8 @@
 
 <img src="img/preview.png" width="747" alt="浅色主题下高亮的贡献柱体，以及显示日期和贡献数的浮窗" />
 
+<img src="img/preview-dark.png" width="747" alt="深色主题下高亮的贡献柱体，以及显示日期和贡献数的浮窗" />
+
 ## 安装方式
 
 ### Chrome / Brave
