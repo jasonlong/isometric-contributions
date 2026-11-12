@@ -9,6 +9,8 @@ Besides being sort of neat looking, this view is interesting in that it highligh
 
 <img src="img/preview.png" width="1052" />
 
+<img src="img/preview-dark.png" width="747" alt="Dark theme with a highlighted contribution bar and its date and count tooltip" />
+
 ## Installation
 
 ### Chrome/Brave
